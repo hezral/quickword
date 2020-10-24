@@ -1,3 +1,7 @@
+@define-color shaded_dark shade(@theme_base_color, 0.87);
+@define-color shaded_darker shade(@theme_base_color, 0.85);
+@define-color shaded_base shade(@theme_base_color, 0.98);
+
 .lookup-word-header {
     letter-spacing: 1px;
     font-size: large;
@@ -14,4 +18,21 @@ headerbar > label:backdrop {
 color: white;
 }
 
+.section-header {
+    font-weight: bold;
+    }
+    
+.section-sub-header {
+    font-style: italic;
+    color: gray;
+    font-size: 0.9em;
+}
 
+.stack-settings, .headerbar-settings {
+    background-color: @shaded_dark;
+}
+
+.settings-frame {
+    background-color: @shaded_darker;
+    border-radius: 4px;
+}

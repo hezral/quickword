@@ -31,8 +31,7 @@ class QuickWordWindow(Gtk.ApplicationWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        #-- objects --------#
-        gio_settings = Gio.Settings(schema_id="com.github.hezral.quickword")
+
 
         #-- constants --------#
         self.LOOKUP_WORD = "QuickWord"
@@ -57,11 +56,14 @@ class QuickWordWindow(Gtk.ApplicationWindow):
         word_label.get_style_context().add_class("lookup-word-header")
 
         #------ view switch ----#
-        view_switch = Granite.ModeSwitch.from_icon_name("preferences-desktop-locale-symbolic", "preferences-system-symbolic")
+        icon_theme = Gtk.IconTheme.get_default()
+        icon_theme.prepend_search_path('data/icons')
+        view_switch = Granite.ModeSwitch.from_icon_name("com.github.hezral.quickwork-symbolic", "preferences-system-symbolic")
         view_switch.props.primary_icon_tooltip_text = "Word Lookup"
         view_switch.props.secondary_icon_tooltip_text = "Settings"
         view_switch.props.valign = Gtk.Align.CENTER
         view_switch.bind_property("active", settings, "visible", GObject.BindingFlags.BIDIRECTIONAL)
+
 
         #-- header construct--------#
         headerbar = Gtk.HeaderBar()
@@ -72,6 +74,10 @@ class QuickWordWindow(Gtk.ApplicationWindow):
         headerbar.get_style_context().add_class("default-decoration")
         headerbar.get_style_context().add_class(Gtk.STYLE_CLASS_FLAT)
 
+        #-- objects --------#
+        gio_settings = Gio.Settings(schema_id="com.github.hezral.quickword")
+
+
         #-- window construct--------#
         self.props.resizable = True
         # self.props.skip_taskbar_hint = True
@@ -81,13 +87,17 @@ class QuickWordWindow(Gtk.ApplicationWindow):
         #self.props.default_height = 500
         #self.props.default_width = 500
         self.set_keep_above(True)
-        self.props.border_width = 20
+        #self.props.border_width = 20
         self.get_style_context().add_class("rounded")
         self.set_size_request(500, 500)
         self.props.window_position = Gtk.WindowPosition.MOUSE
         self.set_titlebar(headerbar)
         self.add(stack)
         self.state_flags_changed_count = 0
+        if gio_settings.get_value("close-on-focus-out"):
+            self.state_flags_on = self.connect("state-flags-changed", self.on_focus_out)
+            print('state-flags-on')
+        
 
     def on_settings_view_visible(self, widget, gparam):
         # get window children
@@ -100,17 +110,21 @@ class QuickWordWindow(Gtk.ApplicationWindow):
                 if widget.is_visible():
                     widget.show_all()
                     stack.set_visible_child_full(name='settings_view', transition=Gtk.StackTransitionType.CROSSFADE)
+                    stack.get_style_context().add_class("stack-settings")
                 else:
                     widget.hide()
                     stack.set_visible_child_full(name='word_view', transition=Gtk.StackTransitionType.CROSSFADE)
+                    stack.get_style_context().remove_class("stack-settings")
             if isinstance(child, Gtk.HeaderBar):
                 headerbar = child
                 for child in headerbar.get_children():
                     if isinstance(child, Gtk.Label):
-                        if child.get_label() == "QuickWord Settings":
+                        if child.get_label() == "Settings":
                             child.props.label = self.LOOKUP_WORD
+                            headerbar.get_style_context().remove_class("headerbar-settings")
                         else:
-                            child.props.label = "QuickWord Settings"
+                            child.props.label = "Settings"
+                            headerbar.get_style_context().add_class("headerbar-settings")
 
 
     def on_focus_out(self, widget, event):
@@ -133,8 +147,10 @@ class WordView(Gtk.Grid):
 
         #-- view construct--------#
         self.props.name = 'word_view'
+        self.get_style_context().add_class(self.props.name)
         self.props.visible = True
         self.props.expand = True
+        self.props.margin = 20
         self.props.row_spacing = 12
         self.props.column_spacing = 6
 
@@ -151,7 +167,7 @@ class WordSection(Gtk.Grid):
         
         self.props.name = name
         self.props.hexpand = True
-        self.props.row_spacing = 10
+        self.props.row_spacing = 6
         self.props.column_spacing = 6
 
         #-- header -------#
@@ -182,10 +198,16 @@ class WordSection(Gtk.Grid):
         separator.props.valign = Gtk.Align.CENTER
 
         self.attach(header, 0, 1, 1, 1)
-        self.attach(separator, 1, 1, 4, 1)
-        self.attach(sub_header, 1, 1, 1, 1)
-        self.attach(separator, 1, 1, 4, 1)
-        self.attach(content, 0, 2, 5, 1)
+        self.attach(self.generate_separator(), 1, 1, 4, 1)
+        self.attach(sub_header, 0, 2, 1, 1)
+        self.attach(content, 0, 3, 5, 1)
+
+    def generate_separator(self):
+        separator = Gtk.Separator()
+        separator.props.hexpand = True
+        separator.props.valign = Gtk.Align.CENTER
+        return separator
+
         
 
 #------------------CLASS-SEPARATOR------------------#
@@ -193,37 +215,80 @@ class WordSection(Gtk.Grid):
 class SettingsView(Gtk.Grid):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+      
+        #-- theme switch ----#
+        theme_label = Gtk.Label("Switch between Light/Dark theme")
+        theme_label.props.halign = Gtk.Align.START
+        theme_switch = Gtk.Switch()
+        theme_switch.props.name = "theme-switch"
+        theme_switch.props.halign = Gtk.Align.END
+        theme_switch.props.hexpand = True
+        theme_switch.connect("notify::active", self.on_switch_activated)
+        theme_switch.bind_property ("active", Gtk.Settings().get_default(), "gtk_application_prefer_dark_theme", GObject.BindingFlags.INVERT_BOOLEAN)
 
         #-- close on focus out ----#
         close_on_focus_out_label = Gtk.Label("Close QuickWord if out of focus")
+        close_on_focus_out_label.props.halign = Gtk.Align.START
         close_on_focus_out_switch = Gtk.Switch()
         close_on_focus_out_switch.props.name = "close-on-focus-out"
         close_on_focus_out_switch.props.halign = Gtk.Align.END
         close_on_focus_out_switch.props.hexpand = True
         close_on_focus_out_switch.connect("notify::active", self.on_switch_activated)
+        gio_settings = Gio.Settings(schema_id="com.github.hezral.quickword")
+        gio_settings.bind ("close-on-focus-out", close_on_focus_out_switch, "active", Gio.SettingsBindFlags.DEFAULT)
+
+        grid = Gtk.Grid()
+        grid.props.margin = 8
+        grid.props.hexpand = True
+        grid.props.row_spacing = 8
+        grid.props.column_spacing = 6
+        grid.attach(theme_label, 0, 1, 1, 1)
+        grid.attach(theme_switch, 1, 1, 1, 1)
+        grid.attach(self.generate_separator(), 0, 2, 2, 1)
+        grid.attach(close_on_focus_out_label, 0, 3, 1, 1)
+        grid.attach(close_on_focus_out_switch, 1, 3, 1, 1)
+
+
+        frame = Gtk.Frame()
+        frame.get_style_context().add_class("settings-frame")
+        frame.add(grid)
+
 
         #-- view construct--------#
-        self.props.name = 'settings_view'
+        self.props.name = "settings_view"
+        self.get_style_context().add_class(self.props.name)
         # self.props.visible = False
         # self.props.no_show_all = True
         self.props.expand = True
+        self.props.margin = 20
         self.props.row_spacing = 6
         self.props.column_spacing = 6
-        self.attach(close_on_focus_out_label, 0, 1, 1, 1)
-        self.attach(close_on_focus_out_switch, 1, 1, 1, 1)
-        
+        self.attach(frame, 0, 1, 1, 1)
+
+    def generate_separator(self):
+        separator = Gtk.Separator()
+        separator.props.hexpand = True
+        separator.props.valign = Gtk.Align.CENTER
+        return separator
+
 
     def on_switch_activated(self, switch, gparam):
-        print(switch.get_name())
+        name = switch.get_name()
+        # stack = self.get_parent()
+        # window = stack.get_parent()
+        print(self)
 
-        window = self.get_parent().get_parent()
+        if self.is_visible():
+            print('visible')
+            print(self.get_parent())
+            print(self.get_parent().get_parent())
 
-        print(window)
+        # gio_settings = Gio.Settings(schema_id="com.github.hezral.quickword")
 
-        # if switch.get_active():
+        # if name == "close-on-focus-out" and gio_settings.get_value("close-on-focus-out") == "true":
         #     window.state_flags_on = self.connect("state-flags-changed", window.on_focus_out)
         # else:
-        #     window.disconnect(self.state_flags_on)
+        #     window.disconnect(window.state_flags_on)
 
 #------------------CLASS-SEPARATOR------------------#
 

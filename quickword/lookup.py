@@ -58,9 +58,27 @@ class WordLookup():
     
     def get_synsets(self, word):
         synsets = wn.synsets(word)
+        print(type(synsets))
+        print('Synonyms:', synsets)
+
+        for synset in synsets:
+            #print(dir(synset))
+            print(type(synset.definition()))
+            print('Definition:', synset.definition())
+            print(type(synset.examples()))
+            print('Examples:', synset.examples())
+
         return synsets
+
+# ADJ: 'a'
+# ADJ_SAT: 's'
+# ADV: 'r'
+# NOUN: 'n'
+# VERB: 'v'
 
 wd = WordLookup()
 
 
-print(wd.lookup('dog'))
+dog = wd.get_synsets('dog')
+
+print('done')
