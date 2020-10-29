@@ -39,8 +39,6 @@ class Clipboard():
         GLib.unix_signal_add(GLib.PRIORITY_DEFAULT, signal.SIGINT, Gtk.main_quit) 
 
 class ClipboardListener(Clipboard):
-    # def __init__(self):
-    #     super().__init__()
 
     def clipboard_changed(self, clipboard=None, event=None):
         if self.clipboard.wait_is_target_available(self.text_target):
@@ -58,8 +56,7 @@ class ClipboardListener(Clipboard):
         return content, valid
 
 class ClipboardCopy(Clipboard):
-    # def __init__(self):
-    #     super().__init__()
+    
     def copied(self, clipboard=None, event=None):
         print('copy')
 
