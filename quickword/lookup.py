@@ -23,62 +23,82 @@ from datetime import datetime
 import gi
 from gi.repository import GLib
 
-from nltk import data, downloader
+from nltk import data
 from nltk.corpus import wordnet as wn
+from nltk.corpus import cmudict as cm
 
-
-APPLICATION_ID = "com.github.hezral.quickword"
-
-
+from clipboard import ClipboardListener
 
 class WordLookup():
-    def __init__(self, *args, **kwargs):
+    def __init__(self, application_id=None, *args, **kwargs):
 
-        nltk_data_path = os.path.join(GLib.get_user_data_dir(), APPLICATION_ID, 'nltk_data')
+        application_id = "com.github.hezral.quickword"
+
+        nltk_data_path = os.path.join(GLib.get_user_data_dir(), application_id, 'nltk_data')
         
         data.path = [nltk_data_path]
-        downloader.download_dir = nltk_data_path
-        data_downloader = downloader.Downloader()
 
-        # check if data dir exist
-        if not os.path.exists(nltk_data_path):
-            os.makedirs(nltk_data_path)
+        self.dictionary = cm.dict()
 
-        # check if wordnet data is installed
-        if not data_downloader.is_installed('wordnet', nltk_data_path):
-            data_downloader.download('wordnet')
-
-        # check if omw data is installed for language support
-        if not data_downloader.is_installed('omw', nltk_data_path):
-            data_downloader.download('omw')
-
-        # check if any data is stale and update it
-        if data_downloader.is_stale('wordnet', nltk_data_path) and data_downloader.is_stale('omw', nltk_data_path):
-            data_downloader.update(quiet=False, prefix=nltk_data_path)
-    
     def get_synsets(self, word):
+
+        print('Word:', word)
+
+        try:
+            pronounce = self.dictionary[word]
+            print(pronounce)
+        except:
+            pass
+        
+        
         synsets = wn.synsets(word)
-        print(type(synsets))
         print('Synonyms:', synsets)
 
+
         for synset in synsets:
-            #print(dir(synset))
-            print(type(synset.definition()))
-            print('Definition:', synset.definition())
-            print(type(synset.examples()))
-            print('Examples:', synset.examples())
+
+            name = synset.name().split('.')[0]
+
+            # sometimes synset contains underscore and maybe other special characters
+            # need to remove them
+            containsSpecialChars = any(not c.isalnum() for c in name)
+            if containsSpecialChars:
+                name_removeSpecialChars = name.translate ({ord(c): " " for c in "!@#$%^&*()[]{};:,./<>?\|`~-=_+"})
+                print('Words:', name_removeSpecialChars)
+            else:
+                print('Words:',name)
+
+            definition = synset.definition()
+            print('Definition:', definition)
+
+            examples = synset.examples()
+            print('Examples:', examples)
 
         return synsets
 
+# Wordnet POS 
 # ADJ: 'a'
 # ADJ_SAT: 's'
 # ADV: 'r'
 # NOUN: 'n'
 # VERB: 'v'
 
+def lookup(clipboard=None, event=None, wd=None):
+    content, valid = clipboard_listener.clipboard_changed(clipboard)
+    if content and valid:
+        results = wd.get_synsets(content)
+        print(results)
+
 wd = WordLookup()
+clipboard_listener = ClipboardListener()
 
+# clipboard_listener.clipboard_changed()
 
-dog = wd.get_synsets('dog')
+# the lines is only for debug
+clipboard_listener.clipboard.connect("owner-change", lookup, wd)
+import gi, signal
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk, GLib
+GLib.unix_signal_add(GLib.PRIORITY_DEFAULT, signal.SIGINT, Gtk.main_quit) 
+Gtk.main()
 
-print('done')

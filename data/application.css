@@ -15,12 +15,12 @@ headerbar {
 }
 
 headerbar > label:backdrop {
-color: white;
+    color: gray;
 }
 
 .section-header {
     font-weight: bold;
-    }
+}
     
 .section-sub-header {
     font-style: italic;
@@ -35,4 +35,53 @@ color: white;
 .settings-frame {
     background-color: @shaded_darker;
     border-radius: 4px;
+}
+
+stack {
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+
+.word-view:backdrop {
+    color: gray;
+    }
+    
+.settings-view:backdrop, .settings-frame:backdrop {
+    color: gray;
+}
+
+.sub-label {
+    font-style: italic;
+    font-size: 0.9em;
+    color: gray;
+}
+
+
+.about-icon-left {
+    animation: float-left 0.5s ease-in-out infinite;
+}
+
+@keyframes float-left {
+    0% {-gtk-icon-transform: translateX(0px);}
+    50% {-gtk-icon-transform: translateX(-2px);}
+    100% {-gtk-icon-transform: translateX(0px);}
+}
+
+.about-icon-right {
+    animation: float-right 0.5s ease-in-out infinite;
+}
+
+@keyframes float-right {
+    0% {-gtk-icon-transform: translateX(0px);}
+    50% {-gtk-icon-transform: translateX(2px);}
+    100% {-gtk-icon-transform: translateX(0px);}
+}
+
+.copy-content {
+    font-size: 0.9em;
+}
+
+.copied-content {
+    font-size: 0.9em;
+    color: gray;
 }
