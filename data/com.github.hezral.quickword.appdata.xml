@@ -5,10 +5,10 @@
   <metadata_license>CC0</metadata_license>
   <project_license>GPL-3.0+</project_license>
   <name>QuickWord</name>
-  <summary>Quick and easy word definition lookups</summary>
+  <summary>Quickly lookup words on the fly</summary>
   <developer_name>Adi Hezral</developer_name>
   <description>
-    <p>Quick and easy word definition lookups that works offline. Definitions are based on Wordnet. </p>
+    <p>Quick and easy word definition lookups that works offline. Definitions are based on Wordnet (http://wordnet.princeton.edu/). </p>
     <ul>
         <li>Word definition lookup</li>
         <li>Examples of word sentences</li>
