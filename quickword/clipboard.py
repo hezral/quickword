@@ -22,25 +22,32 @@
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gdk, GLib
+from gi.repository import Gtk, Gdk
 
-import signal
+
 
 class Clipboard():
-    def __init__(self):
+    def __init__(self, atom_type):
+        
         # create clipboard
-        self.clipboard = Gtk.Clipboard.get(Gdk.SELECTION_PRIMARY)
+        self.clipboard = Gtk.Clipboard.get(atom_type)
+
         # target type to listen for
         self.text_target = Gdk.Atom.intern('text/plain', False)
 
-        # this line is only for debug
-        self.clipboard.connect("owner-change", self.clipboard_changed)
-        # this line is only for debug
-        GLib.unix_signal_add(GLib.PRIORITY_DEFAULT, signal.SIGINT, Gtk.main_quit) 
 
 class ClipboardListener(Clipboard):
+    def __init__(self, *args, **kwargs):
+        super().__init__(atom_type=Gdk.SELECTION_PRIMARY, *args, **kwargs)
+        
+        # # this line is only for debug
+        # self.clipboard.connect("owner-change", self.copy_selected_text)
+        # # this line is only for debug
+        # import signal
+        # from gi.repository import GLib
+        # GLib.unix_signal_add(GLib.PRIORITY_DEFAULT, signal.SIGINT, Gtk.main_quit) 
 
-    def clipboard_changed(self, clipboard=None, event=None):
+    def copy_selected_text(self, clipboard=None, event=None):
         if self.clipboard.wait_is_target_available(self.text_target):
             content = self.clipboard.wait_for_text()
             # avoid returning multi-word selections
@@ -56,10 +63,20 @@ class ClipboardListener(Clipboard):
         return content, valid
 
 class ClipboardCopy(Clipboard):
-    
-    def copied(self, clipboard=None, event=None):
-        print('copy')
+    def __init__(self, *args, **kwargs):
+        super().__init__(atom_type=Gdk.SELECTION_CLIPBOARD, *args, **kwargs)
 
-# this line is only for debug
-clips = ClipboardListener()
-Gtk.main()
+    def copy_to_clipboard(self, text_to_copy):
+        self.clipboard.set_text(text_to_copy, -1)
+
+
+
+
+# # this line is only for debug
+# clips = ClipboardListener()
+
+# ClipboardCopy().copy_to_clipboard("something to copy here")
+
+
+
+# Gtk.main()

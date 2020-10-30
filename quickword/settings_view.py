@@ -51,6 +51,7 @@ class SettingsView(Gtk.Grid):
         gio_settings.bind("sticky-mode", sticky_mode.switch, "active", Gio.SettingsBindFlags.DEFAULT)
 
 
+
         #-- settings items grid --------#
         grid = Gtk.Grid()
         grid.props.margin = 8
@@ -67,15 +68,7 @@ class SettingsView(Gtk.Grid):
         frame.add(grid)
 
 
-        #-- about --------#
 
-        # left_icon = Gtk.Image().new_from_file("data/icons/132.svg")
-        # left_icon.get_style_context().add_class("about-icon-left")
-        # right_icon = Gtk.Image().new_from_file("data/icons/131.svg")
-        # right_icon.get_style_context().add_class("about-icon-right")
-        # icon_overlay = Gtk.Overlay()
-        # icon_overlay.add(left_icon)
-        # icon_overlay.add_overlay(right_icon)
 
         #-- view construct--------#
         self.props.name = "settings-view"
@@ -87,6 +80,7 @@ class SettingsView(Gtk.Grid):
         self.props.column_spacing = 6
         self.attach(frame, 0, 1, 1, 1)
         # self.attach(icon_overlay, 0, 2, 1, 1)
+
 
 
     def generate_separator(self):

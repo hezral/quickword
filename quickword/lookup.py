@@ -50,9 +50,11 @@ class WordLookup():
         except:
             pass
         
+    
         
         synsets = wn.synsets(word)
         print('Synonyms:', synsets)
+        
 
 
         for synset in synsets:
@@ -84,15 +86,15 @@ class WordLookup():
 # VERB: 'v'
 
 def lookup(clipboard=None, event=None, wd=None):
-    content, valid = clipboard_listener.clipboard_changed(clipboard)
+    content, valid = clipboard_listener.copy_selected_text(clipboard)
     if content and valid:
         results = wd.get_synsets(content)
-        print(results)
+        #print(results)
 
 wd = WordLookup()
 clipboard_listener = ClipboardListener()
 
-# clipboard_listener.clipboard_changed()
+# clipboard_listener.copy_selected_text()
 
 # the lines is only for debug
 clipboard_listener.clipboard.connect("owner-change", lookup, wd)

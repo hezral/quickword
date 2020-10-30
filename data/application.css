@@ -58,23 +58,23 @@ stack {
 
 
 .about-icon-left {
-    animation: float-left 0.5s ease-in-out infinite;
+    animation: float-left 1.5s ease-in-out infinite;
 }
 
 @keyframes float-left {
-    0% {-gtk-icon-transform: translateX(0px);}
-    50% {-gtk-icon-transform: translateX(-2px);}
+    25% {-gtk-icon-transform: translateX(0px);}
+    75% {-gtk-icon-transform: translateX(-5px);}
     100% {-gtk-icon-transform: translateX(0px);}
 }
 
 .about-icon-right {
-    animation: float-right 0.5s ease-in-out infinite;
+    animation: float-right 1.25s ease-in-out infinite;
 }
 
 @keyframes float-right {
-    0% {-gtk-icon-transform: translateX(0px);}
-    50% {-gtk-icon-transform: translateX(2px);}
-    100% {-gtk-icon-transform: translateX(0px);}
+    25% {-gtk-icon-transform: translateY(0px);}
+    75% {-gtk-icon-transform: translateY(3px);}
+    100% {-gtk-icon-transform: translateY(0px);}
 }
 
 .copy-content {
@@ -84,4 +84,31 @@ stack {
 .copied-content {
     font-size: 0.9em;
     color: gray;
+}
+
+
+
+
+
+.copy-content:dir(ltr) {
+    opacity: 0;
+}
+
+.copied-content:dir(ltr) {
+    opacity: 0;
+}
+
+.copy-content:backdrop {
+    opacity: 1;
+    transition: all 250ms ease-in-out; 
+}
+
+.copied-content:backdrop {
+    opacity: 1;
+    transition: all 250ms ease-in-out; 
+}
+
+
+.no-word-view > entry > image.right {
+    padding-right: 4px;
 }
