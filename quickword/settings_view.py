@@ -3,20 +3,20 @@
 '''
    Copyright 2020 Adi Hezral (hezral@gmail.com) (https://github.com/hezral)
 
-   This file is part of QuickWord.
+   This file is part of QuickWord ("Application").
 
-    QuickWord is free software: you can redistribute it and/or modify
+    The Application is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    QuickWord is distributed in the hope that it will be useful,
+    The Application is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with Movens.  If not, see <http://www.gnu.org/licenses/>.
+    along with this Application.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import gi
@@ -50,8 +50,6 @@ class SettingsView(Gtk.Grid):
         sticky_mode.switch.connect_after("notify::active", self.on_switch_activated)
         gio_settings.bind("sticky-mode", sticky_mode.switch, "active", Gio.SettingsBindFlags.DEFAULT)
 
-
-
         #-- settings items grid --------#
         grid = Gtk.Grid()
         grid.props.margin = 8
@@ -67,8 +65,17 @@ class SettingsView(Gtk.Grid):
         frame.get_style_context().add_class("settings-frame")
         frame.add(grid)
 
-
-
+        #-- logo --------#
+        left_icon = Gtk.Image().new_from_file("data/icons/134.svg")
+        #left_icon.get_style_context().add_class("about-icon-left")
+        right_icon = Gtk.Image().new_from_file("data/icons/133.svg")
+        #right_icon.get_style_context().add_class("about-icon-right")
+        icon_overlay = Gtk.Overlay()
+        icon_overlay.add(left_icon)
+        icon_overlay.add_overlay(right_icon)
+        icon_overlay.props.can_focus = True
+        icon_overlay.props.focus_on_click = True
+        icon_overlay.grab_focus()
 
         #-- view construct--------#
         self.props.name = "settings-view"
@@ -79,7 +86,7 @@ class SettingsView(Gtk.Grid):
         self.props.row_spacing = 6
         self.props.column_spacing = 6
         self.attach(frame, 0, 1, 1, 1)
-        # self.attach(icon_overlay, 0, 2, 1, 1)
+        self.attach(icon_overlay, 0, 2, 1, 1)
 
 
 

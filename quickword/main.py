@@ -3,20 +3,20 @@
 '''
    Copyright 2020 Adi Hezral (hezral@gmail.com) (https://github.com/hezral)
 
-   This file is part of QuickWord.
+   This file is part of QuickWord ("Application").
 
-    QuickWord is free software: you can redistribute it and/or modify
+    The Application is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    QuickWord is distributed in the hope that it will be useful,
+    The Application is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with Movens.  If not, see <http://www.gnu.org/licenses/>.
+    along with this Application.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from re import sub
@@ -37,14 +37,13 @@ class QuickWordWindow(Gtk.ApplicationWindow):
         super().__init__(*args, **kwargs)
 
         #-- constants --------#
-        self.lookup_word = "QuickWord"
+        self.lookup_word = "fortunately"
 
         #-- view --------#
         noword = NoWordView()
         word = WordView()
         settings = SettingsView()
         settings.connect("notify::visible", self.on_view_visible)
-
 
         #-- stack --------#
         stack = Gtk.Stack()
@@ -55,11 +54,27 @@ class QuickWordWindow(Gtk.ApplicationWindow):
         
         #-- header --------#
         #------ lookup word label ----#
-        word_label = Gtk.Label(self.lookup_word)
-        word_label.props.selectable = True
-        word_label.props.halign = Gtk.Align.START
-        word_label.props.valign = Gtk.Align.CENTER
+        word_label = Gtk.Label(self.lookup_word.capitalize())
+        #word_label.props.selectable = True
+        word_label.props.vexpand = True
         word_label.get_style_context().add_class("lookup-word-header")
+        #word_label.connect("button-press-event", self.on_manual_lookup)
+
+        edit_img = Gtk.Image().new_from_icon_name("insert-text-symbolic", Gtk.IconSize.SMALL_TOOLBAR)
+        edit_img.props.no_show_all = True
+
+        word_grid = Gtk.Grid()
+        word_grid.props.column_spacing = 4
+        word_grid.props.halign = Gtk.Align.START
+        word_grid.props.valign = Gtk.Align.CENTER
+        word_grid.attach(word_label, 0, 1, 1, 1)
+        word_grid.attach(edit_img, 1, 1, 1, 1)
+
+        word_box = Gtk.EventBox()
+        word_box.add(word_grid)
+        word_box.connect("button-press-event", self.on_manual_lookup)
+        word_box.connect("enter-notify-event", self.on_enter_word_label)
+        word_box.connect("leave-notify-event", self.on_leave_word_label)
 
         #------ view switch ----#
         icon_theme = Gtk.IconTheme.get_default()
@@ -70,10 +85,9 @@ class QuickWordWindow(Gtk.ApplicationWindow):
         view_switch.props.valign = Gtk.Align.CENTER
         view_switch.bind_property("active", settings, "visible", GObject.BindingFlags.BIDIRECTIONAL)
 
-
         #-- header construct--------#
         headerbar = Gtk.HeaderBar()
-        headerbar.pack_start(word_label)
+        headerbar.pack_start(word_box)
         headerbar.pack_end(view_switch)
         headerbar.props.show_close_button = False
         headerbar.props.decoration_layout = "close:maximize"
@@ -83,19 +97,22 @@ class QuickWordWindow(Gtk.ApplicationWindow):
         
 
         #-- window construct--------#
-        self.props.resizable = True
+        self.props.resizable = False #set this and window will expand and retract based on child
         # self.props.skip_taskbar_hint = True
         self.title = "QuickWord"
         self.set_keep_above(True)
         self.get_style_context().add_class("rounded")
-        self.set_size_request(600, 500)
+        self.set_size_request(600, -1) #set width to -1 to expand and retract based on content
         self.props.window_position = Gtk.WindowPosition.MOUSE
         self.set_titlebar(headerbar)
         self.add(stack)
-
         
         
         #-- window settings--------#
+        if self.lookup_word == "QuickWord":
+            self.active_view = noword
+        else:
+            self.active_view = word
         self.state_flags_changed_count = 0
         self.active_state_flags = ['GTK_STATE_FLAG_NORMAL', 'GTK_STATE_FLAG_DIR_LTR']
         
@@ -106,16 +123,47 @@ class QuickWordWindow(Gtk.ApplicationWindow):
             # print('state-flags-on')
         if not gio_settings.get_value("sticky-mode"):
             self.stick()
-        
-        
 
-    def on_view_visible(self, view, gparam=None, runlookup=None, word=None):
-        # get window children
+    def get_window_child_widgets(self):
         window = self
         window_children = window.get_children()
-        stack = [child for child in window_children if isinstance(child, Gtk.Stack)][0]
         headerbar = [child for child in window_children if isinstance(child, Gtk.HeaderBar)][0]
-        word_label = [child for child in headerbar.get_children() if isinstance(child, Gtk.Label)][0]
+        stack = [child for child in window_children if isinstance(child, Gtk.Stack)][0]
+        word_box = [child for child in headerbar.get_children() if isinstance(child, Gtk.EventBox)][0]
+        word_grid = word_box.get_child()
+        return headerbar, stack, word_grid
+    
+    def on_enter_word_label(self, *args):
+        headerbar, stack, word_grid = self.get_window_child_widgets()
+        edit_img = [child for child in word_grid.get_children() if isinstance(child, Gtk.Image)][0]
+        edit_img.show()
+
+    def on_leave_word_label(self, *args):
+        headerbar, stack, word_grid = self.get_window_child_widgets()
+        edit_img = [child for child in word_grid.get_children() if isinstance(child, Gtk.Image)][0]
+        edit_img.hide()
+
+    def on_manual_lookup(self, *args):
+        headerbar, stack, word_grid = self.get_window_child_widgets()
+        word_label = [child for child in word_grid.get_children() if isinstance(child, Gtk.Label)][0]
+        noword_view = stack.get_child_by_name("no-word-view")
+        settings_view = stack.get_child_by_name("settings-view")
+
+        word_label.props.label = "QuickWord"
+
+        if settings_view.is_visible():
+            pass
+        else:
+            self.active_view = noword_view
+            noword_view.show() #need to show since it was hiddden in on_view_visible
+            stack.set_visible_child_full(name="no-word-view", transition=Gtk.StackTransitionType.CROSSFADE)
+
+
+    def on_view_visible(self, view, gparam=None, runlookup=None, word=None):
+        headerbar, stack, word_grid = self.get_window_child_widgets()
+        word_label = [child for child in word_grid.get_children() if isinstance(child, Gtk.Label)][0]
+        word_view = stack.get_child_by_name("word-view")
+        noword_view = stack.get_child_by_name("no-word-view")
 
         if word is not None:
             self.lookup_word = word.capitalize()
@@ -128,11 +176,21 @@ class QuickWordWindow(Gtk.ApplicationWindow):
             word_label.props.label = "Settings"
             headerbar.get_style_context().add_class("headerbar-settings")
         elif view.props.name == "no-word-view" and runlookup:
+            self.active_view = word_view
             view.hide()
+
+            # for testing content variation
+            word_view.remove_row(3)
+            word_view.remove_row(3)
+            word_view.remove_row(3)
+            word_view.remove_row(3)
+
             stack.set_visible_child_full(name="word-view", transition=Gtk.StackTransitionType.CROSSFADE)
             word_label.props.label = self.lookup_word
             headerbar.get_style_context().remove_class("headerbar-settings")
+
         elif self.lookup_word == "QuickWord":
+            self.active_view = noword_view
             view.hide()
             word_label.props.label = self.lookup_word
             stack.get_style_context().remove_class("stack-settings")
@@ -140,31 +198,13 @@ class QuickWordWindow(Gtk.ApplicationWindow):
             headerbar.get_style_context().remove_class("headerbar-settings")
         else:
             view.hide()
-            word_label.props.label = self.lookup_word
+            if self.active_view.get_name() == "no-word-view":
+                word_label.props.label = "QuickWord"
+            else:
+                word_label.props.label = self.lookup_word
             stack.get_style_context().remove_class("stack-settings")
-            stack.set_visible_child_full(name="word-view", transition=Gtk.StackTransitionType.CROSSFADE)
+            stack.set_visible_child_full(name=self.active_view.get_name(), transition=Gtk.StackTransitionType.CROSSFADE)
             headerbar.get_style_context().remove_class("headerbar-settings")
-
-        # # toggle settings_view visiblility based on visible property
-        # if view.is_visible():
-        #     view.show_all()
-        #     stack.set_visible_child_full(name="settings-view", transition=Gtk.StackTransitionType.CROSSFADE)
-        #     stack.get_style_context().add_class("stack-settings")
-        # else:
-        #     view.hide()
-        #     stack.get_style_context().remove_class("stack-settings")
-        #     if self.lookup_word == "QuickWord":
-        #         stack.set_visible_child_full(name="no-word-view", transition=Gtk.StackTransitionType.CROSSFADE)
-        #     else:
-        #         stack.set_visible_child_full(name="word-view", transition=Gtk.StackTransitionType.CROSSFADE)
-
-        # if word_label.get_label() == "Settings":
-        #     word_label.props.label = self.lookup_word
-        #     headerbar.get_style_context().remove_class("headerbar-settings")
-        # else:
-        #     word_label.props.label = "Settings"
-        #     headerbar.get_style_context().add_class("headerbar-settings")
-
 
 
     def on_persistent_mode(self, widget, event):
@@ -186,25 +226,35 @@ class QuickWordWindow(Gtk.ApplicationWindow):
 #------------------CLASS-SEPARATOR------------------#
 
 class WordView(Gtk.Grid):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, word_data=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         #-- view construct--------#
         self.props.name = 'word-view'
         self.get_style_context().add_class(self.props.name)
         self.props.visible = True
-        self.props.expand = True
+        self.props.expand = False
         self.props.margin = 20
         self.props.margin_top = 12
         self.props.row_spacing = 12
         self.props.column_spacing = 6
 
         #-- view contents--------#
-        definition = WordSection(name="definition", contents="This is a contents block of text with lots of texts lots of texts lots of texts lots of texts")
-        other = WordSection(name="other", contents="This is a contents block of text with lots of texts lots of texts lots of texts lots of texts")
+        definition = WordSection(name="definition", contents="This is a contents block of text ")
+        other = WordSection(name="other", contents="This is a contents block of text")
+        
+        definition2 = WordSection(name="definition2", contents="This is a contents block of text with lots of texts lots of texts lots of texts lots of texts")
+        other2 = WordSection(name="other2", contents="This is a contents block of text with lots of texts lots of texts lots of texts lots of texts")
+        
+        definition3 = WordSection(name="definition3", contents="This is a contents block of text with lots of texts lots of texts lots of texts lots of texts")
+        other3 = WordSection(name="other3", contents="This is a contents block of text with lots of texts lots of texts lots of texts lots of texts")
         
         self.attach(definition, 0, 1, 1, 1)
         self.attach(other, 0, 2, 1, 1)
+        self.attach(definition2, 0, 3, 1, 1)
+        self.attach(other2, 0, 4, 1, 1)
+        self.attach(definition3, 0, 5, 1, 1)
+        self.attach(other3, 0, 6, 1, 1)
 
 
 
@@ -243,7 +293,7 @@ class WordSection(Gtk.Grid):
         copy_img.props.no_show_all = True
         copy_img.props.hexpand = True
         copy_img.props.halign = Gtk.Align.END
-        copy_img.props.valign = Gtk.Align.END
+        copy_img.props.valign = Gtk.Align.START
         copy_img.get_style_context().add_class("copy-content")
 
         copied_img = Gtk.Image().new_from_icon_name("emblem-default", Gtk.IconSize.SMALL_TOOLBAR)
@@ -387,6 +437,8 @@ class QuickWordApp(Gtk.Application):
             self.add_window(self.window)
 
             self.window.show_all()
+
+
             
 
     def on_quit_action(self, action, param):
@@ -398,6 +450,5 @@ class QuickWordApp(Gtk.Application):
 if __name__ == "__main__":
     app = QuickWordApp()
     app.run(sys.argv)
-
 
 

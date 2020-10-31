@@ -3,20 +3,20 @@
 '''
    Copyright 2020 Adi Hezral (hezral@gmail.com) (https://github.com/hezral)
 
-   This file is part of QuickWord.
+   This file is part of QuickWord ("Application").
 
-    QuickWord is free software: you can redistribute it and/or modify
+    The Application is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    QuickWord is distributed in the hope that it will be useful,
+    The Application is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with Movens.  If not, see <http://www.gnu.org/licenses/>.
+    along with this Application.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import gi
@@ -36,9 +36,11 @@ class NoWordView(Gtk.Grid):
         self.props.visible = True
         self.props.expand = True
         self.props.margin = 20
+        #self.props.margin_bottom = 100
         self.props.margin_top = 12
         self.props.row_spacing = 12
         self.props.column_spacing = 6
+        self.props.valign = Gtk.Align.CENTER
         
 
         #-- quickword logo --------#
@@ -53,9 +55,9 @@ class NoWordView(Gtk.Grid):
         icon_overlay.props.can_focus = True
         icon_overlay.props.focus_on_click = True
         icon_overlay.grab_focus()
-
+        
         #-- message header --------#
-        message = Gtk.Label("No word selected")
+        message = Gtk.Label("No word detected")
         message.props.margin_bottom = 5
         message.props.hexpand = True
         message.props.halign = Gtk.Align.CENTER
@@ -88,6 +90,7 @@ class NoWordView(Gtk.Grid):
         entry.props.placeholder_text = "type a word like 'quick' and press enter"
         entry.props.xalign = 0.5
         entry.connect("key-press-event", self.on_entry_start)
+        entry.connect("button-press-event", self.on_entry_start)
         entry.connect("activate", self.on_entry_activate)
         entry.connect("icon_press", self.on_backspace)
 
@@ -114,12 +117,12 @@ class NoWordView(Gtk.Grid):
         if entry.props.text == "":
             # need to reset text, bug maybe?
             entry.props.text = ""
-            entry.props.placeholder_text = "need a word here"
+            entry.props.placeholder_text = "need a word here 😀️"
             icon_overlay.grab_focus()
         elif len(entry.get_text().split(" ")) > 1:
             # need to reset text, bug maybe?
             entry.props.text = ""
-            entry.props.placeholder_text = "please type a single word"
+            entry.props.placeholder_text = "please type a single word 🧐️"
             icon_overlay.grab_focus()
         else:
             # callback to WordLookup
