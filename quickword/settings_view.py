@@ -26,6 +26,7 @@ from gi.repository import Gtk, Gio,  GObject
 
 #------------------CLASS-SEPARATOR------------------#
 
+
 class SettingsView(Gtk.Grid):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -88,14 +89,11 @@ class SettingsView(Gtk.Grid):
         self.attach(frame, 0, 1, 1, 1)
         self.attach(icon_overlay, 0, 2, 1, 1)
 
-
-
     def generate_separator(self):
         separator = Gtk.Separator()
         separator.props.hexpand = True
         separator.props.valign = Gtk.Align.CENTER
         return separator
-
 
     def on_switch_activated(self, switch, gparam):
         name = switch.get_name()
@@ -115,6 +113,9 @@ class SettingsView(Gtk.Grid):
                     window.unstick()
                 else:
                     window.stick()
+
+
+#------------------CLASS-SEPARATOR------------------#
 
 
 class SubSettings(Gtk.Grid):

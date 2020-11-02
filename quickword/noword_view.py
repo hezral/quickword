@@ -26,6 +26,7 @@ from gi.repository import Gtk, Pango
 
 #------------------CLASS-SEPARATOR------------------#
 
+
 class NoWordView(Gtk.Grid):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -41,7 +42,6 @@ class NoWordView(Gtk.Grid):
         self.props.row_spacing = 12
         self.props.column_spacing = 6
         self.props.valign = Gtk.Align.CENTER
-        
 
         #-- quickword logo --------#
 
@@ -58,6 +58,7 @@ class NoWordView(Gtk.Grid):
         
         #-- message header --------#
         message = Gtk.Label("No word detected")
+        message.props.name = "message"
         message.props.margin_bottom = 5
         message.props.hexpand = True
         message.props.halign = Gtk.Align.CENTER

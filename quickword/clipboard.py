@@ -25,6 +25,8 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk
 
 
+#------------------CLASS-SEPARATOR------------------#
+
 
 class Clipboard():
     def __init__(self, atom_type):
@@ -36,17 +38,13 @@ class Clipboard():
         self.text_target = Gdk.Atom.intern('text/plain', False)
 
 
+#------------------CLASS-SEPARATOR------------------#
+
+
 class ClipboardListener(Clipboard):
     def __init__(self, *args, **kwargs):
         super().__init__(atom_type=Gdk.SELECTION_PRIMARY, *args, **kwargs)
         
-        # # this line is only for debug
-        # self.clipboard.connect("owner-change", self.copy_selected_text)
-        # # this line is only for debug
-        # import signal
-        # from gi.repository import GLib
-        # GLib.unix_signal_add(GLib.PRIORITY_DEFAULT, signal.SIGINT, Gtk.main_quit) 
-
     def copy_selected_text(self, clipboard=None, event=None):
         if self.clipboard.wait_is_target_available(self.text_target):
             content = self.clipboard.wait_for_text()
@@ -59,10 +57,14 @@ class ClipboardListener(Clipboard):
             content = None
             valid = False
         # this line is only for debug
-        print(content, valid)
+        # print(content, valid)
         return content, valid
 
-class ClipboardCopy(Clipboard):
+
+#------------------CLASS-SEPARATOR------------------#
+
+
+class ClipboardPaste(Clipboard):
     def __init__(self, *args, **kwargs):
         super().__init__(atom_type=Gdk.SELECTION_CLIPBOARD, *args, **kwargs)
 
@@ -77,6 +79,10 @@ class ClipboardCopy(Clipboard):
 
 # ClipboardCopy().copy_to_clipboard("something to copy here")
 
-
+# # this line is only for debug
+# clips.clipboard.connect("owner-change", self.copy_selected_text)
+# import signal
+# from gi.repository import GLib
+# GLib.unix_signal_add(GLib.PRIORITY_DEFAULT, signal.SIGINT, Gtk.main_quit) 
 
 # Gtk.main()

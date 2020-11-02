@@ -23,9 +23,11 @@
 @define-color shaded_darker shade(@theme_base_color, 0.85);
 @define-color shaded_base shade(@theme_base_color, 0.98);
 
-headerbar label:backdrop, .no-word-view:backdrop, .word-view:backdrop, .settings-view:backdrop, .settings-frame:backdrop {
+
+*:backdrop {
     color: gray;
 }
+
 
 .stack-settings, .headerbar-settings {
     background-color: @shaded_dark;
@@ -100,33 +102,22 @@ stack {
     100% {-gtk-icon-transform: translateY(0px);}
 }
 
-.copy-content {
-    font-size: 0.9em;
-}
 
 .copied-content {
     font-size: 0.9em;
     color: gray;
 }
 
+.edit-img {
+    color: white;
+}
 
-
-
-
-.copy-content:dir(ltr) {
+.transition-on:dir(ltr) {
     opacity: 0;
+    transition: all 100ms ease-in-out; 
 }
 
-.copied-content:dir(ltr) {
-    opacity: 0;
-}
-
-.copy-content:backdrop {
-    opacity: 1;
-    transition: all 250ms ease-in-out; 
-}
-
-.copied-content:backdrop {
+.transition-on:hover {
     opacity: 1;
     transition: all 250ms ease-in-out; 
 }
@@ -138,4 +129,23 @@ stack {
 
 .no-word-view > entry {
     font-size: large;
+}
+
+
+.word-types-left {
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+    }
+    
+.word-types-right {
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+    
+.word-types:checked {
+    font-weight: bold;
+}
+
+.subview-switcher > button:checked {
+    font-weight: bold;
 }

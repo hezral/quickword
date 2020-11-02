@@ -19,16 +19,10 @@
     along with this Application.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import os
-from datetime import datetime
-import gi
-from gi.repository import GLib
-
 from nltk import data
 from nltk.corpus import wordnet as wn
 from nltk.corpus import cmudict as cm
 
-from clipboard import ClipboardListener
 
 class WordLookup():
     def __init__(self, application_id=None, *args, **kwargs):
@@ -36,7 +30,7 @@ class WordLookup():
         application_id = "com.github.hezral.quickword"
 
         nltk_data_path = os.path.join(GLib.get_user_data_dir(), application_id, 'nltk_data')
-        
+
         data.path = [nltk_data_path]
 
         self.dictionary = cm.dict()
@@ -50,54 +44,57 @@ class WordLookup():
             print(pronounce)
         except:
             pass
-        
+
         synsets = wn.synsets(word)
-        print('Synonyms:', synsets)
 
-        for synset in synsets:
+        if len(synsets) > 0:
+            print(len(synsets))
+            print('Synonyms:', synsets)
 
-            name = synset.name().split('.')[0]
+            for synset in synsets:
 
-            # sometimes synset contains underscore and maybe other special characters
-            # need to remove them
-            containsSpecialChars = any(not c.isalnum() for c in name)
-            if containsSpecialChars:
-                name_removeSpecialChars = name.translate ({ord(c): " " for c in "!@#$%^&*()[]{};:,./<>?\|`~-=_+"})
-                print('Words:', name_removeSpecialChars)
-            else:
-                print('Words:',name)
+                name = synset.name().split('.')[0]
 
-            definition = synset.definition()
-            print('Definition:', definition)
+                # sometimes synset contains underscore and maybe other special characters
+                # need to remove them
+                containsSpecialChars = any(not c.isalnum() for c in name)
+                if containsSpecialChars:
+                    name_removeSpecialChars = name.translate ({ord(c): " " for c in "!@#$%^&*()[]{};:,./<>?\|`~-=_+"})
+                    print('Words:', name_removeSpecialChars)
+                else:
+                    print('Words:',name)
 
-            examples = synset.examples()
-            print('Examples:', examples)
+                definition = synset.definition()
+                print('Definition:', definition)
 
-        return synsets
+                examples = synset.examples()
+                print('Examples:', examples)
 
-# Wordnet POS 
+            return synsets
+
+# Wordnet POS
 # ADJ: 'a'
 # ADJ_SAT: 's'
 # ADV: 'r'
 # NOUN: 'n'
 # VERB: 'v'
 
-def lookup(clipboard=None, event=None, wd=None):
-    content, valid = clipboard_listener.copy_selected_text(clipboard)
-    if content and valid:
-        results = wd.get_synsets(content)
-        #print(results)
 
-wd = WordLookup()
-clipboard_listener = ClipboardListener()
-
+# the lines is only for debug
+# def lookup(clipboard=None, event=None, wd=None):
+#     content, valid = clipboard_listener.copy_selected_text(clipboard)
+#     if content and valid:
+#         results = wd.get_synsets(content)
+#         #print(results)
+# from clipboard import ClipboardListener
+# wd = WordLookup()
+# clipboard_listener = ClipboardListener()
 # clipboard_listener.copy_selected_text()
 
 # the lines is only for debug
-clipboard_listener.clipboard.connect("owner-change", lookup, wd)
-import gi, signal
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, GLib
-GLib.unix_signal_add(GLib.PRIORITY_DEFAULT, signal.SIGINT, Gtk.main_quit) 
-Gtk.main()
-
+# clipboard_listener.clipboard.connect("owner-change", lookup, wd)
+# import gi, signal
+# gi.require_version('Gtk', '3.0')
+# from gi.repository import Gtk, GLib
+# GLib.unix_signal_add(GLib.PRIORITY_DEFAULT, signal.SIGINT, Gtk.main_quit)
+# Gtk.main()

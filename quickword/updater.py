@@ -20,13 +20,14 @@
 '''
 
 import os
-from datetime import datetime
-
 from gi.repository import GLib
-
 from nltk import data, downloader
 
+
+
+#------------------CLASS-SEPARATOR------------------#
 DATA_IDS = ('wordnet', 'omw', 'cmudict')
+
 
 class DataUpdater():
     def __init__(self, application_id=None, *args, **kwargs):
@@ -70,8 +71,8 @@ class DataUpdater():
             print('All data up-to-date')
 
 
-updater = DataUpdater()
+# updater = DataUpdater()
 
-updater.download_data()
+# updater.download_data()
 
-updater.update_data()
+# updater.update_data()
