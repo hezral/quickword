@@ -43,17 +43,17 @@ class DataUpdater():
         # check if data dir exist
         if not os.path.exists(self.nltk_data_path):
             os.makedirs(self.nltk_data_path)
-        else:
-            print('nltk_data_path:', self.nltk_data_path)
+        # else:
+        #     print('nltk_data_path:', self.nltk_data_path)
 
     def download_data(self):    
-            # download data if not installed
+        # download data if not installed
         for id in DATA_IDS:
             if not downloader.Downloader().is_installed(id, self.nltk_data_path):
                 downloader.Downloader().download(id)
-                print(id, ': installed')
+                return (id + ': installed')
             else:
-                print(id, ': installed')
+                return (id + ': installed')
 
     def update_data(self):
         # check if any data is stale and update it
@@ -71,8 +71,55 @@ class DataUpdater():
             print('All data up-to-date')
 
 
-# updater = DataUpdater()
+updater = DataUpdater()
 
-# updater.download_data()
 
-# updater.update_data()
+import threading
+from threading import Thread
+import time
+
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import GLib, Gtk, GObject
+
+
+def app_main():
+    win = Gtk.Window(default_height=50, default_width=300)
+    win.connect("destroy", Gtk.main_quit)
+
+    progress = Gtk.ProgressBar(show_text=True)
+    win.add(progress)
+
+    def update_progess(i):
+        progress.pulse()
+        progress.set_text(str(i))
+        return False
+
+    def example_target():
+        for id in DATA_IDS:
+            if not downloader.Downloader().is_installed(id, updater.nltk_data_path):
+                downloader.Downloader().download(id)
+                GLib.idle_add(update_progess, id + ': already finished')
+                time.sleep(0.2)
+            else:
+                GLib.idle_add(update_progess, id + ': installed')
+                time.sleep(0.2)
+            update_progess("finished")
+
+            
+
+    win.show_all()
+
+    thread = threading.Thread(target=example_target)
+    thread.daemon = True
+    thread.start()
+
+class app_thread(Thread):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+
+
+if __name__ == "__main__":
+    app_main()
+    Gtk.main()

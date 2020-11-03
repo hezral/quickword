@@ -57,7 +57,7 @@ class ClipboardListener(Clipboard):
             content = None
             valid = False
         # this line is only for debug
-        # print(content, valid)
+        print(content, valid)
         return content, valid
 
 

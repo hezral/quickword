@@ -56,18 +56,30 @@ class QuickWordApp(Gtk.Application):
         first_run = True
         if first_run:
             from updater import DataUpdater
-            updater = DataUpdater()
+            data_updater = DataUpdater()
             print("updater initiated", datetime.now())
+        
+        # initialize clipboard listener and get current selected text if any
+        clipboard_listener = ClipboardListener()
+        lookup_word = clipboard_listener.copy_selected_text()
+        
+        # setup listener for new text selection
+        clipboard_listener.clipboard.connect("owner-change", clipboard_listener.copy_selected_text)
+
+        # initialize clipboard paster
+        clipboard_paste = ClipboardPaste()
 
         print("init", datetime.now())
 
     def do_startup(self):
         Gtk.Application.do_startup(self)
-        # Support quiting app using Super+Q
+
+        # setup quiting app using Escape, Ctrl+Q
         quit_action = Gio.SimpleAction.new("quit", None)
         quit_action.connect("activate", self.on_quit_action)
         self.add_action(quit_action)
         self.set_accels_for_action("app.quit", ["<Ctrl>Q", "Escape"])
+        
         # We only allow a single window and raise any existing ones
         if self.window is None:
             # Windows are associated with the application 
@@ -81,10 +93,29 @@ class QuickWordApp(Gtk.Application):
     def do_activate(self):
         print("activate", datetime.now())
 
+
+        
         # run updater in background
+        import io
         from updater import DataUpdater
-        updater = DataUpdater()
+        data_updater = DataUpdater()
+
+        # redirect sys.stdout to a buffer
+        stdout = sys.stdout
+        sys.stdout = io.StringIO()
+
+        while data_updater.update_data():
+            print("updating:", sys.stdout.getvalue())
+        
+        # get output and restore sys.stdout
+        #output = sys.stdout.getvalue()
+        sys.stdout = stdout
+
+        #print("output:", output)
+
         print("background updater initiated", datetime.now())
+
+
 
     def on_quit_action(self, action, param):
         if self.window is not None:

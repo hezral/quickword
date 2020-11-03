@@ -39,39 +39,7 @@ class WordView(Gtk.Grid):
         # NOUN: 'n'
         # VERB: 'v'
 
-        # data = ("n", "dog, domestic dog, Canis familiaris", "a member of the genus Canis (probably descended from the common wolf) that has been domesticated by man since prehistoric times; occurs in many breeds", "the dog barked all night")
-        # data1 = ("r", "dog1, domestic dog, Canis familiaris", "a member of the genus Canis (probably descended from the common wolf) that has been domesticated by man since prehistoric times; occurs in many breeds", "the dog barked all night")
-        # data2 = ("a", "dog2, domestic dog, Canis familiaris", "a member of the genus Canis (probably descended from the common wolf) that has been domesticated by man since prehistoric times; occurs in many breeds", "the dog barked all night")
-        # data3 = ("v", "dog3, domestic dog, Canis familiaris", "a member of the genus Canis (probably descended from the common wolf) that has been domesticated by man since prehistoric times; occurs in many breeds", "the dog barked all night")
-        # data4 = ("s", "dog4, domestic dog, Canis familiaris", "a member of the genus Canis (probably descended from the common wolf) that has been domesticated by man since prehistoric times; occurs in many breeds", "the dog barked all night")
-        # data5 = ("n", "dog5, domestic dog, Canis familiaris", "a member of the genus Canis (probably descended from the common wolf) that has been domesticated by man since prehistoric times; occurs in many breeds", "the dog barked all night")
-        # data6 = ("s", "dog6, domestic dog, Canis familiaris", "a member of the genus Canis (probably descended from the common wolf) that has been domesticated by man since prehistoric times; occurs in many breeds", "the dog barked all night")
 
-        # synsets = (data, data1, data2, data3, data4, data5, data6)
-
-        # # create list for each type of word
-        # noun_data = []
-        # adjective_data = []
-        # adverb_data = []
-        # ver_data = []
-
-        # # add data to each word list
-        # for synset in synsets:
-        #     if synset[0] == "n":
-        #         noun_data.append(synset)
-        #     if synset[0] == "a" or synset[0] == "s":
-        #         adjective_data.append(synset)
-        #     if synset[0] == "r":
-        #         adverb_data.append(synset)
-        #     if synset[0] == "v":
-        #         ver_data.append(synset)
-        
-        # # add word lists to dict
-        # word_list_dict = {}
-        # word_list_dict["noun"] = noun_data
-        # word_list_dict["adjective"] = adjective_data
-        # word_list_dict["adverb"] = adverb_data
-        # word_list_dict["verb"] = ver_data
 
         #-- pronounciation --------#
         pronounciation_label = Gtk.Label()
@@ -81,21 +49,10 @@ class WordView(Gtk.Grid):
         pronounciation_label.get_style_context().add_class("pronounciation-label")
 
 
-        # #-- subviews --------#
-        # # create subviews from each word list if there is data
-        # subviews = {}
-        # for type in word_list_dict:
-        #     if len(word_list_dict[type]) > 0:
-        #         subviews["{0}".format(type)] = WordSubView(name=type, contents=word_list_dict[type])
-
         #-- stack construct --------#
         stack = Gtk.Stack()
         stack.props.expand = True
         stack.props.transition_type = Gtk.StackTransitionType.CROSSFADE
-        
-        # # add views to stack
-        # for view in subviews:
-        #     stack.add_titled(subviews[view], view, view)
         
         # info stack switcher contruct
         stack_switcher = Gtk.StackSwitcher()
@@ -103,14 +60,7 @@ class WordView(Gtk.Grid):
         stack_switcher.props.stack = stack
         stack_switcher.get_style_context().add_class("subview-switcher")
 
-        
 
-        # # style left and right tabs for stack switcher
-        # stack_count = len(stack_switcher.get_children())
-        # left_tab = stack_switcher.get_children()[0]
-        # left_tab.get_style_context().add_class("word-types-left")
-        # right_tab = stack_switcher.get_children()[stack_count-1]
-        # right_tab.get_style_context().add_class("word-types-right")
 
         button = Gtk.Button(label="remove")
         button.connect("clicked", self.on_wordlookup)
@@ -140,6 +90,7 @@ class WordView(Gtk.Grid):
         view = self
         pronounciation_label = [child for child in view.get_children() if child.get_name() == "pronounciation_label"][0]
         stack = [child for child in view.get_children() if isinstance(child, Gtk.Stack)][0]
+        stack_switcher = [child for child in view.get_children() if isinstance(child, Gtk.StackSwitcher)][0]
 
         pronounciation = "/" + "pronounciation" + "/"
         pronounciation_label.props.label = pronounciation
@@ -197,6 +148,13 @@ class WordView(Gtk.Grid):
         # add views to stack
         for view in subviews:
             stack.add_titled(subviews[view], view, view)
+        
+        # # style left and right tabs for stack switcher
+        stack_count = len(stack_switcher.get_children())
+        left_tab = stack_switcher.get_children()[0]
+        left_tab.get_style_context().add_class("word-types-left")
+        right_tab = stack_switcher.get_children()[stack_count-1]
+        right_tab.get_style_context().add_class("word-types-right")
         
         stack.show_all()
 
