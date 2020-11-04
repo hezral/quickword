@@ -28,7 +28,7 @@ from gi.repository import Gtk, Pango
 
 
 class WordView(Gtk.Grid):
-    def __init__(self, word_data=None, clipboardcopy=None, *args, **kwargs):
+    def __init__(self, word_data=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         #-- process the data --------#
@@ -38,8 +38,7 @@ class WordView(Gtk.Grid):
         # ADV: 'r'
         # NOUN: 'n'
         # VERB: 'v'
-
-
+        self.clipboard_paste = None
 
         #-- pronounciation --------#
         pronounciation_label = Gtk.Label()
@@ -60,12 +59,10 @@ class WordView(Gtk.Grid):
         stack_switcher.props.stack = stack
         stack_switcher.get_style_context().add_class("subview-switcher")
 
-
-
         button = Gtk.Button(label="remove")
         button.connect("clicked", self.on_wordlookup)
 
-         #-- view construct--------#
+         #-- WordView construct--------#
         self.props.name = 'word-view'
         self.get_style_context().add_class(self.props.name)
         self.props.visible = True
@@ -79,11 +76,8 @@ class WordView(Gtk.Grid):
         self.attach(stack_switcher, 0, 3, 1, 1,)
         self.attach(button, 0, 4, 1, 1)
 
+        # generate the views on word lookup
         self.on_wordlookup()
-
-
-    
-
 
 
     def on_wordlookup(self, button=None, data=None):
@@ -158,6 +152,8 @@ class WordView(Gtk.Grid):
         
         stack.show_all()
 
+        
+
 
 
         
@@ -169,7 +165,7 @@ class WordSubView(Gtk.Grid):
     def __init__(self, name, contents, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        #-- view construct -----#
+        #-- WordSubView construct -----#
         self.props.name = name
         self.props.hexpand = True
         self.props.row_spacing = 4
@@ -258,13 +254,14 @@ class WordItems(Gtk.Grid):
         content_grid.attach(copied_grid, 0, 1, 1, 3)
         content_grid.attach(word_examples, 0, 2, 1, 1)
 
-
+        #-- eventbox -------#
         content_eventbox = Gtk.EventBox()
         content_eventbox.add(content_grid)
         content_eventbox.connect("enter-notify-event", self.on_enter_content_box, hidden_widget)
         content_eventbox.connect("leave-notify-event", self.on_leave_content_box, hidden_widget)
         content_eventbox.connect("button-press-event", self.on_copy_content_clicked, hidden_widget)
 
+        #-- WordItems construct--------#
         # self.props.name = name
         self.props.hexpand = True
         self.props.row_spacing = 3
@@ -291,7 +288,6 @@ class WordItems(Gtk.Grid):
         # set flags to ready state for transition effect, see application.css
         copied_grid.set_state_flags(Gtk.StateFlags.DIR_LTR, True)
 
-
     def on_leave_content_box(self, eventbox, event, widget_list):
         copy_img = widget_list[0]
         copied_grid = widget_list[3]
@@ -302,7 +298,6 @@ class WordItems(Gtk.Grid):
         # reset state flags to ready state for transition effect, see application.css
         # grid can stay as show state since only toggle widget hide/shows
         copied_grid.set_state_flags(Gtk.StateFlags.DIR_LTR, True)
-
 
     def on_copy_content_clicked(self, eventbox, event, widget_list):
         copy_img = widget_list[0]
@@ -322,4 +317,14 @@ class WordItems(Gtk.Grid):
         copied_grid.set_state_flags(Gtk.StateFlags.PRELIGHT, True)
 
         # callback to copy content to clipboard
+        clipboard_paste = self.get_clipboard_paste()
+        print(clipboard_paste)
+        clipboard_paste.copy_to_clipboard("test")
         print("Callback to copy to clipbpard:", content)
+
+    def get_clipboard_paste(self):
+        subview = self.get_parent()
+        wordview_stack = subview.get_parent()
+        wordview = wordview_stack.get_parent()
+        clipboard_paste = wordview.clipboard_paste
+        return clipboard_paste

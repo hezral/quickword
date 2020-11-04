@@ -36,12 +36,17 @@ from word_view import WordView
 
 
 class QuickWordWindow(Gtk.ApplicationWindow):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, lookup_word="QuickWord", lookup_data=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        #-- constants --------#
-        self.lookup_word = ("dog").capitalize()
+        # Add custom signals to detec new word selected
+        # GObject.signal_new(signal_name, type, flags, return_type, param_types)
+        GObject.signal_new("on-new-word-selected", Gtk.ApplicationWindow, GObject.SIGNAL_RUN_LAST, GObject.TYPE_BOOLEAN, [GObject.TYPE_STRING])
+        self.connect("on-new-word-selected", self.on_new_word_received)
+        # self.emit("on-new-word-selected", new_word)
 
+        #-- variables --------#
+        self.lookup_word = lookup_word
 
         #-- view --------#
         noword = NoWordView()
@@ -49,7 +54,6 @@ class QuickWordWindow(Gtk.ApplicationWindow):
         settings = SettingsView()
         settings.connect("notify::visible", self.on_view_visible)
         
-
         #-- stack --------#
         stack = Gtk.Stack()
         stack.props.transition_type = Gtk.StackTransitionType.CROSSFADE
@@ -58,10 +62,10 @@ class QuickWordWindow(Gtk.ApplicationWindow):
         stack.add_named(noword, noword.get_name())
         
         #-- header --------#
-        #------ lookup word label ----#
         word_label = Gtk.Label(self.lookup_word)
         word_label.props.vexpand = True
         word_label.get_style_context().add_class("lookup-word-header")
+        #word_label.connect("property-notify-event", self.on_label_changed)
 
         edit_img = Gtk.Image().new_from_icon_name("insert-text-symbolic", Gtk.IconSize.SMALL_TOOLBAR)
         edit_img.props.no_show_all = True
@@ -99,8 +103,7 @@ class QuickWordWindow(Gtk.ApplicationWindow):
         headerbar.get_style_context().add_class("default-decoration")
         headerbar.get_style_context().add_class(Gtk.STYLE_CLASS_FLAT)
 
-
-        #-- window construct--------#
+        #-- QuickWordWindow construct--------#
         self.props.resizable = False #set this and window will expand and retract based on child
         # self.props.skip_taskbar_hint = True
         self.title = "QuickWord"
@@ -111,23 +114,24 @@ class QuickWordWindow(Gtk.ApplicationWindow):
         self.set_titlebar(headerbar)
         self.add(stack)
         
-        
-        #-- window variables--------#
+        #-- QuickWordWindow variables--------#
         if self.lookup_word == "QuickWord":
             self.active_view = noword
         else:
             self.active_view = word
 
+        # this is for tracking window state flags for persistent mode
         self.state_flags_changed_count = 0
         self.active_state_flags = ['GTK_STATE_FLAG_NORMAL', 'GTK_STATE_FLAG_DIR_LTR']
         
+        # read user saved settings
         gio_settings = Gio.Settings(schema_id="com.github.hezral.quickword")
-        
         if not gio_settings.get_value("persistent-mode"):
             self.state_flags_on = self.connect("state-flags-changed", self.on_persistent_mode)
             # print('state-flags-on')
         if not gio_settings.get_value("sticky-mode"):
             self.stick()
+            
 
     def get_window_child_widgets(self):
         window = self
@@ -137,7 +141,14 @@ class QuickWordWindow(Gtk.ApplicationWindow):
         word_box = [child for child in headerbar.get_children() if isinstance(child, Gtk.EventBox)][0]
         word_grid = word_box.get_child()
         return headerbar, stack, word_grid
-    
+
+    def on_new_word_received(self, window, new_word):
+        headerbar, stack, word_grid = self.get_window_child_widgets()
+        word_label = [child for child in word_grid.get_children() if isinstance(child, Gtk.Label)][0]
+        word_label.props.label = new_word
+        word_view = stack.get_child_by_name("word-view")
+        word_view.on_wordlookup() 
+
     def on_enter_word_label(self, *args):
         headerbar, stack, word_grid = self.get_window_child_widgets()
         edit_img = [child for child in word_grid.get_children() if isinstance(child, Gtk.Image)][0]

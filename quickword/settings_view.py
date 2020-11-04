@@ -78,7 +78,7 @@ class SettingsView(Gtk.Grid):
         icon_overlay.props.focus_on_click = True
         icon_overlay.grab_focus()
 
-        #-- view construct--------#
+        #-- SettingsView construct--------#
         self.props.name = "settings-view"
         self.get_style_context().add_class(self.props.name)
         self.props.expand = True
@@ -121,13 +121,7 @@ class SettingsView(Gtk.Grid):
 class SubSettings(Gtk.Grid):
     def __init__(self, name, label, sublabel=None, separator=True, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        #-- view construct--------#
-        self.props.name = name
-        self.props.hexpand = True
-        self.props.row_spacing = 8
-        self.props.column_spacing = 10
-        
+       
         #------ box--------#
         box = Gtk.VBox()
         box.props.spacing = 2
@@ -159,5 +153,10 @@ class SubSettings(Gtk.Grid):
             row_separator.props.valign = Gtk.Align.CENTER
             self.attach(row_separator, 0, 3, 2, 1)
         
+        #-- SubSettings construct--------#
+        self.props.name = name
+        self.props.hexpand = True
+        self.props.row_spacing = 8
+        self.props.column_spacing = 10
         self.attach(box, 0, 1, 1, 2)
         self.attach(self.switch, 1, 1, 1, 2)

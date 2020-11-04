@@ -19,22 +19,21 @@
     along with this Application.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-
+# base imports
 import sys, os
 import gi
 gi.require_version('Gtk', '3.0')
-gi.require_version('Granite', '1.0')
-from gi.repository import Gtk, Gio, Gdk, Granite, GObject, Pango
+from gi.repository import Gtk, Gio, Gdk, GObject
 
 from datetime import datetime
 
-print("python_run", datetime.now())
+print(datetime.now(), "python_run", )
 
 # QuickWord imports
 from main_window import QuickWordWindow
-from clipboard import ClipboardListener, ClipboardPaste
-from lookup import WordLookup
-from updater import DataUpdater
+from clipboard_manager import ClipboardListener, ClipboardPaste
+from word_lookup import WordLookup
+
 
 #------------------CLASS-SEPARATOR------------------#
 
@@ -45,31 +44,50 @@ class QuickWordApp(Gtk.Application):
         # set application properties
         self.props.application_id = "com.github.hezral.quickword"
 
-        provider = Gtk.CssProvider()
-        provider.load_from_path("/home/adi/Work/quickword/data/application.css")
-        # # provider.load_from_resource ("com/github/hezral/quickword/application.css")
-        Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
-        
         # initialize any objects
         self.window = None
 
-        first_run = True
+        # first run
+        gio_settings = Gio.Settings(schema_id="com.github.hezral.quickword")
+        first_run = False
         if first_run:
-            from updater import DataUpdater
-            data_updater = DataUpdater()
-            print("updater initiated", datetime.now())
+            from data_manager import DataUpdater
+            data_updater = DataUpdater(application_id=self.props.application_id)
+            print(datetime.now(), "updater initiated")
+
+        # initialize word lookup
+        _word_lookup = WordLookup(application_id=self.props.application_id)
+        print(datetime.now(), "word lookup init")
         
         # initialize clipboard listener and get current selected text if any
         clipboard_listener = ClipboardListener()
-        lookup_word = clipboard_listener.copy_selected_text()
+        self.lookup_word = clipboard_listener.copy_selected_text()
+        self.lookup_word = self.lookup_word.capitalize()
         
-        # setup listener for new text selection
-        clipboard_listener.clipboard.connect("owner-change", clipboard_listener.copy_selected_text)
-
+        # default if no word found or selected
+        if self.lookup_word is None or self.lookup_word == "":
+            self.lookup_word = "QuickWord"
+        else:
+            word_data = _word_lookup.get_synsets(self.lookup_word)
+        
         # initialize clipboard paster
         clipboard_paste = ClipboardPaste()
 
-        print("init", datetime.now())
+        # setup clipboard listener and paster after app activation
+        self.connect_after("activate", self.on_activate, clipboard_listener, clipboard_paste, _word_lookup)
+        
+        # set CSS provider
+        provider = Gtk.CssProvider()
+        provider.load_from_path("data/application.css")
+        # # provider.load_from_resource ("com/github/hezral/quickword/application.css")
+        Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+
+        # Add custom signals for callback from manual word lookup in no-word-view
+        # GObject.signal_new(signal_name, type, flags, return_type, param_types)
+        GObject.signal_new("on-new-word-entered", Gtk.Application, GObject.SIGNAL_RUN_LAST, GObject.TYPE_BOOLEAN, [GObject.TYPE_STRING])
+        self.connect("on-new-word-entered", self.on_new_word_lookup, _word_lookup)
+
+        print(datetime.now(), "app init")
 
     def do_startup(self):
         Gtk.Application.do_startup(self)
@@ -84,37 +102,46 @@ class QuickWordApp(Gtk.Application):
         if self.window is None:
             # Windows are associated with the application 
             # when the last one is closed the application shuts down
-            self.window = QuickWordWindow(application=self)
+            self.window = QuickWordWindow(application=self, lookup_word=self.lookup_word, lookup_data=None)
             self.add_window(self.window)
             self.window.show_all()
-            
-        print("startup", datetime.now())
+
+        print(datetime.now(), "startup")
 
     def do_activate(self):
-        print("activate", datetime.now())
+        print(datetime.now(), "activate")
 
+    def on_activate(self, app, clipboard_listener, clipboard_paste, _word_lookup):
+        # setup listener for new text selection
+        clipboard_listener.clipboard.connect("owner-change", self.on_new_word_selected, clipboard_listener, _word_lookup)
+        print(datetime.now(), "cliboard listener initiated")
 
+        # setup background updater
+        print(datetime.now(), "background updater initiated")
+
+        # setup paster for copying texts in word-view
+        stack = self.window.get_window_child_widgets()[1]
+        word_view = stack.get_child_by_name("word-view")
+        word_view.clipboard_paste = clipboard_paste
+
+        print(datetime.now(), "post-activate")
+
+    def on_new_word_selected(self, clipboard, event, clipboard_listener, _word_lookup):
+        # get selected word from clipboard
+        new_word = clipboard_listener.copy_selected_text()
+        new_word = new_word.capitalize()
+
+        # trigger new word lookup
+        self.on_new_word_lookup(self, new_word, _word_lookup)
+
+    def on_new_word_lookup(self, app, new_word, _word_lookup):
         
-        # run updater in background
-        import io
-        from updater import DataUpdater
-        data_updater = DataUpdater()
-
-        # redirect sys.stdout to a buffer
-        stdout = sys.stdout
-        sys.stdout = io.StringIO()
-
-        while data_updater.update_data():
-            print("updating:", sys.stdout.getvalue())
+        new_word = new_word.capitalize()
         
-        # get output and restore sys.stdout
-        #output = sys.stdout.getvalue()
-        sys.stdout = stdout
+        word_data = _word_lookup.get_synsets(new_word)
 
-        #print("output:", output)
-
-        print("background updater initiated", datetime.now())
-
+        # emit the signal to trigger content update callback
+        self.window.emit("on-new-word-selected", new_word)
 
 
     def on_quit_action(self, action, param):

@@ -48,17 +48,23 @@ class ClipboardListener(Clipboard):
     def copy_selected_text(self, clipboard=None, event=None):
         if self.clipboard.wait_is_target_available(self.text_target):
             content = self.clipboard.wait_for_text()
-            # avoid returning multi-word selections
+
+            # if selected text contains underscore and maybe other special characters
+            # try to remove them and get the first word
+            containsSpecialChars = any(not c.isalnum() for c in content)
+            if containsSpecialChars:
+                content_remove_special_chars = content.translate ({ord(c): " " for c in "!@#$%^&*()[]{};:,./<>?\|`~-=_+"})
+                content = content_remove_special_chars.split(" ")[0]
+            
+            # avoid returning multi-word selections, just the first word
             if len(content.split(" ")) > 1:
-                valid = False
-            else:
-                valid = True
+                content = content.split(" ")[0]
+            valid = True
+            return content
         else:
             content = None
             valid = False
-        # this line is only for debug
-        print(content, valid)
-        return content, valid
+
 
 
 #------------------CLASS-SEPARATOR------------------#
@@ -76,10 +82,6 @@ class ClipboardPaste(Clipboard):
 
 # # this line is only for debug
 # clips = ClipboardListener()
-
-# ClipboardCopy().copy_to_clipboard("something to copy here")
-
-# # this line is only for debug
 # clips.clipboard.connect("owner-change", self.copy_selected_text)
 # import signal
 # from gi.repository import GLib

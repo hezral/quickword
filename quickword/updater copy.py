@@ -18,21 +18,100 @@
     You should have received a copy of the GNU General Public License
     along with this Application.  If not, see <http://www.gnu.org/licenses/>.
 '''
+# #updater = DataUpdater(application_id="com.github.hezral.quickword")
+
+
+# #------------------CLASS-SEPARATOR------------------#
+
+
+# # class UpdateDialog(Gtk.Dialog):
+# #     def __init__(self, window, *args, **kwargs):
+# #         super().__init__(*args, **kwargs)
+
+        
+
+
+
+
+# # def app_main():
+# #     win = Gtk.Window(default_height=50, default_width=300)
+# #     win.connect("destroy", Gtk.main_quit)
+
+# #     progress = Gtk.ProgressBar(show_text=True)
+# #     spinner = Gtk.Spinner()
+# #     label = Gtk.Label()
+# #     label.props.expand = True
+
+# #     grid = Gtk.Grid()
+# #     grid.props.expand = True
+# #     grid.attach(spinner, 0, 1, 1, 1)
+# #     grid.attach(label, 0, 2, 1, 1)
+# #     grid.attach(progress, 0, 3, 1, 1)
+
+
+# #     win.add(grid)
+
+# #     def update_progess(i, fraction):
+# #         progress.pulse()
+# #         progress.set_text(str(i))
+# #         if fraction == 1:
+# #             progress.set_fraction(fraction)
+# #         else:
+# #             progress.set_pulse_step(fraction)
+# #         return False
+
+# #     def example_target():
+# #         spinner.start()
+# #         fraction = 1 / len(DATA_IDS)
+# #         for id in DATA_IDS:
+            
+# #             if not downloader.Downloader().is_installed(id, updater.nltk_data_path):
+# #                 downloader.Downloader().download(id)
+# #                 GLib.idle_add(update_progess, id + ': installed', fraction)
+# #                 #time.sleep(0.2)
+# #                 label.set_label(id + ': already finished')
+# #             else:
+# #                 GLib.idle_add(update_progess, id + ': installed', fraction)
+# #                 label.set_label(id + ': already installed')
+# #             time.sleep(0.2)
+# #             fraction = fraction + 0.3
+# #         spinner.stop()
+# #         label.set_label('finished')
+# #         update_progess("finished", 1)
+
+
+# #     win.show_all()
+
+# #     thread = threading.Thread(target=example_target)
+# #     thread.daemon = True
+# #     thread.start()
+
+
+
+# # if __name__ == "__main__":
+# #     app_main()
+# #     Gtk.main()
 
 import os
-from gi.repository import GLib
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import GLib, Gtk
+
+import threading
+import time
+
 from nltk import data, downloader
 
+DATA_IDS = ('wordnet', 'omw', 'cmudict')
 
 
 #------------------CLASS-SEPARATOR------------------#
-DATA_IDS = ('wordnet', 'omw', 'cmudict')
 
 
 class DataUpdater():
     def __init__(self, application_id=None, *args, **kwargs):
 
-        application_id = "com.github.hezral.quickword"
+        #application_id = "com.github.hezral.quickword"
 
         self.nltk_data_path = os.path.join(GLib.get_user_data_dir(), application_id, 'nltk_data')
 
@@ -71,55 +150,4 @@ class DataUpdater():
             print('All data up-to-date')
 
 
-updater = DataUpdater()
 
-
-import threading
-from threading import Thread
-import time
-
-import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import GLib, Gtk, GObject
-
-
-def app_main():
-    win = Gtk.Window(default_height=50, default_width=300)
-    win.connect("destroy", Gtk.main_quit)
-
-    progress = Gtk.ProgressBar(show_text=True)
-    win.add(progress)
-
-    def update_progess(i):
-        progress.pulse()
-        progress.set_text(str(i))
-        return False
-
-    def example_target():
-        for id in DATA_IDS:
-            if not downloader.Downloader().is_installed(id, updater.nltk_data_path):
-                downloader.Downloader().download(id)
-                GLib.idle_add(update_progess, id + ': already finished')
-                time.sleep(0.2)
-            else:
-                GLib.idle_add(update_progess, id + ': installed')
-                time.sleep(0.2)
-            update_progess("finished")
-
-            
-
-    win.show_all()
-
-    thread = threading.Thread(target=example_target)
-    thread.daemon = True
-    thread.start()
-
-class app_thread(Thread):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        
-
-
-if __name__ == "__main__":
-    app_main()
-    Gtk.main()

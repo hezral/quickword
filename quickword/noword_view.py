@@ -31,20 +31,7 @@ class NoWordView(Gtk.Grid):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        #-- view construct--------#
-        self.props.name = 'no-word-view'
-        self.get_style_context().add_class(self.props.name)
-        self.props.visible = True
-        self.props.expand = True
-        self.props.margin = 20
-        #self.props.margin_bottom = 100
-        self.props.margin_top = 12
-        self.props.row_spacing = 12
-        self.props.column_spacing = 6
-        self.props.valign = Gtk.Align.CENTER
-
         #-- quickword logo --------#
-
         left_icon = Gtk.Image().new_from_file("data/icons/134.svg")
         #left_icon.get_style_context().add_class("about-icon-left")
         right_icon = Gtk.Image().new_from_file("data/icons/133.svg")
@@ -87,7 +74,6 @@ class NoWordView(Gtk.Grid):
         entry.props.margin = 10
         entry.props.margin_bottom = 0
         entry.props.focus_on_click = True
-        # entry.props.input_hints = Gtk.InputHints.WORD_COMPLETION
         entry.props.placeholder_text = "type a word like 'quick' and press enter"
         entry.props.xalign = 0.5
         entry.connect("key-press-event", self.on_entry_start)
@@ -95,7 +81,16 @@ class NoWordView(Gtk.Grid):
         entry.connect("activate", self.on_entry_activate)
         entry.connect("icon_press", self.on_backspace)
 
-
+        #-- NoWordView construct--------#
+        self.props.name = 'no-word-view'
+        self.get_style_context().add_class(self.props.name)
+        self.props.visible = True
+        self.props.expand = True
+        self.props.margin = 20
+        self.props.margin_top = 12
+        self.props.row_spacing = 12
+        self.props.column_spacing = 6
+        self.props.valign = Gtk.Align.CENTER
         self.attach(icon_overlay, 0, 1, 1, 1)
         self.attach(message, 0, 2, 1, 1)
         self.attach(sub_message, 0, 3, 1, 1)
@@ -111,6 +106,7 @@ class NoWordView(Gtk.Grid):
         view = self
         stack = self.get_parent()
         window = stack.get_parent()
+        app = window.props.application
         icon_overlay = [child for child in self.get_children() if isinstance(child, Gtk.Overlay)][0]
 
         entry.props.secondary_icon_name = None
@@ -128,5 +124,6 @@ class NoWordView(Gtk.Grid):
         else:
             # callback to WordLookup
             print('Callback to WordLookup')
+            app.emit("on-new-word-entered", entry.props.text)
             # callback to WordView
             window.on_view_visible(view, runlookup=True, word=entry.props.text)

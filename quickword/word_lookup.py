@@ -19,15 +19,17 @@
     along with this Application.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import os
+import gi
+from gi.repository import GLib
+
 from nltk import data
 from nltk.corpus import wordnet as wn
 from nltk.corpus import cmudict as cm
 
 
 class WordLookup():
-    def __init__(self, application_id=None, *args, **kwargs):
-
-        application_id = "com.github.hezral.quickword"
+    def __init__(self, application_id="quickword", *args, **kwargs):
 
         nltk_data_path = os.path.join(GLib.get_user_data_dir(), application_id, 'nltk_data')
 
