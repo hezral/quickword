@@ -62,10 +62,9 @@ class QuickWordApp(Gtk.Application):
         # initialize clipboard listener and get current selected text if any
         clipboard_listener = ClipboardListener()
         self.lookup_word = clipboard_listener.copy_selected_text()
-        self.lookup_word = self.lookup_word.capitalize()
         
         # default if no word found or selected
-        if self.lookup_word is None or self.lookup_word == "":
+        if self.lookup_word is None or self.lookup_word == "" or self.lookup_word == " ":
             self.lookup_word = "QuickWord"
         else:
             word_data = _word_lookup.get_synsets(self.lookup_word)
@@ -129,19 +128,19 @@ class QuickWordApp(Gtk.Application):
     def on_new_word_selected(self, clipboard, event, clipboard_listener, _word_lookup):
         # get selected word from clipboard
         new_word = clipboard_listener.copy_selected_text()
-        new_word = new_word.capitalize()
 
         # trigger new word lookup
         self.on_new_word_lookup(self, new_word, _word_lookup)
 
     def on_new_word_lookup(self, app, new_word, _word_lookup):
         
-        new_word = new_word.capitalize()
-        
         word_data = _word_lookup.get_synsets(new_word)
 
-        # emit the signal to trigger content update callback
-        self.window.emit("on-new-word-selected", new_word)
+        print(word_data)
+        if word_data is not None:
+            # emit the signal to trigger content update callback
+            self.window.emit("on-new-word-selected", new_word)
+
 
 
     def on_quit_action(self, action, param):

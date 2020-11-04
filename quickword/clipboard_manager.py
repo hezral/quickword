@@ -60,6 +60,7 @@ class ClipboardListener(Clipboard):
             if len(content.split(" ")) > 1:
                 content = content.split(" ")[0]
             valid = True
+            # content = content.capitalize()
             return content
         else:
             content = None

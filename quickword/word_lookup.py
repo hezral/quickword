@@ -39,40 +39,53 @@ class WordLookup():
 
     def get_synsets(self, word):
 
-        print('Word:', word)
+        # lowercase the word for dict to work and maybe wordnet too
+        word = word.lower()
+
+        # create list to store data to return
+        data_tuple = []
+
+        # capitalize the word for display and add to data list
+        data_tuple.append(word.capitalize())
 
         try:
             pronounce = self.dictionary[word]
-            print(pronounce)
         except:
-            pass
+            pronounce = ""
+        # add pronounciation to data list
+        data_tuple.append(pronounce)
 
+        # get synsets for word and add to data list if there is any synset found
         synsets = wn.synsets(word)
-
         if len(synsets) > 0:
-            print(len(synsets))
-            print('Synonyms:', synsets)
+            data_tuple.append(synsets)
+            return data_tuple
 
-            for synset in synsets:
 
-                name = synset.name().split('.')[0]
+        # if len(synsets) > 0:
+        #     print(len(synsets))
+        #     print('Synonyms:', synsets)
 
-                # sometimes synset contains underscore and maybe other special characters
-                # need to remove them
-                containsSpecialChars = any(not c.isalnum() for c in name)
-                if containsSpecialChars:
-                    name_removeSpecialChars = name.translate ({ord(c): " " for c in "!@#$%^&*()[]{};:,./<>?\|`~-=_+"})
-                    print('Words:', name_removeSpecialChars)
-                else:
-                    print('Words:',name)
+        #     for synset in synsets:
 
-                definition = synset.definition()
-                print('Definition:', definition)
+        #         name = synset.name().split('.')[0]
 
-                examples = synset.examples()
-                print('Examples:', examples)
+        #         # sometimes synset contains underscore and maybe other special characters
+        #         # need to remove them
+        #         containsSpecialChars = any(not c.isalnum() for c in name)
+        #         if containsSpecialChars:
+        #             name_removeSpecialChars = name.translate ({ord(c): " " for c in "!@#$%^&*()[]{};:,./<>?\|`~-=_+"})
+        #             print('Words:', name_removeSpecialChars)
+        #         else:
+        #             print('Words:',name)
 
-            return synsets
+        #         definition = synset.definition()
+        #         print('Definition:', definition)
+
+        #         examples = synset.examples()
+        #         print('Examples:', examples)
+
+        #     return synsets
 
 # Wordnet POS
 # ADJ: 'a'
