@@ -27,7 +27,6 @@ from nltk import data
 from nltk.corpus import wordnet as wn
 from nltk.corpus import cmudict as cm
 
-
 class WordLookup():
     def __init__(self, application_id="quickword", *args, **kwargs):
 
@@ -43,6 +42,7 @@ class WordLookup():
         word = word.lower()
 
         # create list to store data to return
+        # structure = word, pronounciation, synsets
         data_tuple = []
 
         # capitalize the word for display and add to data list
@@ -51,7 +51,7 @@ class WordLookup():
         try:
             pronounce = self.dictionary[word]
         except:
-            pronounce = ""
+            pronounce = ["NA"]
         # add pronounciation to data list
         data_tuple.append(pronounce)
 
@@ -59,6 +59,7 @@ class WordLookup():
         synsets = wn.synsets(word)
         if len(synsets) > 0:
             data_tuple.append(synsets)
+            #print("lookup completed")
             return data_tuple
 
 
@@ -86,6 +87,9 @@ class WordLookup():
         #         print('Examples:', examples)
 
         #     return synsets
+
+
+
 
 # Wordnet POS
 # ADJ: 'a'

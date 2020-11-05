@@ -22,6 +22,7 @@
 @define-color shaded_dark shade(@theme_base_color, 0.87);
 @define-color shaded_darker shade(@theme_base_color, 0.85);
 @define-color shaded_base shade(@theme_base_color, 0.98);
+@define-color popup shade(@theme_base_color, 0.98);
 
 
 *:backdrop {
@@ -66,6 +67,9 @@ headerbar {
     border-radius: 4px;
 }
 
+.word-definition {
+    font-style: italic;
+}
 
 
 stack {
@@ -102,10 +106,14 @@ stack {
     100% {-gtk-icon-transform: translateY(0px);}
 }
 
-
-.copied-content {
+.copied-content, .copy-img {
     font-size: 0.9em;
-    color: gray;
+    color: white;
+    background-color: rgba(24, 24, 24, 0.85);
+    border-style: solid;
+    border-color: rgba(24, 24, 24, 0.9);
+    padding: 6px;
+    border-radius: 4px;
 }
 
 .edit-img {

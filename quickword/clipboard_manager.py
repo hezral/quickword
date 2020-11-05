@@ -49,6 +49,10 @@ class ClipboardListener(Clipboard):
         if self.clipboard.wait_is_target_available(self.text_target):
             content = self.clipboard.wait_for_text()
 
+            # remove multiple lines and only return first line
+            if "\n" in content:
+                content = content.split("\n")[0]
+
             # if selected text contains underscore and maybe other special characters
             # try to remove them and get the first word
             containsSpecialChars = any(not c.isalnum() for c in content)
@@ -59,8 +63,9 @@ class ClipboardListener(Clipboard):
             # avoid returning multi-word selections, just the first word
             if len(content.split(" ")) > 1:
                 content = content.split(" ")[0]
+
             valid = True
-            # content = content.capitalize()
+
             return content
         else:
             content = None

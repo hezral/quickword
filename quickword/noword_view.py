@@ -96,6 +96,7 @@ class NoWordView(Gtk.Grid):
         self.attach(sub_message, 0, 3, 1, 1)
         self.attach(entry, 0, 4, 1, 1)
 
+
     def on_entry_start(self, entry, eventkey):
         entry.props.secondary_icon_name = "edit-clear-symbolic"
 
@@ -108,7 +109,6 @@ class NoWordView(Gtk.Grid):
         window = stack.get_parent()
         app = window.props.application
         icon_overlay = [child for child in self.get_children() if isinstance(child, Gtk.Overlay)][0]
-
         entry.props.secondary_icon_name = None
 
         if entry.props.text == "":
@@ -124,6 +124,6 @@ class NoWordView(Gtk.Grid):
         else:
             # callback to WordLookup
             print('Callback to WordLookup')
-            app.emit("on-new-word-entered", entry.props.text)
+            app.emit("on-new-word-lookup", entry.props.text)
             # callback to WordView
             window.on_view_visible(view, runlookup=True, word=entry.props.text)

@@ -31,13 +31,7 @@ class WordView(Gtk.Grid):
     def __init__(self, word_data=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        #-- process the data --------#
-        # Wordnet POS 
-        # ADJ: 'a'
-        # ADJ_SAT: 's'
-        # ADV: 'r'
-        # NOUN: 'n'
-        # VERB: 'v'
+        # copy to clipboard
         self.clipboard_paste = None
 
         #-- pronounciation --------#
@@ -46,7 +40,6 @@ class WordView(Gtk.Grid):
         pronounciation_label.props.halign = Gtk.Align.START
         pronounciation_label.props.expand = False
         pronounciation_label.get_style_context().add_class("pronounciation-label")
-
 
         #-- stack construct --------#
         stack = Gtk.Stack()
@@ -74,11 +67,6 @@ class WordView(Gtk.Grid):
         self.attach(pronounciation_label, 0, 1, 1, 1)
         self.attach(stack, 0, 2, 1, 1)
         self.attach(stack_switcher, 0, 3, 1, 1,)
-        self.attach(button, 0, 4, 1, 1)
-
-        # generate the views on word lookup
-        self.on_wordlookup()
-
 
     def on_wordlookup(self, button=None, data=None):
         view = self
@@ -86,29 +74,37 @@ class WordView(Gtk.Grid):
         stack = [child for child in view.get_children() if isinstance(child, Gtk.Stack)][0]
         stack_switcher = [child for child in view.get_children() if isinstance(child, Gtk.StackSwitcher)][0]
 
-        pronounciation = "/" + "pronounciation" + "/"
-        pronounciation_label.props.label = pronounciation
+        word = data[1]
+        synsets = data[2]
+
+        # if len(pronounciation) > 1:
+        #     for i in pronounciation:
+        #         pronounciation = pronounciation + "," + "/" + i + "/"
+        # else:
+        #     pronounciation = "/" + data[1] + "/"
+        # pronounciation_label.props.label = '-'.join(pronounciation)
+
+        pronounciation = data[1]
+        # pronounciation_str = ""
+        # if len(pronounciation) > 1:
+        #     for item in pronounciation:
+        #         if pronounciation_str == "":
+        #             pronounciation_str = "," + item
+        #         else:
+        #             pronounciation_str = pronounciation_str + ", " + item
+        # elif len(pronounciation) == 0:
+        #     pronounciation_str = ""
+        # else:
+        #     pronounciation_str = pronounciation[0]
+
+        #print(pronounciation_str)
+
+        #pronounciation_label.props.label = "/ " + '-'.join(pronounciation_str) + " /"
 
         # delete all stack children if any
         if stack.get_children():
             for child in stack.get_children():
                 stack.remove(child)
-
-        import random
-        import string
-
-        letters = string.ascii_lowercase
-        result_str = ''.join(random.choice(letters) for i in range(8))
-
-        data = ("n", result_str + "-1", "a member of the genus Canis (probably descended from the common wolf) that has been domesticated by man since prehistoric times; occurs in many breeds", "the dog barked all night")
-        data1 = ("r", result_str + "-1", "a member of the genus Canis (probably descended from the common wolf) that has been domesticated by man since prehistoric times; occurs in many breeds", "the dog barked all night")
-        data2 = ("a", result_str + "-2", "a member of the genus Canis (probably descended from the common wolf) that has been domesticated by man since prehistoric times; occurs in many breeds", "the dog barked all night")
-        data3 = ("v", result_str + "-3", "a member of the genus Canis (probably descended from the common wolf) that has been domesticated by man since prehistoric times; occurs in many breeds", "the dog barked all night")
-        data4 = ("s", result_str + "-4", "a member of the genus Canis (probably descended from the common wolf) that has been domesticated by man since prehistoric times; occurs in many breeds", "the dog barked all night")
-        data5 = ("n", result_str + "-5", "a member of the genus Canis (probably descended from the common wolf) that has been domesticated by man since prehistoric times; occurs in many breeds", "the dog barked all night")
-        data6 = ("s", result_str + "-6", "a member of the genus Canis (probably descended from the common wolf) that has been domesticated by man since prehistoric times; occurs in many breeds", "the dog barked all night")
-
-        synsets = (data, data1, data2, data3, data4, data5, data6)
 
         # create list for each type of word
         noun_data = []
@@ -118,13 +114,13 @@ class WordView(Gtk.Grid):
 
         # add data to each word list
         for synset in synsets:
-            if synset[0] == "n":
+            if synset.pos() == "n":
                 noun_data.append(synset)
-            if synset[0] == "a" or synset[0] == "s":
+            if synset.pos() == "a" or synset.pos() == "s":
                 adjective_data.append(synset)
-            if synset[0] == "r":
+            if synset.pos() == "r":
                 adverb_data.append(synset)
-            if synset[0] == "v":
+            if synset.pos() == "v":
                 ver_data.append(synset)
 
         # add word lists to dict
@@ -152,11 +148,6 @@ class WordView(Gtk.Grid):
         
         stack.show_all()
 
-        
-
-
-
-        
 
 #------------------CLASS-SEPARATOR------------------#
 
@@ -168,7 +159,7 @@ class WordSubView(Gtk.Grid):
         #-- WordSubView construct -----#
         self.props.name = name
         self.props.hexpand = True
-        self.props.row_spacing = 4
+        self.props.row_spacing = 6
         self.props.column_spacing = 0
 
         if len(self.get_children()) > 0:
@@ -186,17 +177,60 @@ class WordSubView(Gtk.Grid):
 class WordItems(Gtk.Grid):
     def __init__(self, contents, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        #print("content", dir(contents))
+        synset = contents
+
+        lemmas = synset.lemma_names()
+
+        # if text contains underscore and maybe other special characters
+        # try to remove them and get the first word
+        for lemma in lemmas:
+            containsSpecialChars = any(not c.isalnum() for c in lemma)
+            if containsSpecialChars:
+                new_lemma = lemma.translate ({ord(c): " " for c in "!@#$%^&*()[]{};:,./<>?\|`~-=_+"})
+                lemmas.append(new_lemma)
+                lemmas.remove(lemma)
+
+        lemmas_str = ""
+        if len(lemmas) > 1:
+            for i in range(0, len(lemmas), 6):
+                if i < 6:
+                    lemmas_str += ", ".join(lemmas[i:i+6])
+                else:
+                    lemmas_str += "\n" + ", ".join(lemmas[i:i+6])
+        else:
+            lemmas_str = lemmas[0]
+        
+        definition_str = synset.definition()
+
+        examples = synset.examples()
+        examples_str = ""
+        if len(examples) > 1:
+            for example in examples:
+                if examples_str == "":
+                    examples_str = "- " + example
+                else:
+                    examples_str = examples_str + "\n" + "- " + example
+        elif len(examples) == 0:
+            examples_str = ""
+        else:
+            examples_str = "- " + examples[0]
+
         
         #-- header -------#
-        lemma_names = Gtk.Label(contents[1])
+        lemma_names = Gtk.Label(lemmas_str)
+        lemma_names.props.max_width_chars = 50
+        lemma_names.props.wrap = True
+        lemma_names.props.wrap_mode = Pango.WrapMode.CHAR
         lemma_names.props.halign = Gtk.Align.START
         lemma_names.props.valign = Gtk.Align.CENTER
         lemma_names.get_style_context().add_class("section-header")
 
         #-- word definition -------#
-        word_definition = Gtk.Label(contents[2])
-        word_definition.props.margin_bottom = 8
-        word_definition.props.margin_left = 4
+        word_definition = Gtk.Label(definition_str)
+        # word_definition.props.margin_bottom = 4
+        #word_definition.props.margin_left = 4
         word_definition.props.max_width_chars = 50
         word_definition.props.wrap = True
         word_definition.props.hexpand = True
@@ -204,11 +238,11 @@ class WordItems(Gtk.Grid):
         word_definition.props.justify = Gtk.Justification.FILL
         word_definition.props.halign = Gtk.Align.START
         word_definition.props.valign = Gtk.Align.START
-        word_definition.get_style_context().add_class("section-content")
+        word_definition.set_size_request(-1, 30)
+        word_definition.get_style_context().add_class("word-definition")
 
         #-- word examples -------#
-        word_examples = Gtk.Label("Examples: " + contents[3])
-        word_examples.props.margin_bottom = 15
+        word_examples = Gtk.Label(examples_str)
         word_examples.props.max_width_chars = 50
         word_examples.props.wrap = True
         word_examples.props.hexpand = True
@@ -218,13 +252,19 @@ class WordItems(Gtk.Grid):
         word_examples.props.valign = Gtk.Align.START
         word_examples.get_style_context().add_class("section-content")
 
+        word_examples_expander = Gtk.Expander()
+        word_examples_expander.props.label = "Examples (" + str(len(examples)) + ")"
+        word_examples_expander.add(word_examples)
+
         #-- copy action -------#
         copy_img = Gtk.Image().new_from_icon_name("edit-copy-symbolic", Gtk.IconSize.SMALL_TOOLBAR)
         copy_img.props.no_show_all = True
         copy_img.props.hexpand = True
         copy_img.props.halign = Gtk.Align.END
-        copy_img.props.valign = Gtk.Align.END
+        copy_img.props.valign = Gtk.Align.START
         copy_img.get_style_context().add_class("transition-on")
+        copy_img.get_style_context().add_class("copy-img")
+        
 
         copied_img = Gtk.Image().new_from_icon_name("emblem-default", Gtk.IconSize.SMALL_TOOLBAR)
         copied_img.props.no_show_all = True
@@ -235,24 +275,25 @@ class WordItems(Gtk.Grid):
         copied_grid = Gtk.Grid()
         copied_grid.props.column_spacing = 4
         copied_grid.props.halign = Gtk.Align.END
-        copied_grid.props.valign = Gtk.Align.END
+        copied_grid.props.valign = Gtk.Align.START
         copied_grid.props.hexpand = True
         copied_grid.get_style_context().add_class("transition-on")
         copied_grid.get_style_context().add_class("copied-content")
         copied_grid.attach(copied_img, 0, 1, 1, 1)
         copied_grid.attach(copied_label, 1, 1, 1, 1)
 
-        # contents = (lemma_names, word_definition)
-        hidden_widget = (copy_img, copied_label, copied_img, copied_grid, contents)
+        hidden_widget = (copy_img, copied_label, copied_img, copied_grid, synset)
 
         # workaround to avoid weird issue with enter and notify events after adding to the eventbox
         # put all in a grid, then put in eventbox. overlay didn't work
         content_grid = Gtk.Grid()
         content_grid.props.hexpand = True
-        content_grid.attach(word_definition, 0, 1, 1, 1)
         content_grid.attach(copy_img, 0, 1, 1, 3)
         content_grid.attach(copied_grid, 0, 1, 1, 3)
-        content_grid.attach(word_examples, 0, 2, 1, 1)
+        content_grid.attach(word_definition, 0, 1, 1, 1)
+
+        # if not examples_str == "":
+        #     content_grid.attach(word_examples_expander, 0, 2, 1, 1)
 
         #-- eventbox -------#
         content_eventbox = Gtk.EventBox()
@@ -270,6 +311,8 @@ class WordItems(Gtk.Grid):
         self.attach(lemma_names, 0, 1, 1, 1)
         self.attach(self.generate_separator(), 1, 1, 4, 1)
         self.attach(content_eventbox, 0, 2, 5, 1)
+        if len(examples) >= 1:
+            self.attach(word_examples_expander, 0, 3, 1, 1)
 
     def generate_separator(self):
         separator = Gtk.Separator()
@@ -318,9 +361,11 @@ class WordItems(Gtk.Grid):
 
         # callback to copy content to clipboard
         clipboard_paste = self.get_clipboard_paste()
+        
         print(clipboard_paste)
         clipboard_paste.copy_to_clipboard("test")
-        print("Callback to copy to clipbpard:", content)
+
+        print("Callback to copy to clipbpard:")
 
     def get_clipboard_paste(self):
         subview = self.get_parent()

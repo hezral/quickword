@@ -66,17 +66,17 @@ class SettingsView(Gtk.Grid):
         frame.get_style_context().add_class("settings-frame")
         frame.add(grid)
 
-        #-- logo --------#
-        left_icon = Gtk.Image().new_from_file("data/icons/134.svg")
-        #left_icon.get_style_context().add_class("about-icon-left")
-        right_icon = Gtk.Image().new_from_file("data/icons/133.svg")
-        #right_icon.get_style_context().add_class("about-icon-right")
-        icon_overlay = Gtk.Overlay()
-        icon_overlay.add(left_icon)
-        icon_overlay.add_overlay(right_icon)
-        icon_overlay.props.can_focus = True
-        icon_overlay.props.focus_on_click = True
-        icon_overlay.grab_focus()
+        # #-- logo --------#
+        # left_icon = Gtk.Image().new_from_file("data/icons/134.svg")
+        # #left_icon.get_style_context().add_class("about-icon-left")
+        # right_icon = Gtk.Image().new_from_file("data/icons/133.svg")
+        # #right_icon.get_style_context().add_class("about-icon-right")
+        # icon_overlay = Gtk.Overlay()
+        # icon_overlay.add(left_icon)
+        # icon_overlay.add_overlay(right_icon)
+        # icon_overlay.props.can_focus = True
+        # icon_overlay.props.focus_on_click = True
+        # icon_overlay.grab_focus()
 
         #-- SettingsView construct--------#
         self.props.name = "settings-view"
@@ -87,7 +87,7 @@ class SettingsView(Gtk.Grid):
         self.props.row_spacing = 6
         self.props.column_spacing = 6
         self.attach(frame, 0, 1, 1, 1)
-        self.attach(icon_overlay, 0, 2, 1, 1)
+        # self.attach(icon_overlay, 0, 2, 1, 1)
 
     def generate_separator(self):
         separator = Gtk.Separator()

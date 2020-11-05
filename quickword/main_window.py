@@ -36,17 +36,19 @@ from word_view import WordView
 
 
 class QuickWordWindow(Gtk.ApplicationWindow):
-    def __init__(self, lookup_word="QuickWord", lookup_data=None, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         # Add custom signals to detec new word selected
         # GObject.signal_new(signal_name, type, flags, return_type, param_types)
-        GObject.signal_new("on-new-word-selected", Gtk.ApplicationWindow, GObject.SIGNAL_RUN_LAST, GObject.TYPE_BOOLEAN, [GObject.TYPE_STRING])
-        self.connect("on-new-word-selected", self.on_new_word_received)
+        # param_types is a list example [GObject.TYPE_PYOBJECT, GObject.TYPE_STRING]
+        GObject.signal_new("on-new-word-selected", Gtk.ApplicationWindow, GObject.SIGNAL_RUN_LAST, GObject.TYPE_BOOLEAN, [GObject.TYPE_PYOBJECT])
+        self.connect("on-new-word-selected", self.on_new_word_selected)
         # self.emit("on-new-word-selected", new_word)
 
         #-- variables --------#
-        self.lookup_word = lookup_word
+        # self.lookup_word = self.props.application.lookup_word
+        self.lookup_word = "QuickWord"
 
         #-- view --------#
         noword = NoWordView()
@@ -110,6 +112,12 @@ class QuickWordWindow(Gtk.ApplicationWindow):
         self.set_keep_above(True)
         self.get_style_context().add_class("rounded")
         self.set_size_request(600, -1) #set width to -1 to expand and retract based on content
+
+        # geometry = Gdk.Geometry()
+        # setattr(geometry, 'max_width', 600)
+        # setattr(geometry, 'min_height', -1)
+        # self.set_geometry_hints(None, geometry, Gdk.WindowHints.MAX_SIZE)
+
         self.props.window_position = Gtk.WindowPosition.MOUSE
         self.set_titlebar(headerbar)
         self.add(stack)
@@ -131,7 +139,7 @@ class QuickWordWindow(Gtk.ApplicationWindow):
             # print('state-flags-on')
         if not gio_settings.get_value("sticky-mode"):
             self.stick()
-            
+        
 
     def get_window_child_widgets(self):
         window = self
@@ -142,13 +150,16 @@ class QuickWordWindow(Gtk.ApplicationWindow):
         word_grid = word_box.get_child()
         return headerbar, stack, word_grid
 
-    def on_new_word_received(self, window, new_word):
+    def on_new_word_selected(self, window, word_data):
         headerbar, stack, word_grid = self.get_window_child_widgets()
         word_label = [child for child in word_grid.get_children() if isinstance(child, Gtk.Label)][0]
-        word_label.props.label = new_word
+        word_label.props.label = word_data[0]
         word_view = stack.get_child_by_name("word-view")
-        word_view.on_wordlookup()
-        stack.set_visible_child_name(name="word-view")  
+        stack.set_visible_child_name(name="word-view")
+        word_view.on_wordlookup(data=word_data)
+        # reset active_view and lookup_word
+        self.active_view = word_view
+        self.lookup_word = word_data[0]
 
     def on_enter_word_label(self, *args):
         headerbar, stack, word_grid = self.get_window_child_widgets()
@@ -177,8 +188,14 @@ class QuickWordWindow(Gtk.ApplicationWindow):
             message.props.label = "Lookup a new word"
             word_label.props.label = "QuickWord"
             self.active_view = noword_view
-            noword_view.show() #need to show since it was hiddden in on_view_visible
+            # need to clear entry text since clipboard_listener will pickup the text as it will be selected on focus and cause a loop back to the word-view
+            entry = [child for child in noword_view.get_children() if isinstance(child, Gtk.Entry)][0]
+            entry.props.text = ""
+            #need to show since it was hiddden in on_view_visible
+            noword_view.show() 
             stack.set_visible_child_name(name="no-word-view")
+
+            
 
     def on_view_visible(self, view, gparam=None, runlookup=None, word=None):
         headerbar, stack, word_grid = self.get_window_child_widgets()
@@ -196,15 +213,17 @@ class QuickWordWindow(Gtk.ApplicationWindow):
             stack.get_style_context().add_class("stack-settings")
             headerbar.get_style_context().add_class("headerbar-settings")
             stack.set_visible_child_name(name="settings-view")
+
         elif view.props.name == "no-word-view" and runlookup:
             self.active_view = word_view
             view.hide()
             word_label.props.label = self.lookup_word
             word_view_stack = [child for child in word_view.get_children() if isinstance(child, Gtk.Stack)][0]
-            word_view_stack_first_child = word_view_stack.get_children()[0]
-            word_view_stack.set_visible_child(word_view_stack_first_child)
+            # word_view_stack_first_child = word_view_stack.get_children()[0]
+            # word_view_stack.set_visible_child(word_view_stack_first_child)
             headerbar.get_style_context().remove_class("headerbar-settings")
-            stack.set_visible_child_name(name="word-view")            
+            stack.set_visible_child_name(name="word-view")
+
         elif self.lookup_word == "QuickWord":
             self.active_view = noword_view
             view.hide()
@@ -212,6 +231,7 @@ class QuickWordWindow(Gtk.ApplicationWindow):
             stack.get_style_context().remove_class("stack-settings")
             headerbar.get_style_context().remove_class("headerbar-settings")
             stack.set_visible_child_name(name="no-word-view")
+
         else:
             view.hide()
             if self.active_view.get_name() == "no-word-view":
@@ -221,6 +241,7 @@ class QuickWordWindow(Gtk.ApplicationWindow):
             stack.get_style_context().remove_class("stack-settings")
             headerbar.get_style_context().remove_class("headerbar-settings")
             stack.set_visible_child_name(name=self.active_view.get_name())
+
 
     def on_persistent_mode(self, widget, event):
         # state flags for window active state
