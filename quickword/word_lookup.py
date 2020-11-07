@@ -28,7 +28,7 @@ from nltk.corpus import wordnet as wn
 from nltk.corpus import cmudict as cm
 
 class WordLookup():
-    def __init__(self, application_id="quickword", *args, **kwargs):
+    def __init__(self, application_id="com.github.hezral.quickword", *args, **kwargs):
 
         nltk_data_path = os.path.join(GLib.get_user_data_dir(), application_id, 'nltk_data')
 
@@ -37,7 +37,6 @@ class WordLookup():
         self.dictionary = cm.dict()
 
     def get_synsets(self, word):
-
         # lowercase the word for dict to work and maybe wordnet too
         word = word.lower()
 
@@ -46,7 +45,15 @@ class WordLookup():
         data_tuple = []
 
         # capitalize the word for display and add to data list
-        data_tuple.append(word.capitalize())
+        # if text contains underscore and maybe other special characters
+        # use lemma_label for cleaned string
+        # use lemma_name for original string
+        containsSpecialChars = any(not c.isalnum() for c in word)
+        if containsSpecialChars:
+            _word = word.translate ({ord(c): " " for c in "!@#$%^&*()[]{};:,./<>?\|`~-=_+"})
+            data_tuple.append(_word.title())
+        else:
+            data_tuple.append(word.capitalize())
 
         try:
             pronounce = self.dictionary[word]
@@ -62,31 +69,13 @@ class WordLookup():
             #print("lookup completed")
             return data_tuple
 
+    def get_totalwords(self, run):
+        total = len(list(wn.all_synsets()))
+        result = []
+        result.append(total)
+        return result
 
-        # if len(synsets) > 0:
-        #     print(len(synsets))
-        #     print('Synonyms:', synsets)
 
-        #     for synset in synsets:
-
-        #         name = synset.name().split('.')[0]
-
-        #         # sometimes synset contains underscore and maybe other special characters
-        #         # need to remove them
-        #         containsSpecialChars = any(not c.isalnum() for c in name)
-        #         if containsSpecialChars:
-        #             name_removeSpecialChars = name.translate ({ord(c): " " for c in "!@#$%^&*()[]{};:,./<>?\|`~-=_+"})
-        #             print('Words:', name_removeSpecialChars)
-        #         else:
-        #             print('Words:',name)
-
-        #         definition = synset.definition()
-        #         print('Definition:', definition)
-
-        #         examples = synset.examples()
-        #         print('Examples:', examples)
-
-        #     return synsets
 
 
 

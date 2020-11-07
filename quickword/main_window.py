@@ -150,6 +150,10 @@ class QuickWordWindow(Gtk.ApplicationWindow):
         word_grid = word_box.get_child()
         return headerbar, stack, word_grid
 
+    def get_window_child(self, class_obj):
+        widget = [child for child in self.get_children() if isinstance(child, class_obj)][0]
+        return widget
+
     def on_new_word_selected(self, window, word_data):
         headerbar, stack, word_grid = self.get_window_child_widgets()
         word_label = [child for child in word_grid.get_children() if isinstance(child, Gtk.Label)][0]
@@ -196,51 +200,50 @@ class QuickWordWindow(Gtk.ApplicationWindow):
             stack.set_visible_child_name(name="no-word-view")
 
             
-
     def on_view_visible(self, view, gparam=None, runlookup=None, word=None):
         headerbar, stack, word_grid = self.get_window_child_widgets()
         word_label = [child for child in word_grid.get_children() if isinstance(child, Gtk.Label)][0]
         word_view = stack.get_child_by_name("word-view")
         noword_view = stack.get_child_by_name("no-word-view")
+        settings_view = stack.get_child_by_name("settings-view")
 
         if word is not None:
             self.lookup_word = word.capitalize()
 
         # toggle settings-view visibility based on visible property
         if view.props.name == "settings-view" and view.is_visible():
-            view.show_all()
+            # view.show_all() # have to manually show settings-view?
+            self.active_view = settings_view
             word_label.props.label = "Settings"
-            stack.get_style_context().add_class("stack-settings")
-            headerbar.get_style_context().add_class("headerbar-settings")
-            stack.set_visible_child_name(name="settings-view")
 
         elif view.props.name == "no-word-view" and runlookup:
-            self.active_view = word_view
             view.hide()
-            word_label.props.label = self.lookup_word
-            word_view_stack = [child for child in word_view.get_children() if isinstance(child, Gtk.Stack)][0]
-            # word_view_stack_first_child = word_view_stack.get_children()[0]
-            # word_view_stack.set_visible_child(word_view_stack_first_child)
-            headerbar.get_style_context().remove_class("headerbar-settings")
-            stack.set_visible_child_name(name="word-view")
+            self.active_view = word_view
 
         elif self.lookup_word == "QuickWord":
-            self.active_view = noword_view
             view.hide()
+            self.active_view = noword_view
             word_label.props.label = self.lookup_word
-            stack.get_style_context().remove_class("stack-settings")
-            headerbar.get_style_context().remove_class("headerbar-settings")
-            stack.set_visible_child_name(name="no-word-view")
 
         else:
             view.hide()
-            if self.active_view.get_name() == "no-word-view":
+            if self.active_view.props.name == "no-word-view":
+                self.active_view = noword_view
                 word_label.props.label = "QuickWord"
             else:
+                self.active_view = word_view
                 word_label.props.label = self.lookup_word
+
+        # toggle css styling
+        if self.active_view.props.name == "settings-view":
+            stack.get_style_context().add_class("stack-settings")
+            headerbar.get_style_context().add_class("headerbar-settings")
+        else:
             stack.get_style_context().remove_class("stack-settings")
             headerbar.get_style_context().remove_class("headerbar-settings")
-            stack.set_visible_child_name(name=self.active_view.get_name())
+
+        # finally set visible stack
+        stack.set_visible_child_name(name=self.active_view.props.name)
 
 
     def on_persistent_mode(self, widget, event):

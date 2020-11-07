@@ -36,7 +36,7 @@ DATA_IDS = ('wordnet', 'omw', 'cmudict')
 
 
 class DataUpdater():
-    def __init__(self, application_id="quickword", *args, **kwargs):
+    def __init__(self, application_id="com.github.hezral.quickword", *args, **kwargs):
 
         self.nltk_data_path = os.path.join(GLib.get_user_data_dir(), application_id, 'nltk_data')
 
@@ -86,6 +86,9 @@ class UpdateDialog(Gtk.Dialog):
         print("something")
         #-- UpdateDialog construct--------#
 
+
+# update = DataUpdater("com.github.hezral.quickword")
+# update.update_data()
 
 
 # def app_main():

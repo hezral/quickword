@@ -83,7 +83,6 @@ class QuickWordApp(Gtk.Application):
         # # provider.load_from_resource ("com/github/hezral/quickword/application.css")
         Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 
-
         # get word_lookup after background init
         _word_lookup = _run_background.join()
         print(datetime.now(), "word lookup init")
@@ -150,6 +149,7 @@ class QuickWordApp(Gtk.Application):
         # setup background updater
         print(datetime.now(), "background updater initiated")
 
+
         print(datetime.now(), "post-activate")
 
     def on_word_lookup_load(self, application_id):
@@ -173,6 +173,12 @@ class QuickWordApp(Gtk.Application):
             # emit the signal to trigger content update callback
             self.window.emit("on-new-word-selected", word_data)
             print(datetime.now(), "emit on-new-word-selected")
+            return True
+        else:
+            # go back to no-word-view
+            self.window.on_manual_lookup()
+            return False
+
 
     def on_quit_action(self, action, param):
         if self.window is not None:

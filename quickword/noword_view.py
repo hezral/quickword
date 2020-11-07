@@ -76,6 +76,7 @@ class NoWordView(Gtk.Grid):
         entry.props.focus_on_click = True
         entry.props.placeholder_text = "type a word like 'quick' and press enter"
         entry.props.xalign = 0.5
+        entry.get_style_context().add_class("entry-word")
         entry.connect("key-press-event", self.on_entry_start)
         entry.connect("button-press-event", self.on_entry_start)
         entry.connect("activate", self.on_entry_activate)
@@ -116,14 +117,11 @@ class NoWordView(Gtk.Grid):
             entry.props.text = ""
             entry.props.placeholder_text = "need a word here 😀️"
             icon_overlay.grab_focus()
-        elif len(entry.get_text().split(" ")) > 1:
-            # need to reset text, bug maybe?
-            entry.props.text = ""
-            entry.props.placeholder_text = "please type a single word 🧐️"
-            icon_overlay.grab_focus()
         else:
             # callback to WordLookup
-            print('Callback to WordLookup')
-            app.emit("on-new-word-lookup", entry.props.text)
-            # callback to WordView
-            window.on_view_visible(view, runlookup=True, word=entry.props.text)
+            lookup = app.emit("on-new-word-lookup", entry.props.text)
+            # check if word lookup succeeded or not
+            if lookup is False:
+                entry.props.text = ""
+                entry.props.placeholder_text = "please type a valid word 🧐️"
+                icon_overlay.grab_focus()

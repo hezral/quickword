@@ -67,9 +67,6 @@ headerbar {
     border-radius: 4px;
 }
 
-.word-definition {
-    font-style: italic;
-}
 
 
 stack {
@@ -109,12 +106,36 @@ stack {
 .copied-content, .copy-img {
     font-size: 0.9em;
     color: white;
-    background-color: rgba(24, 24, 24, 0.85);
+    background-color: rgba(24, 24, 24, 0.75);
     border-style: solid;
-    border-color: rgba(24, 24, 24, 0.9);
-    padding: 6px;
+    padding: 4px;
     border-radius: 4px;
 }
+
+.word-examples {
+    font-style: italic;
+    color: gray;
+}
+
+.word-lemmas {
+    opacity: 0.7;
+    font-size: 0.9em;
+    border-style: solid;
+    border-width: 1px;
+    padding-left: 4px;
+    padding-right: 4px;
+    border-radius: 12px;
+}
+
+.word-lemmas:hover {
+    opacity: 1.0;
+}
+
+.word-lemmas:focus {
+    box-shadow: none;
+}
+    
+
 
 .edit-img {
     color: white;
@@ -156,4 +177,20 @@ stack {
 
 .subview-switcher > button:checked {
     font-weight: bold;
+}
+
+
+/* .scrolled-view-top-overlay {
+    opacity: 0.5;
+    background-image: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%,rgba(0,0,0,0) 25%,rgba(0,0,0,0) 100%);
+}
+
+.scrolled-view-bottom-overlay {
+    opacity: 0.5;
+    background-image: linear-gradient(to top, rgba(0,0,0,0.3) 0%,rgba(0,0,0,0) 25%,rgba(0,0,0,0) 100%);
+} */
+
+.more-results {
+    color: gray;
+    font-size: 0.9em;
 }
