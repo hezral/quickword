@@ -23,61 +23,101 @@ import os
 import gi
 from gi.repository import GLib
 
+# nltk imports
 from nltk import data
 from nltk.corpus import wordnet as wn
 from nltk.corpus import cmudict as cm
 
+# for ipa output of words by espeak
+import subprocess
+from shutil import which, Error
+
 class WordLookup():
     def __init__(self, application_id="com.github.hezral.quickword", *args, **kwargs):
 
+        # setup nltk data path
         nltk_data_path = os.path.join(GLib.get_user_data_dir(), application_id, 'nltk_data')
-
         data.path = [nltk_data_path]
 
-        self.dictionary = cm.dict()
+        # # setup cmudict
+        # self.dictionary = cm.dict()
+
+        #check if exiftool is installed
+        try:
+            self.espeak = which("espeak")
+        except Error as error:
+            print("espeack not installed") 
 
     def get_synsets(self, word):
-        # lowercase the word for dict to work and maybe wordnet too
-        word = word.lower()
+
 
         # create list to store data to return
         # structure = word, pronounciation, synsets
         data_tuple = []
 
-        # capitalize the word for display and add to data list
-        # if text contains underscore and maybe other special characters
-        # use lemma_label for cleaned string
-        # use lemma_name for original string
+        # lowercase the word
+        word = word.lower()
+
+        # remove spaces in front and back
+        word = word.strip()
+
+        # remove special characters in front of word
+        FirstContainsSpecialChars = any(not c.isalnum() for c in word[0])
+        LastContainsSpecialChars = any(not c.isalnum() for c in word[len(word)-1])
+
+        if FirstContainsSpecialChars:
+             word = word[1:]
+        if LastContainsSpecialChars:
+             word = word[0:-1]
+
+        # get synsets for word
+        # wordnet lookup can only contain letters, numbers, spaces, hyphens, periods, slashes, and/or apostrophes.
+        # check if safe chars and try to get synsets first
+        containsSafeChar = set(" -./'_")
+        if any((c in containsSafeChar) for c in word):
+
+            synsets = wn.synsets(word)
+            # if none returns
+            if len(synsets) == 0:
+                word = word.translate({ord(c): " " for c in " -./'_"}).split(" ")[0] #replace safe chars with space and only get for first word
+
+                synsets = wn.synsets(word)
+        else:
+            synsets = wn.synsets(word)
+        
+        # clean up word for display, remove any special characters
         containsSpecialChars = any(not c.isalnum() for c in word)
         if containsSpecialChars:
-            _word = word.translate ({ord(c): " " for c in "!@#$%^&*()[]{};:,./<>?\|`~-=_+"})
+            _word = word.translate({ord(c): " " for c in "!@#$%^&*()[]{};:,./<>?\|`~-=_+"})
             data_tuple.append(_word.title())
         else:
             data_tuple.append(word.capitalize())
 
+        # get pronounciation
         try:
-            pronounce = self.dictionary[word]
+            run_espeak = subprocess.Popen([self.espeak, word, "-q", "--ipa"], stdout=subprocess.PIPE)
+            stdout, stderr = run_espeak.communicate()
+            pronounce = stdout.decode("utf-8").split("\n")[0].strip()
         except:
             pronounce = ["NA"]
         # add pronounciation to data list
+
         data_tuple.append(pronounce)
 
-        # get synsets for word and add to data list if there is any synset found
-        synsets = wn.synsets(word)
+        # add to data list if there is any synset found
         if len(synsets) > 0:
             data_tuple.append(synsets)
-            #print("lookup completed")
+
             return data_tuple
 
-    def get_totalwords(self, run):
-        total = len(list(wn.all_synsets()))
-        result = []
-        result.append(total)
-        return result
+    def get_totalwords(self):
+        return len(wn._lemma_pos_offset_map)
+
+# wd = WordLookup()
 
 
 
-
+# wd.get_synsets("data_tuple")
 
 
 # Wordnet POS

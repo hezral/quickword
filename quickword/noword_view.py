@@ -33,9 +33,9 @@ class NoWordView(Gtk.Grid):
 
         #-- quickword logo --------#
         left_icon = Gtk.Image().new_from_file("data/icons/134.svg")
-        #left_icon.get_style_context().add_class("about-icon-left")
+        #left_icon.get_style_context().add_class("quickword-icon-left")
         right_icon = Gtk.Image().new_from_file("data/icons/133.svg")
-        right_icon.get_style_context().add_class("about-icon-right")
+        right_icon.get_style_context().add_class("quickword-icon-right")
         icon_overlay = Gtk.Overlay()
         icon_overlay.add(left_icon)
         icon_overlay.add_overlay(right_icon)
@@ -110,6 +110,7 @@ class NoWordView(Gtk.Grid):
         window = stack.get_parent()
         app = window.props.application
         icon_overlay = [child for child in self.get_children() if isinstance(child, Gtk.Overlay)][0]
+        message = [child for child in self.get_children() if child.props.name == "message"][0]
         entry.props.secondary_icon_name = None
 
         if entry.props.text == "":
@@ -122,6 +123,7 @@ class NoWordView(Gtk.Grid):
             lookup = app.emit("on-new-word-lookup", entry.props.text)
             # check if word lookup succeeded or not
             if lookup is False:
+                message.props.label = "Word not found"
                 entry.props.text = ""
-                entry.props.placeholder_text = "please type a valid word 🧐️"
+                entry.props.placeholder_text = "please type a valid ssssword 🧐️"
                 icon_overlay.grab_focus()

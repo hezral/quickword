@@ -68,15 +68,23 @@ class SettingsView(Gtk.Grid):
 
         # #-- logo --------#
         # left_icon = Gtk.Image().new_from_file("data/icons/134.svg")
-        # #left_icon.get_style_context().add_class("about-icon-left")
+        # #left_icon.get_style_context().add_class("quickword-icon-left")
         # right_icon = Gtk.Image().new_from_file("data/icons/133.svg")
-        # #right_icon.get_style_context().add_class("about-icon-right")
+        # right_icon.get_style_context().add_class("quickword-icon-right")
         # icon_overlay = Gtk.Overlay()
         # icon_overlay.add(left_icon)
         # icon_overlay.add_overlay(right_icon)
         # icon_overlay.props.can_focus = True
         # icon_overlay.props.focus_on_click = True
         # icon_overlay.grab_focus()
+
+        #-- total words --------#
+        totalwords_label = Gtk.Label()
+        totalwords_label.props.name = "total-words"
+        totalwords_label.props.vexpand = True
+        totalwords_label.props.valign = Gtk.Align.END
+        totalwords_label.get_style_context().add_class(totalwords_label.props.name)
+
 
         #-- SettingsView construct--------#
         self.props.name = "settings-view"
@@ -87,7 +95,12 @@ class SettingsView(Gtk.Grid):
         self.props.row_spacing = 6
         self.props.column_spacing = 6
         self.attach(frame, 0, 1, 1, 1)
+        self.attach(totalwords_label, 0, 2, 1, 1)
         # self.attach(icon_overlay, 0, 2, 1, 1)
+
+    def on_totalwords(self, total_words):
+        totalwords_label = [child for child in self.get_children() if isinstance(child, Gtk.Label)][0]
+        totalwords_label.props.label = "Total words available: " + str(total_words)
 
     def generate_separator(self):
         separator = Gtk.Separator()
@@ -110,9 +123,9 @@ class SettingsView(Gtk.Grid):
                     #print('state-flags-off')
             if name == "sticky-mode":
                 if switch.get_active():
-                    window.unstick()
-                else:
                     window.stick()
+                else:
+                    window.unstick()
 
 
 #------------------CLASS-SEPARATOR------------------#
@@ -136,7 +149,7 @@ class SubSettings(Gtk.Grid):
         if sublabel is not None:
             sublabel = Gtk.Label(sublabel)
             sublabel.props.halign = Gtk.Align.START
-            sublabel.get_style_context().add_class("sub-label")
+            sublabel.get_style_context().add_class("settings-sub-label")
             box.add(sublabel)
 
         #------ switch--------#

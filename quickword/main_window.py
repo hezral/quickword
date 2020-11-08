@@ -72,7 +72,6 @@ class QuickWordWindow(Gtk.ApplicationWindow):
         edit_img = Gtk.Image().new_from_icon_name("insert-text-symbolic", Gtk.IconSize.SMALL_TOOLBAR)
         edit_img.props.no_show_all = True
         edit_img.get_style_context().add_class("transition-on")
-        edit_img.get_style_context().add_class("edit-img")
 
         word_grid = Gtk.Grid()
         word_grid.props.column_spacing = 4
@@ -137,7 +136,7 @@ class QuickWordWindow(Gtk.ApplicationWindow):
         if not gio_settings.get_value("persistent-mode"):
             self.state_flags_on = self.connect("state-flags-changed", self.on_persistent_mode)
             # print('state-flags-on')
-        if not gio_settings.get_value("sticky-mode"):
+        if gio_settings.get_value("sticky-mode"):
             self.stick()
         
 
@@ -182,14 +181,17 @@ class QuickWordWindow(Gtk.ApplicationWindow):
         else:
             edit_img.set_state_flags(Gtk.StateFlags.DIR_LTR, True)
 
-    def on_manual_lookup(self, *args):
+    def on_manual_lookup(self, eventbutton=None, eventbox=None, not_found=False, *args):
         headerbar, stack, word_grid = self.get_window_child_widgets()
         word_label = [child for child in word_grid.get_children() if isinstance(child, Gtk.Label)][0]
         noword_view = stack.get_child_by_name("no-word-view")
         message = [child for child in noword_view.get_children() if child.get_name() == "message"][0]
 
         if stack.get_visible_child_name() == "word-view":
-            message.props.label = "Lookup a new word"
+            if not_found:
+                message.props.label = "Word not found"
+            else:
+                message.props.label = "Lookup a new word"
             word_label.props.label = "QuickWord"
             self.active_view = noword_view
             # need to clear entry text since clipboard_listener will pickup the text as it will be selected on focus and cause a loop back to the word-view
@@ -215,6 +217,7 @@ class QuickWordWindow(Gtk.ApplicationWindow):
             # view.show_all() # have to manually show settings-view?
             self.active_view = settings_view
             word_label.props.label = "Settings"
+            settings_view.on_totalwords(self.props.application.total_words)
 
         elif view.props.name == "no-word-view" and runlookup:
             view.hide()

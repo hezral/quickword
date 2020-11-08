@@ -23,23 +23,35 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Pango
 
+# for espeak
+import subprocess
+from shutil import which, Error
 
 #------------------CLASS-SEPARATOR------------------#
 
 
 class WordView(Gtk.Grid):
-    def __init__(self, word_data=None, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         # copy to clipboard
         self.clipboard_paste = None
+        self.lookup_word = None
 
         #-- pronounciation --------#
         pronounciation_label = Gtk.Label()
-        pronounciation_label.props.name = "pronounciation_label"
+        pronounciation_label.props.name = "pronounciation-label"
         pronounciation_label.props.halign = Gtk.Align.START
-        pronounciation_label.props.expand = False
-        pronounciation_label.get_style_context().add_class("pronounciation-label")
+        pronounciation_label.props.hexpand = True
+        pronounciation_label.get_style_context().add_class(pronounciation_label.props.name)
+
+        #-- speak button --------#
+        speak_btn = Gtk.Button(image=Gtk.Image().new_from_icon_name("audio-volume-high-symbolic", Gtk.IconSize.SMALL_TOOLBAR))
+        speak_btn.props.halign = Gtk.Align.START
+        speak_btn.props.hexpand = False
+        speak_btn.props.margin_right = 5
+        speak_btn.props.name = "speak-btn"
+        speak_btn.connect("clicked", self.on_speak_word)
 
         #-- stack construct --------#
         stack = Gtk.Stack()
@@ -51,10 +63,7 @@ class WordView(Gtk.Grid):
         stack_switcher.props.homogeneous = True
         stack_switcher.props.stack = stack
         stack_switcher.props.margin_top = 4
-        stack_switcher.get_style_context().add_class("subview-switcher")
-
-        button = Gtk.Button(label="remove")
-        button.connect("clicked", self.on_wordlookup)
+        stack_switcher.get_style_context().add_class("subview-switcher")       
 
          #-- WordView construct--------#
         self.props.name = 'word-view'
@@ -63,46 +72,32 @@ class WordView(Gtk.Grid):
         self.props.expand = False
         self.props.margin = 20
         self.props.margin_top = 0
-        self.props.row_spacing = 6
-        # self.props.column_spacing = 6
-        self.attach(pronounciation_label, 0, 1, 1, 1)
-        self.attach(stack, 0, 2, 1, 1)
-        self.attach(stack_switcher, 0, 3, 1, 1,)
+        self.props.row_spacing = 6       
+        self.attach(speak_btn, 0, 1, 1, 1)
+        self.attach(pronounciation_label, 1, 1, 1, 1)
+        self.attach(stack, 0, 2, 2, 1)
+        self.attach(stack_switcher, 0, 3, 2, 1,)
+
+    def on_speak_word(self, button):
+        try:
+            subprocess.call(["espeak", self.lookup_word])
+        except:
+            pass
 
     def on_wordlookup(self, button=None, data=None):
         view = self
-        pronounciation_label = [child for child in view.get_children() if child.get_name() == "pronounciation_label"][0]
+        pronounciation_label = [child for child in view.get_children() if child.get_name() == "pronounciation-label"][0]
+        speak_btn = [child for child in view.get_children() if child.get_name() == "speak-btn"][0]
         stack = [child for child in view.get_children() if isinstance(child, Gtk.Stack)][0]
         stack_switcher = [child for child in view.get_children() if isinstance(child, Gtk.StackSwitcher)][0]
 
-        lookup_word = data[0]
+        self.lookup_word = data[0]
         synsets = data[2]
 
-        # if len(pronounciation) > 1:
-        #     for i in pronounciation:
-        #         pronounciation = pronounciation + "," + "/" + i + "/"
-        # else:
-        #     pronounciation = "/" + data[1] + "/"
-        # pronounciation_label.props.label = '-'.join(pronounciation)
-
+        # set pronounciation label
         pronounciation = data[1]
-        # pronounciation_str = ""
-        # if len(pronounciation) > 1:
-        #     for item in pronounciation:
-        #         if pronounciation_str == "":
-        #             pronounciation_str = "," + item
-        #         else:
-        #             pronounciation_str = pronounciation_str + ", " + item
-        # elif len(pronounciation) == 0:
-        #     pronounciation_str = ""
-        # else:
-        #     pronounciation_str = pronounciation[0]
-
-        #print(pronounciation_str)
-
-        pronounciation_label.props.label = "/ " + "pronounciation" + " /"
-        # pronounciation_label.props.label = "/ " + '-'.join(pronounciation_str) + " /"
-
+        pronounciation_label.props.label = "/ " + pronounciation + " /"
+        
         # delete all stack children if any
         if stack.get_children():
             for child in stack.get_children():
@@ -135,7 +130,7 @@ class WordView(Gtk.Grid):
         subviews = {}
         for type in word_list_dict:
             if len(word_list_dict[type]) > 0:
-                subviews["{0}".format(type)] = WordSubView(name=type, word=lookup_word, contents=word_list_dict[type])
+                subviews["{0}".format(type)] = WordSubView(name=type, word=self.lookup_word, contents=word_list_dict[type])
                 
         # add views to stack
         for view in subviews:
@@ -184,8 +179,8 @@ class WordSubView(Gtk.Grid):
             scrolled_view.add(scrolled_view_grid)
             self.attach(scrolled_view, 0, 1, 1, 1)
 
-            more = len(scrolled_view_grid.get_children()) - 10
-            label = Gtk.Label(str(more) + " more results below..")
+            more_count = len(scrolled_view_grid.get_children()) - 10
+            label = Gtk.Label(str(more_count) + " more results below..")
             label.get_style_context().add_class("more-results")
             self.attach(label, 0, 2, 1, 1)
 
@@ -209,12 +204,12 @@ class WordItems(Gtk.Grid):
         word_definition.props.wrap_mode = Pango.WrapMode.WORD
         word_definition.props.justify = Gtk.Justification.FILL
         word_definition.props.halign = Gtk.Align.START
-        word_definition.props.valign = Gtk.Align.START
+        word_definition.props.valign = Gtk.Align.CENTER
         word_definition.get_style_context().add_class("word-definition")
 
         #-- word examples -------#
         examples = synset.examples()
-        
+
         if len(examples) > 0:
             examples_str = '"' + examples[0] + '"'
         else:
@@ -236,10 +231,16 @@ class WordItems(Gtk.Grid):
         word_box.set_size_request(-1, 24)
         word_box.add(word_definition)
         if not examples_str == "":
+            word_definition.props.valign = Gtk.Align.START
             word_box.add(word_examples)
 
         #-- lemmas (similar words) -------#
         lemmas = synset.lemma_names()
+        # print(lemmas)
+
+        lemmas.sort(key=len)
+
+        # print(lemmas)
 
         # remove lemma that is same with lookup word
         for lemma in lemmas:
@@ -249,20 +250,26 @@ class WordItems(Gtk.Grid):
         # grid to hold lemma till 5th item
         lemma_box = Gtk.Grid()
         lemma_box.props.column_spacing = 2
-        lemma_box.props.hexpand = False
-        lemma_box.props.margin_left = 4
+        lemma_box.props.row_spacing = 2
+        lemma_box.props.hexpand = True
         lemma_box.props.halign = Gtk.Align.START
 
         # grid to hold lemma for 6th item onwards
         lemma_more_box = Gtk.Grid()
         lemma_more_box.props.margin_top = 10
+        lemma_more_box.props.hexpand = False
+        lemma_more_box.props.halign = Gtk.Align.START
+        lemma_more_box.props.column_spacing = 2
+        lemma_more_box.props.row_spacing = 4
         # encased into expander
         lemma_more_expander = Gtk.Expander()
         lemma_more_expander.props.margin_top = 3        
         lemma_more_expander.add(lemma_more_box)
         
         # iterate through lemmas list
-        i = 0
+        i = j = k = 0
+        charslen = 0
+        charslenmore = 0
         if len(lemmas) > 1:
             for lemma in lemmas:
                 # if text contains underscore and maybe other special characters
@@ -273,11 +280,24 @@ class WordItems(Gtk.Grid):
                     lemma_name = lemma.translate ({ord(c): " " for c in "!@#$%^&*()[]{};:,./<>?\|`~-=_+"})
                 else:
                     lemma_name = lemma
-                if i < 5:
-                    lemma_box.attach(self.generate_lemma_buttons(lemma_label=lemma_name, lemma_name=lemmas[i]), i, 1, 1, 1)
-                else:
-                    lemma_more_box.attach(self.generate_lemma_buttons(lemma_label=lemma_name, lemma_name=lemmas[i]), i, 1, 1, 1)
+
+                charslen = len(lemma) + charslen
+                if i < 6:
+                    if charslen <= 70:
+                        lemma_box.attach(self.generate_lemma_buttons(lemma_label=lemma_name, lemma_name=lemmas[i]), i, 1, 1, 1)
+                    else:
+                        charslenmore = len(lemma) + charslenmore
+                        if charslenmore <= 70:
+                            lemma_more_box.attach(self.generate_lemma_buttons(lemma_label=lemma_name, lemma_name=lemmas[i]), j, 1, 1, 1)
+                            j += 1
+                        else:
+                            lemma_more_box.attach(self.generate_lemma_buttons(lemma_label=lemma_name, lemma_name=lemmas[i]), k, 2, 1, 1) #need to recalculate i from zero and offset
+                            k += 1
                 i += 1
+
+        # add margin if lemma_more_box is present
+        if len(lemma_more_box.get_children()) >= 1:
+            lemma_box.props.margin_left = 16
 
         #-- copy action -------#
         copy_img = Gtk.Image().new_from_icon_name("edit-copy-symbolic", Gtk.IconSize.SMALL_TOOLBAR)
@@ -327,10 +347,8 @@ class WordItems(Gtk.Grid):
         #-- WordItems construct--------#
         # self.props.name = name
         self.props.hexpand = True
-        self.props.row_spacing = 3
-        self.props.column_spacing = 0
-
-        
+        self.props.row_spacing = 2
+        self.props.column_spacing = 0        
         self.attach(content_eventbox, 0, 1, 5, 1)
 
         if len(lemma_more_box) >= 1:
@@ -343,6 +361,7 @@ class WordItems(Gtk.Grid):
     def generate_lemma_buttons(self, lemma_label, lemma_name):
         button = Gtk.Button(label=lemma_label)
         button.props.name = lemma_name
+        button.props.expand = False
         button.get_style_context().add_class("word-lemmas")
         button.connect("clicked", self.on_lemma_clicked)
         return button

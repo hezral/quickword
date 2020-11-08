@@ -18,7 +18,7 @@
 */
 
 /* -- colors -- */
-
+/* ------------------------------ */
 @define-color shaded_dark shade(@theme_base_color, 0.87);
 @define-color shaded_darker shade(@theme_base_color, 0.85);
 @define-color shaded_base shade(@theme_base_color, 0.98);
@@ -28,20 +28,13 @@
 *:backdrop {
     color: gray;
 }
+/* ------------------------------ */
 
-
-.stack-settings, .headerbar-settings {
-    background-color: @shaded_dark;
-}
-
-.settings-frame {
-    background-color: @shaded_darker;
-}
 
 /* -- headerbar -- */
-
+/* ------------------------------ */
 .lookup-word-header {
-    letter-spacing: 1px;
+
     font-size: larger;
     font-weight: bold;
 }
@@ -51,39 +44,40 @@ headerbar {
     padding-right: 12px;
     padding-top: 4px;
 }
+/* ------------------------------ */
 
 
-.section-header {
-    font-weight: bold;
-}
-    
-.section-sub-header {
-    font-style: italic;
-    color: gray;
-    font-size: 0.9em;
-}
-
-.settings-frame {
-    border-radius: 4px;
-}
-
-
-
+/* -- stack -- */
+/* ------------------------------ */
 stack {
     border-bottom-right-radius: 4px;
     border-bottom-left-radius: 4px;
 }
+/* ------------------------------ */
 
 
+/* -- settings-view -- */
+/* ------------------------------ */
+.stack-settings, .headerbar-settings {
+    background-color: @shaded_dark;
+}
 
-.sub-label {
+.settings-frame {
+    border-radius: 4px;
+    background-color: @shaded_darker;
+}
+
+.settings-sub-label {
     font-style: italic;
     font-size: 0.9em;
     color: gray;
 }
+/* ------------------------------ */
 
 
-.about-icon-left {
+/* -- quickword icon animation -- */
+/* ------------------------------ */
+.quickword-icon-left {
     animation: float-left 1.5s ease-in-out infinite;
 }
 
@@ -93,7 +87,7 @@ stack {
     100% {-gtk-icon-transform: translateX(0px);}
 }
 
-.about-icon-right {
+.quickword-icon-right {
     animation: float-right 1.25s ease-in-out infinite;
 }
 
@@ -101,6 +95,25 @@ stack {
     25% {-gtk-icon-transform: translateY(0px);}
     75% {-gtk-icon-transform: translateY(3px);}
     100% {-gtk-icon-transform: translateY(0px);}
+}
+/* ------------------------------ */
+
+
+
+/* -- word-view -- */
+/* ------------------------------ */
+.word-types-left {
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+    }
+    
+.word-types-right {
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+    
+.subview-switcher > button:checked {
+    font-weight: bold;
 }
 
 .copied-content, .copy-img {
@@ -134,13 +147,25 @@ stack {
 .word-lemmas:focus {
     box-shadow: none;
 }
-    
 
-
-.edit-img {
-    color: white;
+.more-results {
+    color: gray;
+    font-size: 0.9em;
 }
 
+button#speak-btn {
+    border-style: none;
+    background-image: none;
+    border-radius: 16px;
+    box-shadow: none;
+}
+
+button#speak-btn:active {
+    background-color: rgba(24, 24, 24, 0.25)
+}
+
+/* -- transition effects -- */
+/* ------------------------------ */
 .transition-on:dir(ltr) {
     opacity: 0;
     transition: all 100ms ease-in-out; 
@@ -150,33 +175,17 @@ stack {
     opacity: 1;
     transition: all 250ms ease-in-out; 
 }
+/* ------------------------------ */
 
 
+/* -- no-word-view -- */
+/* ------------------------------ */
 .no-word-view > entry > image.right {
     padding-right: 4px;
 }
 
 .no-word-view > entry {
     font-size: large;
-}
-
-
-.word-types-left {
-    border-top-left-radius: 4px;
-    border-bottom-left-radius: 4px;
-    }
-    
-.word-types-right {
-    border-top-right-radius: 4px;
-    border-bottom-right-radius: 4px;
-}
-    
-.word-types:checked {
-    font-weight: bold;
-}
-
-.subview-switcher > button:checked {
-    font-weight: bold;
 }
 
 
@@ -190,7 +199,5 @@ stack {
     background-image: linear-gradient(to top, rgba(0,0,0,0.3) 0%,rgba(0,0,0,0) 25%,rgba(0,0,0,0) 100%);
 } */
 
-.more-results {
-    color: gray;
-    font-size: 0.9em;
-}
+
+

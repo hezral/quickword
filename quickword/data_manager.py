@@ -29,7 +29,7 @@ import time
 
 from nltk import data, downloader
 
-DATA_IDS = ('wordnet', 'omw', 'cmudict')
+DATA_IDS = ('wordnet')
 
 
 #------------------CLASS-SEPARATOR------------------#
@@ -47,8 +47,7 @@ class DataUpdater():
         # check if data dir exist
         if not os.path.exists(self.nltk_data_path):
             os.makedirs(self.nltk_data_path)
-        # else:
-        #     print('nltk_data_path:', self.nltk_data_path)
+
 
     def download_data(self, callback=None):    
         # download data if not installed
@@ -76,19 +75,23 @@ class DataUpdater():
 
 
 
+
 # #------------------CLASS-SEPARATOR------------------#
 
 
-class UpdateDialog(Gtk.Dialog):
+class UpdateWindow(Gtk.Dialog):
     def __init__(self, parent_window, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        print("something")
         #-- UpdateDialog construct--------#
+        self.props.name = "QuickWord Data Manager"
+        self.props.transient_for = parent_window
+        self.props.window_position = Gtk.WindowPosition.CENTER_ON_PARENT
+        self.props.modal = True
+
+        
 
 
-# update = DataUpdater("com.github.hezral.quickword")
-# update.update_data()
 
 
 # def app_main():
@@ -143,6 +146,8 @@ class UpdateDialog(Gtk.Dialog):
 #     thread.daemon = True
 #     thread.start()
 
-# if __name__ == "__main__":
-#     app_main()
-#     Gtk.main()
+# # if __name__ == "__main__":
+# #     app_main()
+# #     Gtk.main()
+
+

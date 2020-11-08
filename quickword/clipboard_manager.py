@@ -55,11 +55,11 @@ class ClipboardListener(Clipboard):
 
             # if selected text contains underscore and maybe other special characters
             # wordnet lookup can only contain letters, numbers, spaces, hyphens, periods, slashes, and/or apostrophes.
-            # try to remove them and get the first word
-            containsSpecialChars = any(not c.isalnum() for c in content)
-            if containsSpecialChars:
-                content_remove_special_chars = content.translate ({ord(c): " " for c in "!@#$%^&*()[]{};:,/<>?\|`~=+"})
-                content = content_remove_special_chars.split(" ")[0]
+
+            # containsSpecialChars = any(not c.isalnum() for c in content)
+            # if containsSpecialChars:
+            #     content_remove_special_chars = content.translate ({ord(c): " " for c in "!@#$%^&*()[]{};:,/<>?\|`~=+"})
+            #     content = content_remove_special_chars
 
             valid = True
             return content
@@ -67,6 +67,8 @@ class ClipboardListener(Clipboard):
             content = None
             valid = False
             return content
+
+# application_program
 
 
 

@@ -53,21 +53,11 @@ class QuickWordApp(Gtk.Application):
         # set application properties
         self.props.application_id = "com.github.hezral.quickword"
 
-        # initialize any objects
+        # initialize objects
         self.window = None
 
-        # first run
-        gio_settings = Gio.Settings(schema_id="com.github.hezral.quickword")
-        first_run = False
-        if first_run:
-            from data_manager import DataUpdater
-            data_updater = DataUpdater(application_id=self.props.application_id)
-            print(datetime.now(), "updater initiated")
-
         # initialize word lookup
-        _run_background = RunInBackground(target=self.on_word_lookup_load, args=(self.props.application_id,))
-        _run_background.start()
-        # _word_lookup = WordLookup(application_id=self.props.application_id)
+        _word_lookup = WordLookup(application_id=self.props.application_id)
         print(datetime.now(), "word lookup background init ")
         
         # initialize clipboard listener and get current selected text if any
@@ -77,16 +67,6 @@ class QuickWordApp(Gtk.Application):
         # initialize clipboard paster
         clipboard_paste = ClipboardPaste()
        
-        # set CSS provider
-        provider = Gtk.CssProvider()
-        provider.load_from_path("data/application.css")
-        # # provider.load_from_resource ("com/github/hezral/quickword/application.css")
-        Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
-
-        # get word_lookup after background init
-        _word_lookup = _run_background.join()
-        print(datetime.now(), "word lookup init")
-
         # default if no word found or selected
         # start background lookup if word selected
         if self.lookup_word is None or self.lookup_word == "" or self.lookup_word == " ":
@@ -101,7 +81,7 @@ class QuickWordApp(Gtk.Application):
         self.connect("on-new-word-lookup", self.on_new_word_lookup, _word_lookup)
 
         # setup clipboard listener and paster after app activation
-        self.connect_after("activate", self.on_activate, clipboard_listener, clipboard_paste, _word_lookup)
+        self.connect_after("activate", self.after_activate, clipboard_listener, clipboard_paste, _word_lookup)
  
         print(datetime.now(), "app init")
 
@@ -113,7 +93,16 @@ class QuickWordApp(Gtk.Application):
         quit_action.connect("activate", self.on_quit_action)
         self.add_action(quit_action)
         self.set_accels_for_action("app.quit", ["<Ctrl>Q", "Escape"])
-        
+
+        # set CSS provider
+        provider = Gtk.CssProvider()
+        provider.load_from_path("data/application.css")
+        # # provider.load_from_resource ("com/github/hezral/quickword/application.css")
+        Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+
+        print(datetime.now(), "startup")
+
+    def do_activate(self):
         # We only allow a single window and raise any existing ones
         if self.window is None:
             # Windows are associated with the application 
@@ -122,12 +111,17 @@ class QuickWordApp(Gtk.Application):
             self.add_window(self.window)
             self.window.show_all()
 
-        print(datetime.now(), "startup")
+        # first run
+        gio_settings = Gio.Settings(schema_id="com.github.hezral.quickword")
+        first_run = True
+        if first_run:
+            from data_manager import DataUpdater
+            data_updater = DataUpdater(application_id=self.props.application_id)
+            print(datetime.now(), "updater initiated")
 
-    def do_activate(self):
         print(datetime.now(), "activate")
 
-    def on_activate(self, app, clipboard_listener, clipboard_paste, _word_lookup):
+    def after_activate(self, app, clipboard_listener, clipboard_paste, _word_lookup):
         # setup listener for new text selection
         clipboard_listener.clipboard.connect("owner-change", self.on_new_word_selected, clipboard_listener, _word_lookup)
         print(datetime.now(), "cliboard listener initiated")
@@ -138,7 +132,7 @@ class QuickWordApp(Gtk.Application):
         word_view.clipboard_paste = clipboard_paste
 
         if app._run_background_lookup is not None:
-            
+   
             word_data = app._run_background_lookup.join()
             print(datetime.now(), "background lookup retrieved")
 
@@ -149,6 +143,8 @@ class QuickWordApp(Gtk.Application):
         # setup background updater
         print(datetime.now(), "background updater initiated")
 
+        # get total words in Wordnet
+        self.total_words = _word_lookup.get_totalwords()
 
         print(datetime.now(), "post-activate")
 
@@ -176,7 +172,7 @@ class QuickWordApp(Gtk.Application):
             return True
         else:
             # go back to no-word-view
-            self.window.on_manual_lookup()
+            self.window.on_manual_lookup(not_found=True)
             return False
 
 
