@@ -1,5 +1,0 @@
-wordnet : up-to-date
-omw : up-to-date
-cmudict : up-to-date
-All data up-to-date
-test <_io.TextIOWrapper name='myoutputfile.txt' mode='w' encoding='UTF-8'>

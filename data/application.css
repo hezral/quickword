@@ -78,23 +78,39 @@ stack {
 /* -- quickword icon animation -- */
 /* ------------------------------ */
 .quickword-icon-left {
-    animation: float-left 1.5s ease-in-out infinite;
+    animation: floating 1.5s ease-in-out infinite;
 }
 
-@keyframes float-left {
-    25% {-gtk-icon-transform: translateX(0px);}
-    75% {-gtk-icon-transform: translateX(-5px);}
+@keyframes float-down {
+    25% {-gtk-icon-transform: translateY(0px);}
+    75% {-gtk-icon-transform: translateY(-5px);}
     100% {-gtk-icon-transform: translateX(0px);}
 }
 
 .quickword-icon-right {
-    animation: float-right 1.25s ease-in-out infinite;
+    animation: floating 1.25s ease-in-out infinite;
 }
 
-@keyframes float-right {
+@keyframes floating {
     25% {-gtk-icon-transform: translateY(0px);}
     75% {-gtk-icon-transform: translateY(3px);}
     100% {-gtk-icon-transform: translateY(0px);}
+}
+
+@keyframes floating-two {
+    from {
+        -gtk-icon-transform: translateY(60px);
+    }
+    25% {-gtk-icon-transform: translateY(60px);}
+    75% {-gtk-icon-transform: translateY(65px);}
+    100% {-gtk-icon-transform: translateY(60px);}	
+}
+
+.download-icon-start {
+    -gtk-icon-transform: translateY(60px);
+    transition: -gtk-icon-transform 1.25s;
+    animation: floating-two 1.25s ease-in-out infinite;
+
 }
 /* ------------------------------ */
 
@@ -161,8 +177,31 @@ button#speak-btn {
 }
 
 button#speak-btn:active {
-    background-color: rgba(24, 24, 24, 0.25)
+    /* background-color: rgba(24, 24, 24, 0.25) */
+    border: solid;
+    border-width: 1px;
+    border-color: shade(@theme_base_color, 0.7);
+    background-color: shade(@theme_base_color, 0.89);
+    box-shadow: 0px 0px 2px 0px shade(@theme_base_color, 0.7) inset;
 }
+
+/* .action-button {
+    color: @theme_text_color;
+    border-radius: 50%;
+    box-shadow: none;
+    border: none;
+    border-width: 1px;
+    border-color: shade(@theme_base_color, 0.7);
+}
+
+
+.action-button:active {
+    border: solid;
+    border-width: 1px;
+    border-color: shade(@theme_base_color, 0.7);
+    background-color: shade(@theme_base_color, 0.89);
+    box-shadow: 0px 0px 2px 0px shade(@theme_base_color, 0.7) inset;
+} */
 
 /* -- transition effects -- */
 /* ------------------------------ */

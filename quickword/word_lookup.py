@@ -113,20 +113,12 @@ class WordLookup():
     def get_totalwords(self):
         return len(wn._lemma_pos_offset_map)
 
-# wd = WordLookup()
 
+# wl = WordLookup()
 
+# print(type(wl))
 
-# wd.get_synsets("data_tuple")
-
-
-# Wordnet POS
-# ADJ: 'a'
-# ADJ_SAT: 's'
-# ADV: 'r'
-# NOUN: 'n'
-# VERB: 'v'
-
+# wl.get_synsets("test")
 
 # the lines is only for debug
 # def lookup(clipboard=None, event=None, wd=None):

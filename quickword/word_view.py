@@ -52,6 +52,7 @@ class WordView(Gtk.Grid):
         speak_btn.props.margin_right = 5
         speak_btn.props.name = "speak-btn"
         speak_btn.connect("clicked", self.on_speak_word)
+        speak_btn.set_size_request(30, 24)
 
         #-- stack construct --------#
         stack = Gtk.Stack()

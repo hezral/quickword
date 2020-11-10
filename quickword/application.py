@@ -55,33 +55,30 @@ class QuickWordApp(Gtk.Application):
 
         # initialize objects
         self.window = None
+        self.word_data = None
 
         # initialize word lookup
-        _word_lookup = WordLookup(application_id=self.props.application_id)
+        self._word_lookup = WordLookup(application_id=self.props.application_id)
         print(datetime.now(), "word lookup background init ")
         
-        # initialize clipboard listener and get current selected text if any
-        clipboard_listener = ClipboardListener()
-        self.lookup_word = clipboard_listener.copy_selected_text()
-  
-        # initialize clipboard paster
-        clipboard_paste = ClipboardPaste()
-       
-        # default if no word found or selected
-        # start background lookup if word selected
-        if self.lookup_word is None or self.lookup_word == "" or self.lookup_word == " ":
-            self.lookup_word = "QuickWord"
-            self._run_background_lookup = None
-        else:
-            self._run_background_lookup = RunInBackground(target=_word_lookup.get_synsets, args=(self.lookup_word,))
-            self._run_background_lookup.start()
-            print(datetime.now(), "lookup background init")
+        # initialize clipboard listener and clipboard paster
+        self.clipboard_listener = ClipboardListener()
+        self.clipboard_paste = ClipboardPaste()
+
+        # get current selected text if any
+        self.lookup_word = self.clipboard_listener.copy_selected_text()
+        print(datetime.now(), "self.lookup_word", self.lookup_word)
+
+        # first run
+        gio_settings = Gio.Settings(schema_id="com.github.hezral.quickword")
+        self.first_run = gio_settings.get_value("first-run")
+        print(datetime.now(), "first_run", self.first_run)
         
         # setup signal for new word lookup
-        self.connect("on-new-word-lookup", self.on_new_word_lookup, _word_lookup)
+        self.connect("on-new-word-lookup", self.on_new_word_lookup)
 
         # setup clipboard listener and paster after app activation
-        self.connect_after("activate", self.after_activate, clipboard_listener, clipboard_paste, _word_lookup)
+        self.connect_after("activate", self.after_activate)
  
         print(datetime.now(), "app init")
 
@@ -111,58 +108,73 @@ class QuickWordApp(Gtk.Application):
             self.add_window(self.window)
             self.window.show_all()
 
-        # first run
-        gio_settings = Gio.Settings(schema_id="com.github.hezral.quickword")
-        first_run = True
-        if first_run:
-            from data_manager import DataUpdater
-            data_updater = DataUpdater(application_id=self.props.application_id)
-            print(datetime.now(), "updater initiated")
+        # create data manager if first run
+        if self.first_run:
+            self.generate_data_manager()
+
+
 
         print(datetime.now(), "activate")
 
-    def after_activate(self, app, clipboard_listener, clipboard_paste, _word_lookup):
+    def after_activate(self, app):
         # setup listener for new text selection
-        clipboard_listener.clipboard.connect("owner-change", self.on_new_word_selected, clipboard_listener, _word_lookup)
+        self.clipboard_listener.clipboard.connect("owner-change", self.on_new_word_selected)
         print(datetime.now(), "cliboard listener initiated")
 
         # setup paster for copying texts in word-view
         stack = self.window.get_window_child_widgets()[1]
         word_view = stack.get_child_by_name("word-view")
-        word_view.clipboard_paste = clipboard_paste
+        word_view.clipboard_paste = self.clipboard_paste
 
-        if app._run_background_lookup is not None:
-   
-            word_data = app._run_background_lookup.join()
+        # get total words in Wordnet
+        if not self.first_run:
+            self.total_words = self._word_lookup.get_totalwords()
+
+            # default if no word found or selected
+            # start background lookup if word selected
+            if self.lookup_word is None:
+                self.lookup_word = "QuickWord"
+                self._run_background_lookup = None
+            else:
+                self._run_background_lookup = RunInBackground(target=self._word_lookup.get_synsets, args=(self.lookup_word,))
+                self._run_background_lookup.start()
+                print(datetime.now(), "lookup background init")
+
+            self.word_data = app._run_background_lookup.join()
             print(datetime.now(), "background lookup retrieved")
 
-            if word_data is not None:
-                app.emit("on-new-word-lookup", word_data)
+            if self.word_data is not None:
+                app.emit("on-new-word-lookup", self.word_data)
                 print(datetime.now(), "emit word lookup")
+            else:
+                self.lookup_word = "QuickWord"
 
         # setup background updater
         print(datetime.now(), "background updater initiated")
 
-        # get total words in Wordnet
-        self.total_words = _word_lookup.get_totalwords()
-
         print(datetime.now(), "post-activate")
+
+    def generate_data_manager(self):
+        from data_manager import DataUpdater
+        self._data_manager = DataUpdater(application_id=self.props.application_id)
+        print(datetime.now(), "updater initiated")
+        return True
 
     def on_word_lookup_load(self, application_id):
         _word_lookup = WordLookup(application_id=application_id)
         return _word_lookup
 
-    def on_new_word_selected(self, clipboard, event, clipboard_listener, _word_lookup):
+    def on_new_word_selected(self, clipboard, event):
         # get selected word from clipboard
-        new_word = clipboard_listener.copy_selected_text()
+        new_word = self.clipboard_listener.copy_selected_text()
         # trigger new word lookup
-        self.on_new_word_lookup(self, new_word, _word_lookup)
+        self.on_new_word_lookup(self, new_word)
 
-    def on_new_word_lookup(self, app, word_data, _word_lookup):
+    def on_new_word_lookup(self, app, word_data):
         # check if data is string from new word selected or data from background lookup
         if isinstance(word_data, str):
             new_word = word_data
-            word_data = _word_lookup.get_synsets(new_word)
+            word_data = self._word_lookup.get_synsets(new_word)
 
         if word_data is not None:
             #print(word_data)

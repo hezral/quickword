@@ -20,6 +20,8 @@
 '''
 
 import os
+
+
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import GLib, Gtk
@@ -29,7 +31,7 @@ import time
 
 from nltk import data, downloader
 
-DATA_IDS = ('wordnet')
+DATA_IDS = ('wordnet',)
 
 
 #------------------CLASS-SEPARATOR------------------#
@@ -48,33 +50,50 @@ class DataUpdater():
         if not os.path.exists(self.nltk_data_path):
             os.makedirs(self.nltk_data_path)
 
-
-    def download_data(self, callback=None):    
-        # download data if not installed
-        for id in DATA_IDS:
-            if not downloader.Downloader().is_installed(id, self.nltk_data_path):
-                downloader.Downloader().download(id)
-                return (id + ': installed')
-            else:
-                return (id + ': installed')
-
     def update_data(self, callback=None):
         # check if any data is stale and update it
         stale = 0
         for id in DATA_IDS:
             if downloader.Downloader().is_stale(id, self.nltk_data_path):
                 stale += 1
-                print(id, ': stale')
+                GLib.idle_add(callback, "Updating", id + " has an update")
+                time.sleep(0.5)
             else:
-                print(id, ': up-to-date')
+                GLib.idle_add(callback, "No Updates", id + " is up-to-date")
         if stale > 0:
-            print('There are', stale, 'data. Updating..')
+            GLib.idle_add(callback, "Updates Available", "There are " + str(stale) + "data updates available for download")
+            time.sleep(0.5)
             downloader.Downloader().update(quiet=False, prefix=self.nltk_data_path)
+            time.sleep(0.5)
+            GLib.idle_add(callback, "Completed", "All data has been updated.")
         else:
-            print('All data up-to-date')
+            time.sleep(0.5)
+            GLib.idle_add(callback, "No Updates", "All data is up-to-date.")
+
+    def download_data(self, callback=None):   
+        # download data if not installed
+        for id in DATA_IDS:
+            if not downloader.Downloader().is_installed(id, self.nltk_data_path):
+                GLib.idle_add(callback, "Downloading...", "Downloading " + id)
+                time.sleep(0.5)
+                downloader.Downloader().download(id)
+                time.sleep(0.5)
+                GLib.idle_add(callback, "Downloading", id + " data has been downloaded.")
+                time.sleep(0.5)
+                GLib.idle_add(callback, "Completed", "All data has been downloaded.")
+            else:
+                time.sleep(0.5)
+                GLib.idle_add(callback, "Downloaded", "All data has already been downloaded.")
 
 
-
+    def run_func(self, runname=None, callback=None):
+        if runname == "download":
+            target = self.download_data
+        else:
+            target = self.update_data
+        thread = threading.Thread(target=target, args=(callback,))
+        thread.daemon = True
+        thread.start()
 
 # #------------------CLASS-SEPARATOR------------------#
 
@@ -91,6 +110,12 @@ class UpdateWindow(Gtk.Dialog):
 
         
 
+# updater = DataUpdater()
+
+# try:
+#     updater.update_data()
+# except:
+#     print("update failed")
 
 
 
@@ -129,12 +154,12 @@ class UpdateWindow(Gtk.Dialog):
 #             if not downloader.Downloader().is_installed(id, updater.nltk_data_path):
 #                 downloader.Downloader().download(id)
 #                 GLib.idle_add(update_progess, id + ': installed', fraction)
-#                 #time.sleep(0.2)
+#                 #time.sleep(0.5)
 #                 label.set_label(id + ': already finished')
 #             else:
 #                 GLib.idle_add(update_progess, id + ': installed', fraction)
 #                 label.set_label(id + ': already installed')
-#             time.sleep(0.2)
+#             time.sleep(0.5)
 #             fraction = fraction + 0.3
 #         spinner.stop()
 #         label.set_label('finished')

@@ -52,24 +52,31 @@ class ClipboardListener(Clipboard):
             # remove multiple lines and only return first line
             if "\n" in content:
                 content = content.split("\n")[0]
+                
+            # lowercase the word
+            content = content.lower()
 
-            # if selected text contains underscore and maybe other special characters
-            # wordnet lookup can only contain letters, numbers, spaces, hyphens, periods, slashes, and/or apostrophes.
+            # remove spaces in front and back
+            content = content.strip()
 
-            # containsSpecialChars = any(not c.isalnum() for c in content)
-            # if containsSpecialChars:
-            #     content_remove_special_chars = content.translate ({ord(c): " " for c in "!@#$%^&*()[]{};:,/<>?\|`~=+"})
-            #     content = content_remove_special_chars
+            # remove special characters in front of word
+            if len(content) > 0:
+                FirstContainsSpecialChars = any(not c.isalnum() for c in content[0])
+                LastContainsSpecialChars = any(not c.isalnum() for c in content[len(content)-1])
 
-            valid = True
-            return content
+                if FirstContainsSpecialChars:
+                    content = content[1:]
+                if LastContainsSpecialChars:
+                    content = content[0:-1]
+
+            # don't return empty lines
+            if len(content) > 0:
+                valid = True
+                return content
         else:
             content = None
             valid = False
             return content
-
-# application_program
-
 
 
 #------------------CLASS-SEPARATOR------------------#
