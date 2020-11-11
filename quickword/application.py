@@ -52,7 +52,8 @@ class QuickWordApp(Gtk.Application):
 
         # set application properties
         self.props.application_id = "com.github.hezral.quickword"
-        
+        # Gdk.set_program_class("com.github.hezral.quickword")
+
         # setup path
         self.modulepath = os.path.dirname(__file__)
 
@@ -86,7 +87,7 @@ class QuickWordApp(Gtk.Application):
 
         # Set shortcut
         SHORTCUT = "<Super><Control>d"
-        ID = self.props.application_id
+        ID = "gtk-launch" + " " + self.props.application_id
         _custom_shortcut_settings = CustomShortcutSettings()
 
         has_shortcut = False

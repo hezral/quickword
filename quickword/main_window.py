@@ -75,6 +75,7 @@ class QuickWordWindow(Gtk.ApplicationWindow):
         #-- QuickWordWindow construct--------#
         self.props.resizable = False #set this and window will expand and retract based on child
         # self.props.skip_taskbar_hint = True
+        # self.set_icon_name("com.github.hezral.quickword")
         self.title = "QuickWord"
         self.set_keep_above(True)
         self.get_style_context().add_class("rounded")
