@@ -37,7 +37,7 @@ print(datetime.now(), "python_run", )
 from main_window import QuickWordWindow
 from clipboard_manager import ClipboardListener, ClipboardPaste
 from word_lookup import WordLookup
-
+from custom_shortcut_settings import CustomShortcutSettings
 
 #------------------CLASS-SEPARATOR------------------#
 
@@ -79,6 +79,23 @@ class QuickWordApp(Gtk.Application):
 
         # setup clipboard listener and paster after app activation
         self.connect_after("activate", self.after_activate)
+
+        # Set shortcut
+        SHORTCUT = "<Super><Control>d"
+        ID = self.props.application_id
+        _custom_shortcut_settings = CustomShortcutSettings()
+
+        has_shortcut = False
+        for shortcut in _custom_shortcut_settings.list_custom_shortcuts():
+            if shortcut[1] == ID:
+                has_shortcut = True
+
+        if has_shortcut is False:
+            shortcut = _custom_shortcut_settings.create_shortcut()
+            if shortcut is not None:
+                _custom_shortcut_settings.edit_shortcut(shortcut, SHORTCUT)
+                _custom_shortcut_settings.edit_command(shortcut, ID)
+
  
         print(datetime.now(), "app init")
 
@@ -140,8 +157,8 @@ class QuickWordApp(Gtk.Application):
                 self._run_background_lookup.start()
                 print(datetime.now(), "lookup background init")
 
-            self.word_data = app._run_background_lookup.join()
-            print(datetime.now(), "background lookup retrieved")
+                self.word_data = app._run_background_lookup.join()
+                print(datetime.now(), "background lookup retrieved")
 
             if self.word_data is not None:
                 app.emit("on-new-word-lookup", self.word_data)
