@@ -31,7 +31,7 @@ from gi.repository import Gtk, Gio, Gdk, GObject
 from threading import Thread
 from datetime import datetime
 
-print(datetime.now(), "python_run", )
+# print(datetime.now(), "python_run", )
 
 # QuickWord imports
 from main_window import QuickWordWindow
@@ -52,6 +52,10 @@ class QuickWordApp(Gtk.Application):
 
         # set application properties
         self.props.application_id = "com.github.hezral.quickword"
+        
+        # setup path
+        self.modulepath = os.path.dirname(__file__)
+
 
         # initialize objects
         self.window = None
@@ -59,7 +63,7 @@ class QuickWordApp(Gtk.Application):
 
         # initialize word lookup
         self._word_lookup = WordLookup(application_id=self.props.application_id)
-        print(datetime.now(), "word lookup background init ")
+        # print(datetime.now(), "word lookup background init ")
         
         # initialize clipboard listener and clipboard paster
         self.clipboard_listener = ClipboardListener()
@@ -67,12 +71,12 @@ class QuickWordApp(Gtk.Application):
 
         # get current selected text if any
         self.lookup_word = self.clipboard_listener.copy_selected_text()
-        print(datetime.now(), "self.lookup_word", self.lookup_word)
+        # print(datetime.now(), "self.lookup_word", self.lookup_word)
 
         # first run
         gio_settings = Gio.Settings(schema_id="com.github.hezral.quickword")
         self.first_run = gio_settings.get_value("first-run")
-        print(datetime.now(), "first_run", self.first_run)
+        # print(datetime.now(), "first_run", self.first_run)
         
         # setup signal for new word lookup
         self.connect("on-new-word-lookup", self.on_new_word_lookup)
@@ -97,7 +101,7 @@ class QuickWordApp(Gtk.Application):
                 _custom_shortcut_settings.edit_command(shortcut, ID)
 
  
-        print(datetime.now(), "app init")
+        # print(datetime.now(), "app init")
 
     def do_startup(self):
         Gtk.Application.do_startup(self)
@@ -110,11 +114,11 @@ class QuickWordApp(Gtk.Application):
 
         # set CSS provider
         provider = Gtk.CssProvider()
-        provider.load_from_path("data/application.css")
+        provider.load_from_path(os.path.join(self.modulepath, "data/application.css"))
         # # provider.load_from_resource ("com/github/hezral/quickword/application.css")
         Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 
-        print(datetime.now(), "startup")
+        # print(datetime.now(), "startup")
 
     def do_activate(self):
         # We only allow a single window and raise any existing ones
@@ -131,12 +135,12 @@ class QuickWordApp(Gtk.Application):
 
 
 
-        print(datetime.now(), "activate")
+        # print(datetime.now(), "activate")
 
     def after_activate(self, app):
         # setup listener for new text selection
         self.clipboard_listener.clipboard.connect("owner-change", self.on_new_word_selected)
-        print(datetime.now(), "cliboard listener initiated")
+        # print(datetime.now(), "cliboard listener initiated")
 
         # setup paster for copying texts in word-view
         stack = self.window.get_window_child_widgets()[1]
@@ -155,26 +159,26 @@ class QuickWordApp(Gtk.Application):
             else:
                 self._run_background_lookup = RunInBackground(target=self._word_lookup.get_synsets, args=(self.lookup_word,))
                 self._run_background_lookup.start()
-                print(datetime.now(), "lookup background init")
+                # print(datetime.now(), "lookup background init")
 
                 self.word_data = app._run_background_lookup.join()
-                print(datetime.now(), "background lookup retrieved")
+                # print(datetime.now(), "background lookup retrieved")
 
             if self.word_data is not None:
                 app.emit("on-new-word-lookup", self.word_data)
-                print(datetime.now(), "emit word lookup")
+                # print(datetime.now(), "emit word lookup")
             else:
                 self.lookup_word = "QuickWord"
 
         # setup background updater
-        print(datetime.now(), "background updater initiated")
+        # print(datetime.now(), "background updater initiated")
 
-        print(datetime.now(), "post-activate")
+        # print(datetime.now(), "post-activate")
 
     def generate_data_manager(self):
         from data_manager import DataUpdater
         self._data_manager = DataUpdater(application_id=self.props.application_id)
-        print(datetime.now(), "updater initiated")
+        # print(datetime.now(), "updater initiated")
         return True
 
     def on_word_lookup_load(self, application_id):
@@ -197,7 +201,7 @@ class QuickWordApp(Gtk.Application):
             #print(word_data)
             # emit the signal to trigger content update callback
             self.window.emit("on-new-word-selected", word_data)
-            print(datetime.now(), "emit on-new-word-selected")
+            # print(datetime.now(), "emit on-new-word-selected")
             return True
         else:
             # go back to no-word-view
@@ -225,8 +229,8 @@ class RunInBackground(Thread):
 
 #------------------CLASS-SEPARATOR------------------#
 
-if __name__ == "__main__":
-    app = QuickWordApp()
-    app.run(sys.argv)
+# if __name__ == "__main__":
+#     app = QuickWordApp()
+#     app.run(sys.argv)
 
 

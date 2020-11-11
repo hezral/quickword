@@ -43,14 +43,21 @@ icon_scalable = prefix_data + '/icons/hicolor/scalable/apps'
 # Setup install data list
 install_data = [(prefix_data + '/metainfo', ['data/' + app_id + '.appdata.xml']),
                 (prefix_data + '/applications', ['data/' + app_id + '.desktop']),
-                (prefix_data + '/contractor', ['data/' + app_id + '.contract']),
                 (prefix_data + 'glib-2.0/schemas',['data/' + app_id + '.gschema.xml']),
-                (install_path,['data/' + app_id + '.gresource']),
+                (install_path + '/data/icons',['data/icons/' + app_id + '-symbolic.svg']),
+                (install_path + '/data/icons',['data/icons/' + app_id + '-left.svg']),
+                (install_path + '/data/icons',['data/icons/' + app_id + '-right.svg']),
+                (install_path + '/data',['data/application.css']),
                 (install_path,[app_name + '/application.py']),
-                (install_path,[app_name + '/window.py']),
-                (install_path,[app_name + '/about.py']),
-                (install_path,[app_name + '/constants.py']),
-                (icon_scalable,['data/icons/128/' + app_id + '.svg'])]
+                (install_path,[app_name + '/clipboard_manager.py']),
+                (install_path,[app_name + '/custom_shortcut_settings.py']),
+                (install_path,[app_name + '/main_window.py']),
+                (install_path,[app_name + '/noword_view.py']),
+                (install_path,[app_name + '/settings_view.py']),
+                (install_path,[app_name + '/updater_view.py']),
+                (install_path,[app_name + '/word_lookup.py']),
+                (install_path,[app_name + '/word_view.py']),
+                (icon_scalable,['data/icons/128/' + app_id + '.svg']),]
 
 # Add icon data files to install data list
 for size in icon_sizes:
@@ -80,10 +87,11 @@ class PostInstall(install):
         print("Installing new Schemas")
         call(['glib-compile-schemas', path.join(prefix_data, 'glib-2.0/schemas')])
 
-        print("Clean-up")
-        for size in icon_sizes:
-            os.rmdir('data/icons/' + size)
-
+        # print("Clean-up")
+        # import shutil
+        # for size in icon_sizes:
+        #     shutil.rmtree('data/icons/' + size)
+            
 setup(
     name=app_name,  # Required
     license='GNU GPL3',
