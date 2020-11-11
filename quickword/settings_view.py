@@ -67,12 +67,21 @@ class SettingsView(Gtk.Grid):
         frame.add(grid)
 
         #-- total words --------#
-        totalwords_label = Gtk.Label()
+        totalwords_label = Gtk.Label("NA")
         totalwords_label.props.name = "total-words"
         totalwords_label.props.vexpand = True
         totalwords_label.props.valign = Gtk.Align.END
         totalwords_label.get_style_context().add_class(totalwords_label.props.name)
 
+        #-- start button --------#
+        check_update_btn = Gtk.Button(label="Check Data Updates")
+        check_update_btn.props.name = "check-update-btn"
+        check_update_btn.props.expand = False
+        check_update_btn.props.halign = check_update_btn.props.valign = Gtk.Align.CENTER
+        #check_update_btn.get_style_context().add_class("h3")
+        #.get_style_context().add_class(Gtk.STYLE_CLASS_SUGGESTED_ACTION)
+        #check_update_btn.set_size_request(-1, 32)
+        check_update_btn.connect("clicked", self.on_check_update)
 
         #-- SettingsView construct--------#
         self.props.name = "settings-view"
@@ -84,14 +93,30 @@ class SettingsView(Gtk.Grid):
         self.props.column_spacing = 6
         self.attach(frame, 0, 1, 1, 1)
         self.attach(totalwords_label, 0, 2, 1, 1)
+        self.attach(check_update_btn, 0, 3, 1, 1)
+
         # self.attach(icon_overlay, 0, 2, 1, 1)
 
-    def on_totalwords(self, total_words):
+    def on_check_update(self, button):
+        stack = self.get_parent()
+        window = stack.get_parent()
+        headerbar, stack, word_grid = window.get_window_child_widgets()
+        word_label = [child for child in word_grid.get_children() if isinstance(child, Gtk.Label)][0]
+        updater_view = stack.get_child_by_name("updater-view")
+
+        stack.set_visible_child_name("updater-view")
+        word_label.props.label = "QuickWord"
+        window.active_view = updater_view
+        window.current_view = "updater-view"
+
+    def on_totalwords(self):
         stack = self.get_parent()
         window = stack.get_parent()
         app = window.props.application
         totalwords_label = [child for child in self.get_children() if isinstance(child, Gtk.Label)][0]
-        totalwords_label.props.label = "Total words available: " + str(app._word_lookup.get_totalwords())
+
+        if totalwords_label.props.label == "NA":
+            totalwords_label.props.label = "Total words available: " + str(app._word_lookup.get_totalwords())
 
     def generate_separator(self):
         separator = Gtk.Separator()

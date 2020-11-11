@@ -54,6 +54,7 @@ class UpdaterView(Gtk.Grid):
         icon_overlay.grab_focus()
 
         #-- message header --------#
+
         message = Gtk.Label()
         message.props.name = "message"
         message.props.margin_bottom = 5
@@ -108,11 +109,14 @@ class UpdaterView(Gtk.Grid):
         self.attach(sub_message, 0, 3, 1, 1)
         self.attach(proceed_btn, 0, 4, 1, 1)
         self.attach(start_btn, 0, 4, 1, 1)
+        self.connect_after("realize", self.generate_message_str)
 
-    def on_show(self, *args):
+    def generate_message_str(self, view):
+
         stack = self.get_parent()
         window = stack.get_parent()
         app = window.props.application
+
         if app.first_run:
             message_str ="Hello!"
             sub_message_str = "Before QuickWord can work, it needs to download dictionary data."
@@ -131,11 +135,9 @@ class UpdaterView(Gtk.Grid):
         stack = self.get_parent()
         window = stack.get_parent()
         app = window.props.application
-        print(app.lookup_word)
-        if app.lookup_word is None:
-            app.emit("on-new-word-lookup", app.lookup_word)
-        else:
-            window.on_manual_lookup()
+        lookup = app.emit("on-new-word-lookup", app.lookup_word)
+        if lookup is False:
+            stack.set_visible_child_name("no-word-view")
 
     def on_proceed_update(self, button):
         stack = self.get_parent()
@@ -143,8 +145,7 @@ class UpdaterView(Gtk.Grid):
         app = window.props.application
         icon_overlay = [child for child in self.get_children() if isinstance(child, Gtk.Overlay)][0]
         download_icon = [child for child in icon_overlay.get_children() if child.props.name == "download-icon"][0]
-        proceed_btn = [child for child in self.get_children() if child.props.name == "proceed-btn"][0]
-        start_btn = [child for child in self.get_children() if child.props.name == "start-btn"][0]
+
 
         download_icon.get_style_context().remove_class("quickword-icon-right")
         download_icon.get_style_context().add_class("download-icon-start")
@@ -160,15 +161,23 @@ class UpdaterView(Gtk.Grid):
             app._data_manager.run_func(runname="update", callback=self.on_update_progress)
 
 
-        self.remove_row(4)
-        self.attach(start_btn, 0, 4, 1, 1)
+
 
     def on_update_progress(self, message_str, sub_message_str):
         message = [child for child in self.get_children() if child.props.name == "message"][0]
         sub_message = [child for child in self.get_children() if child.props.name == "sub-message"][0]
+        proceed_btn = [child for child in self.get_children() if child.props.name == "proceed-btn"][0]
+        start_btn = [child for child in self.get_children() if child.props.name == "start-btn"][0]
+
+
+
+        if message_str == "Completed" or message_str == "Downloaded" or message_str == "No Updates":
+            self.remove_row(4)
+            self.attach(start_btn, 0, 4, 1, 1)
+        else:
+            proceed_btn.props.label = "Please wait.."
 
         message.props.label = message_str
         sub_message.props.label = sub_message_str
-
         
 

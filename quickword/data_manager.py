@@ -84,6 +84,7 @@ class DataUpdater():
             else:
                 time.sleep(0.5)
                 GLib.idle_add(callback, "Downloaded", "All data has already been downloaded.")
+        
 
 
     def run_func(self, runname=None, callback=None):

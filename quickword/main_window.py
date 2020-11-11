@@ -108,23 +108,6 @@ class QuickWordWindow(Gtk.ApplicationWindow):
         elif app.lookup_word is not None and not app.lookup_word == "QuickWord":
             self.active_view = word
             self.current_view = "word-view"
-
-        # elif self.lookup_word == "QuickWord":
-        #     self.active_view = noword
-        #     self.current_view = "no-word-view"
-        # else:
-        #     self.active_view = word
-        #     self.current_view = "word-view"
-
-        # # 1. app.first_run
-        # # 2. app.lookup_word is none
-        # # 3. app.lookup_word is not none and == QuickWord
-        # 4. From WordView and wordview.lookup_word
-        # 5. From NoWordView and data is none
-        # 6. From UpdaterView and data is none
-        # 7. From UpdaterView and wordview.lookup_word is none
-        # 8. From UpdaterView and wordview.lookup_word is not none and == QuickWord
-        # 9. From UpdaterView and wordview.lookup_word is not none and not == QuickWord
         
         
 
@@ -256,44 +239,66 @@ class QuickWordWindow(Gtk.ApplicationWindow):
         
         # toggle settings-view visibility based on visible property
         # intial view is always settings-view since connected to its visible signal
+        current_stack_child = {}
+        current_stack_child["current"] = stack.get_visible_child()
 
+        #print(current_stack_child["current"])
 
         if view.is_visible():
             word_label.props.label = "Settings"
             self.current_view = "settings-view"
-            print("on:settings")
+            settings_view.on_totalwords()
+            #print("on:settings")
 
         elif app.first_run is True:
             view.hide()
             word_label.props.label = "QuickWord"
             self.current_view = "updater-view"
-            print("updater")
+            #print("updater")
 
         elif self.active_view == noword_view:
             view.hide()
             word_label.props.label = "QuickWord"
             self.current_view = "no-word-view"
-            print("noword-view")
+            #print("noword-view")
 
         elif self.active_view == word_view and not app.lookup_word == "QuickWord":
             view.hide()
             word_label.props.label = word_view.lookup_word
             self.current_view = "word-view"
-            print("on:word-view")
+            #print("on:word-view")
 
-        elif self.active_view == word_view and app.lookup_word == "QuickWord":
-            view.hide()
-            word_label.props.label = "QuickWord"
-            self.current_view = "no-word-view"
-            print("on:word-view > no-word-view")
+        # elif self.active_view == word_view and app.lookup_word == "QuickWord":
+        #     view.hide()
+        #     word_label.props.label = "QuickWord"
+        #     self.current_view = "no-word-view"
+        #     print("on:word-view > no-word-view")
 
         elif self.active_view == updater_view:
             view.hide()
             word_label.props.label = "QuickWord"
             self.current_view = "updater-view"
-            print("on:updater-view")
+            #print("on:updater-view")
 
-     
+        elif current_stack_child["current"] == word_view:
+            view.hide()
+            word_label.props.label = word_view.lookup_word
+            self.current_view = "word-view"
+            #print("on:settings-view > word-view")
+
+        elif current_stack_child["current"] == noword_view:
+            view.hide()
+            word_label.props.label = "QuickWord"
+            self.current_view = "no-word-view"
+            #print("noword-view")
+
+        elif current_stack_child["current"] == updater_view:
+            view.hide()
+            word_label.props.label = "QuickWord"
+            self.current_view = "updater-view"
+            #print("updater-view")
+
+        #print(app.lookup_word)
 
         # toggle css styling
         if self.current_view == "settings-view":
