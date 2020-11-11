@@ -8,7 +8,7 @@
   <summary>Quickly lookup words on the fly</summary>
   <developer_name>Adi Hezral</developer_name>
   <description>
-    <p>Quick and easy word definition lookups that works offline. Definitions are based on Wordnet (http://wordnet.princeton.edu/). </p>
+    <p>Quick and easy word definition lookups that works offline. Definitions are based on Wordnet <url>http://wordnet.princeton.edu/</url>. </p>
     <ul>
         <li>Word definition lookup</li>
         <li>Examples of word sentences</li>
