@@ -5,14 +5,20 @@
   <metadata_license>CC0</metadata_license>
   <project_license>GPL-3.0+</project_license>
   <name>QuickWord</name>
-  <summary>Quickly lookup words on the fly</summary>
+  <summary>Quickly lookup words on the fly and offline</summary>
   <developer_name>Adi Hezral</developer_name>
   <description>
-    <p>Quick and easy word definition lookups that works offline. Definitions are based on Wordnet. </p>
+    <p>QuickWord can be used by manual lookup and via a keyboard shortcut to open it on the fly. </p>
+    <p>Select a word and hit the ⌘ + Ctrl + D shortcut to get the word lookup.</p>
+    <p>Features include:</p>
     <ul>
-        <li>Word definition lookup</li>
+        <li>On the fly word lookup</li>
+        <li>Works offline (first run will require internet to download dictionary data)</li>
+        <li>Copy definitions and examples to clipboard with just a click</li>
+        <li>Word definitions</li>
         <li>Examples of word sentences</li>
         <li>Synonyms</li>
+        <li>Explore synonyms from each word</li>
     </ul>
   </description>
 
@@ -26,16 +32,12 @@
 
   <screenshots>
       <screenshot type="default">
-          <caption>Basic file information and file comments view</caption>
+          <caption>Manual word lookup</caption>
           <image>https://github.com/hezral/quickword/blob/master/data/screenshot-01.png?raw=true</image>
       </screenshot>
       <screenshot>
-          <caption>Extended file information view</caption>
+          <caption>Word lookup results</caption>
           <image>https://github.com/hezral/quickword/blob/master/data/screenshot-02.png?raw=true</image>
-      </screenshot>
-      <screenshot>
-          <caption>Export file information to JSON, CSV or Text file format</caption>
-          <image>https://github.com/hezral/quickword/blob/master/data/screenshot-03.png?raw=true</image>
       </screenshot>
   </screenshots>
 
@@ -80,8 +82,8 @@
 ​  </releases>
 
   <custom>
-    <value key="x-appcenter-color-primary">#B7E1E5</value>
-    <value key="x-appcenter-color-primary-text">#29484F</value>
+    <value key="x-appcenter-color-primary">#D9262C</value>
+    <value key="x-appcenter-color-primary-text">#FFFFFF</value>
     <value key="x-appcenter-suggested-price">1.99</value>
   </custom>
 

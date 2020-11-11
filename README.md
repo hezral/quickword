@@ -3,22 +3,35 @@
 ![icon](data/icons/com.github.hezral.quickword.svg)
 
 # ![logo_type](data/logo_type.png?raw=true)
-### Quickly lookup words on the fly 
-
 </div>
+
+### Quickly lookup words on the fly and offline
+* On the fly word lookup
+* Works offline (first run will require internet to download dictionary data)
+* Copy definitions and examples to clipboard with just a click
+* Word definitions
+* Examples of word sentences
+* Synonyms
+* Explore synonyms from each word
 
 | ![Screenshot](data/screenshot-01.png?raw=true) | ![Screenshot](data/screenshot-02.png?raw=true) |
 |------------------------------------------|-----------------------------------------|
 
-## Demo
+## Demo and How to use
+QuickWord can be used by manual lookup and via a keyboard shortcut to open it on the fly. 
+
+Select a word and hit the ⌘ + Ctrl + D shortcut to get the lookup.  
+* Manual entry of words
+* Selecting a text
+
 ![](data/demo.gif)
 
 ## Installation
 
-# Install it from source
+### Install it from source
 You can of course download and install this app from source.
 
-## Dependencies
+### Dependencies
 Ensure you have these dependencies installed. 
 
 * python3
@@ -28,7 +41,7 @@ Ensure you have these dependencies installed.
 * libgtk-3-dev
 * espeak
 
-## Installation
+### Installation
 Download the updated source [here](https://gitlab.com/hezral/quickword/archive/master.zip), or use git:
 ```bash
 git clone https://gitlab.com/hezral/quickword.git
@@ -53,6 +66,6 @@ cat files.txt | xargs sudo rm -rf
 ```
 
 ## Thanks/Credits
-
+- [Wordnet](http://wordnetweb.princeton.edu/perl/webwn) Definitions are based on Wordnet.
 - [Ideogram](https://appcenter.elementary.io/com.github.cassidyjames.ideogram/) Inspired by it. Also borrowed/forked some code.
 - [ElementaryPython](https://github.com/mirkobrombin/ElementaryPython) This started me off on coding with Python and GTK. 
