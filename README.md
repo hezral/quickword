@@ -26,14 +26,14 @@ Ensure you have these dependencies installed.
 * espeak
 
 ## Installation
-Download the updated source [here](https://gitlab.com/hezral/inspektor/archive/master.zip), or use git:
+Download the updated source [here](https://gitlab.com/hezral/quickword/archive/master.zip), or use git:
 ```bash
-git clone https://gitlab.com/hezral/inspektor.git
-cd inspektor
+git clone https://gitlab.com/hezral/quickword.git
+cd quickword
 ```
 
 ### From .setup.py
-In the inspektor file directory:
+In the quickword file directory:
 ```bash
 sudo python3 setup.py install --prefix=/usr --install-data prefix/share --install-purelib prefix/share
 ```
@@ -47,10 +47,6 @@ Then when you want to uninstall it simply run; be careful with the 'sudo'
 ```bash
 cat files.txt | xargs sudo rm -rf
 ```
-
-
-
-
 
 ## Thanks/Credits
 
