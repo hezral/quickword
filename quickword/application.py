@@ -155,14 +155,15 @@ class QuickWordApp(Gtk.Application):
             # start background lookup if word selected
             if self.lookup_word is None:
                 self.lookup_word = "QuickWord"
-                self._run_background_lookup = None
+                #self._run_background_lookup = None
             else:
-                self._run_background_lookup = RunInBackground(target=self._word_lookup.get_synsets, args=(self.lookup_word,))
-                self._run_background_lookup.start()
-                # print(datetime.now(), "lookup background init")
+                # self._run_background_lookup = RunInBackground(target=self._word_lookup.get_synsets, args=(self.lookup_word,))
+                # self._run_background_lookup.start()
+                # # print(datetime.now(), "lookup background init")
 
-                self.word_data = app._run_background_lookup.join()
-                # print(datetime.now(), "background lookup retrieved")
+                # self.word_data = app._run_background_lookup.join()
+                # # print(datetime.now(), "background lookup retrieved")
+                self.word_data = self._word_lookup.get_synsets(self.lookup_word)
 
             if self.word_data is not None:
                 app.emit("on-new-word-lookup", self.word_data)
