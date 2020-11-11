@@ -80,12 +80,12 @@ class PostInstall(install):
     """Post-installation for installation mode."""
     def run(self):
         install.run(self)
-        # # PUT YOUR POST-INSTALL SCRIPT HERE or CALL A FUNCTION
+        # PUT YOUR POST-INSTALL SCRIPT HERE or CALL A FUNCTION
         # print('Updating icon cache...')
         # call(['gtk-update-icon-cache', '-qtf', path.join(prefix_data, 'icons', 'hicolor')])
 
-        print("Installing new Schemas")
-        call(['glib-compile-schemas', path.join(prefix_data, 'glib-2.0/schemas')])
+        # print("Installing new Schemas")
+        # call(['glib-compile-schemas', path.join(prefix_data, 'glib-2.0/schemas')])
 
         # print("Clean-up")
         # import shutil

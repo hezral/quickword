@@ -10,6 +10,9 @@
 | ![Screenshot](data/screenshot-01.png?raw=true) | ![Screenshot](data/screenshot-02.png?raw=true) |
 |------------------------------------------|-----------------------------------------|
 
+## Demo
+![](data/demo.gif)
+
 ## Installation
 
 # Install it from source
