@@ -39,6 +39,7 @@ cd quickword
 In the quickword file directory:
 ```bash
 sudo python3 setup.py install --prefix=/usr --install-data prefix/share --install-purelib prefix/share
+sudo python3 post_install.py
 ```
 
 ## Uninstallation
