@@ -50,7 +50,7 @@ install_data = [(prefix_data + '/metainfo', ['data/' + app_id + '.appdata.xml'])
                 (install_path + '/data',['data/application.css']),
                 (install_path,[app_name + '/application.py']),
                 (install_path,[app_name + '/clipboard_manager.py']),
-                (install_path,[app_name + '/custom_shortcut_settings.py']),
+                (install_path,[app_name + '/custom_shortcut_settings.py'
                 (install_path,[app_name + '/data_manager.py']),
                 (install_path,[app_name + '/main_window.py']),
                 (install_path,[app_name + '/noword_view.py']),
@@ -58,7 +58,7 @@ install_data = [(prefix_data + '/metainfo', ['data/' + app_id + '.appdata.xml'])
                 (install_path,[app_name + '/updater_view.py']),
                 (install_path,[app_name + '/word_lookup.py']),
                 (install_path,[app_name + '/word_view.py']),
-                (icon_scalable,['data/icons/128/' + app_id + '.svg']),]
+                (icon_scalable,['data/icons/' + app_id + '.svg']),]
 
 # Add icon data files to install data list
 for size in icon_sizes:
