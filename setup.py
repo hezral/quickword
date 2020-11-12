@@ -43,7 +43,7 @@ icon_scalable = prefix_data + '/icons/hicolor/scalable/apps'
 # Setup install data list
 install_data = [(prefix_data + '/metainfo', ['data/' + app_id + '.appdata.xml']),
                 (prefix_data + '/applications', ['data/' + app_id + '.desktop']),
-                (prefix_data + 'glib-2.0/schemas',['data/' + app_id + '.gschema.xml']),
+                (prefix_data + '/glib-2.0/schemas',['data/' + app_id + '.gschema.xml']),
                 (install_path + '/data/icons',['data/icons/' + app_id + '-symbolic.svg']),
                 (install_path + '/data/icons',['data/icons/' + app_id + '-left.svg']),
                 (install_path + '/data/icons',['data/icons/' + app_id + '-right.svg']),
