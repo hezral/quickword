@@ -72,18 +72,18 @@ install_data = [(prefix_data + '/metainfo', ['data/' + app_id + '.appdata.xml'])
                 (install_path,[app_name + '/word_lookup.py']),
                 (install_path,[app_name + '/word_view.py']),
                 (icon_scalable,['data/icons/' + app_id + '.svg']),
-                (icon_16,['data/icons/16' + app_id + '.svg']),
-                (icon_16_2x,['data/icons/16' + app_id + '.svg']),
-                (icon_24,['data/icons/24' + app_id + '.svg']),
-                (icon_24_2x,['data/icons/24' + app_id + '.svg']),
-                (icon_32,['data/icons/32' + app_id + '.svg']),
-                (icon_32_2x,['data/icons/32' + app_id + '.svg']),
-                (icon_48,['data/icons/48' + app_id + '.svg']),
-                (icon_48_2x,['data/icons/48' + app_id + '.svg']),
-                (icon_64,['data/icons/64' + app_id + '.svg']),
-                (icon_64_2x,['data/icons/64' + app_id + '.svg']),
-                (icon_128,['data/icons/128' + app_id + '.svg']),
-                (icon_128_2x,['data/icons/128' + app_id + '.svg'])]
+                (icon_16,['data/icons/16/' + app_id + '.svg']),
+                (icon_16_2x,['data/icons/16/' + app_id + '.svg']),
+                (icon_24,['data/icons/24/' + app_id + '.svg']),
+                (icon_24_2x,['data/icons/24/' + app_id + '.svg']),
+                (icon_32,['data/icons/32/' + app_id + '.svg']),
+                (icon_32_2x,['data/icons/32/' + app_id + '.svg']),
+                (icon_48,['data/icons/48/' + app_id + '.svg']),
+                (icon_48_2x,['data/icons/48/' + app_id + '.svg']),
+                (icon_64,['data/icons/64/' + app_id + '.svg']),
+                (icon_64_2x,['data/icons/64/' + app_id + '.svg']),
+                (icon_128,['data/icons/128/' + app_id + '.svg']),
+                (icon_128_2x,['data/icons/128/' + app_id + '.svg'])]
 
 # # Add icon data files to install data list
 # for size in icon_sizes:
