@@ -18,7 +18,7 @@
     You should have received a copy of the GNU General Public License
     along with this Application.  If not, see <http://www.gnu.org/licenses/>.
 '''
-
+import os
 import gi
 from gi.repository import GLib
 gi.require_version('Gtk', '3.0')
@@ -32,6 +32,8 @@ class UpdaterView(Gtk.Grid):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        self.modulepath = os.path.dirname(__file__)
+
         #-- quickword logo --------#
         download_icon = Gtk.Image().new_from_icon_name("emblem-downloads", Gtk.IconSize.DIALOG)
         download_icon.props.halign = Gtk.Align.END
@@ -39,9 +41,11 @@ class UpdaterView(Gtk.Grid):
         download_icon.props.expand = False
         download_icon.props.name = "download-icon"
         download_icon.get_style_context().add_class("quickword-icon-right")
-        left_icon = Gtk.Image().new_from_file("data/icons/134.svg")
+        
+        left_icon = Gtk.Image().new_from_file(os.path.join(self.modulepath, "data/icons/com.github.hezral.quickword-left.svg"))
         left_icon.props.expand = False
-        right_icon = Gtk.Image().new_from_file("data/icons/133.svg")
+        
+        right_icon = Gtk.Image().new_from_file(os.path.join(self.modulepath, "data/icons/com.github.hezral.quickword-right.svg"))
         right_icon.props.expand = False
 
         icon_overlay = Gtk.Overlay()
