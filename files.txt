@@ -1,7 +1,7 @@
 /usr/bin/com.github.hezral.quickword
 /usr/share/metainfo/com.github.hezral.quickword.appdata.xml
 /usr/share/applications/com.github.hezral.quickword.desktop
-/usr/shareglib-2.0/schemas/com.github.hezral.quickword.gschema.xml
+/usr/share/glib-2.0/schemas/com.github.hezral.quickword.gschema.xml
 /usr/share/com.github.hezral.quickword/data/icons/com.github.hezral.quickword-symbolic.svg
 /usr/share/com.github.hezral.quickword/data/icons/com.github.hezral.quickword-left.svg
 /usr/share/com.github.hezral.quickword/data/icons/com.github.hezral.quickword-right.svg
@@ -9,6 +9,7 @@
 /usr/share/com.github.hezral.quickword/application.py
 /usr/share/com.github.hezral.quickword/clipboard_manager.py
 /usr/share/com.github.hezral.quickword/custom_shortcut_settings.py
+/usr/share/com.github.hezral.quickword/data_manager.py
 /usr/share/com.github.hezral.quickword/main_window.py
 /usr/share/com.github.hezral.quickword/noword_view.py
 /usr/share/com.github.hezral.quickword/settings_view.py

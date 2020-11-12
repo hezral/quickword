@@ -37,7 +37,6 @@ from datetime import datetime
 from main_window import QuickWordWindow
 from clipboard_manager import ClipboardListener, ClipboardPaste
 from word_lookup import WordLookup
-from data_manager import DataUpdater
 from custom_shortcut_settings import CustomShortcutSettings
 
 #------------------CLASS-SEPARATOR------------------#
@@ -66,10 +65,6 @@ class QuickWordApp(Gtk.Application):
         # initialize word lookup
         self._word_lookup = WordLookup(application_id=self.props.application_id)
         # print(datetime.now(), "word lookup background init ")
-
-        # create data manager if first run
-        if self.first_run:
-            self.generate_data_manager()
         
         # initialize clipboard listener and clipboard paster
         self.clipboard_listener = ClipboardListener()
@@ -135,6 +130,12 @@ class QuickWordApp(Gtk.Application):
             self.add_window(self.window)
             self.window.show_all()
 
+        # create data manager if first run
+        if self.first_run:
+            self.generate_data_manager()
+
+
+
         # print(datetime.now(), "activate")
 
     def after_activate(self, app):
@@ -177,6 +178,7 @@ class QuickWordApp(Gtk.Application):
         # print(datetime.now(), "post-activate")
 
     def generate_data_manager(self):
+        from data_manager import DataUpdater
         self._data_manager = DataUpdater(application_id=self.props.application_id)
         # print(datetime.now(), "updater initiated")
         return True

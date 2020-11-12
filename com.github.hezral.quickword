@@ -29,6 +29,8 @@ if launch_dir == "/usr/bin":
 else:
     modules_path = launch_dir + "/quickword"
 
+print(modules_path)
+
 sys.path.insert(0, modules_path)
 
 try:
