@@ -129,5 +129,5 @@ class NoWordView(Gtk.Grid):
             if lookup is False:
                 message.props.label = "Word not found"
                 entry.props.text = ""
-                entry.props.placeholder_text = "please type a valid ssssword 🧐️"
+                entry.props.placeholder_text = "please type a valid word 🧐️"
                 icon_overlay.grab_focus()
