@@ -50,7 +50,7 @@ install_data = [(prefix_data + '/metainfo', ['data/' + app_id + '.appdata.xml'])
                 (install_path + '/data',['data/application.css']),
                 (install_path,[app_name + '/application.py']),
                 (install_path,[app_name + '/clipboard_manager.py']),
-                (install_path,[app_name + '/custom_shortcut_settings.py'
+                (install_path,[app_name + '/custom_shortcut_settings.py']),
                 (install_path,[app_name + '/data_manager.py']),
                 (install_path,[app_name + '/main_window.py']),
                 (install_path,[app_name + '/noword_view.py']),
