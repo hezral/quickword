@@ -3,7 +3,7 @@ Upstream-Name: quickword
 Source: https://github.com/hezral/quickword
 
 Files: *
-Copyright: 2017 Adi Hezral <hezral@gmail.com>
+Copyright: 2020 Adi Hezral <hezral@gmail.com>
 License: GPL-3.0+
 
 License: GPL-3.0+
@@ -22,4 +22,3 @@ License: GPL-3.0+
  .
  On Debian systems, the complete text of the GNU General
  Public License version 3 can be found in "/usr/share/common-licenses/GPL-3".
-

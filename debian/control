@@ -18,4 +18,4 @@ Depends: ${python3:Depends},
          python3-nltk,
          espeak
 Description: QuickWord
- Quick and easy word lookup
+ Quick and easy word lookup on the fly and offline
