@@ -64,7 +64,7 @@ class WordView(Gtk.Grid):
         stack_switcher.props.homogeneous = True
         stack_switcher.props.stack = stack
         stack_switcher.props.margin_top = 4
-        stack_switcher.get_style_context().add_class("subview-switcher")       
+        stack_switcher.get_style_context().add_class("subview-switcher")
 
          #-- WordView construct--------#
         self.props.name = 'word-view'
