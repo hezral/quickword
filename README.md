@@ -28,6 +28,9 @@ Select a word and hit the ⌘ + Ctrl + D shortcut to get the lookup.
 
 ## Installation
 
+### Install from deb file
+Download the deb file in and install from deb installer or command line. 
+
 ### Install it from source
 You can of course download and install this app from source.
 
