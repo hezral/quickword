@@ -29,7 +29,10 @@ Select a word and hit the ⌘ + Ctrl + D shortcut to get the lookup.
 ## Installation
 
 ### Install from deb file
-Download the deb file in and install from deb installer or command line. 
+Download the deb file from the Releases page and install using a deb installer or command line. 
+```bash
+sudo apt install /path/to/deb/filename.deb
+```
 
 ### Install it from source
 You can of course download and install this app from source.
