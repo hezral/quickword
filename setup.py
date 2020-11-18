@@ -126,8 +126,8 @@ setup(
     author='Adi Hezral',  # Optional
     author_email='hezral@gmail.com',  # Optional
     scripts=[app_id],
-    data_files=install_data,  # Optional
-    cmdclass={
-        'install': PostInstall,
-    }
+    data_files=install_data  # Optional
+    # cmdclass={
+    #     'install': PostInstall,
+    # }
 )
