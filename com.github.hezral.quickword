@@ -21,16 +21,22 @@
 import os
 import sys
 
+prefix = '/usr'
+prefix_data = os.path.join(prefix, 'share')
+
+# Base application info
+base_rdnn = 'com.github.hezral'
+app_name = 'quickword'
+app_id = base_rdnn + '.' + app_name
+
 # Get launch script dir
 launch_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
 
 # Update sys.path to include modules
 if launch_dir == "/usr/bin":
-    modules_path = "/usr/share/com.github.hezral.quickword/"
+    modules_path = os.path.join(prefix_data, app_id, app_name)
 else:
-    modules_path = launch_dir + "/quickword"
-
-print(modules_path)
+    modules_path = os.path.join(launch_dir, app_name)
 
 sys.path.insert(0, modules_path)
 

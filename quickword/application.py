@@ -115,7 +115,8 @@ class QuickWordApp(Gtk.Application):
 
         # set CSS provider
         provider = Gtk.CssProvider()
-        provider.load_from_path(os.path.join(self.modulepath, "data/application.css"))
+        provider.load_from_path("data/application.css")
+        # provider.load_from_path(os.path.join(self.modulepath, "data/application.css"))
         # # provider.load_from_resource ("com/github/hezral/quickword/application.css")
         Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 
@@ -231,8 +232,8 @@ class RunInBackground(Thread):
 
 #------------------CLASS-SEPARATOR------------------#
 
-# if __name__ == "__main__":
-#     app = QuickWordApp()
-#     app.run(sys.argv)
+if __name__ == "__main__":
+    app = QuickWordApp()
+    app.run(sys.argv)
 
 

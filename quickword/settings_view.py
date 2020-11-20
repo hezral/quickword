@@ -108,6 +108,7 @@ class SettingsView(Gtk.Grid):
         word_label.props.label = "QuickWord"
         window.active_view = updater_view
         window.current_view = "updater-view"
+        self.hide()
 
     def on_totalwords(self):
         stack = self.get_parent()

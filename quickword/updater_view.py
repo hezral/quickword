@@ -42,10 +42,12 @@ class UpdaterView(Gtk.Grid):
         download_icon.props.name = "download-icon"
         download_icon.get_style_context().add_class("quickword-icon-right")
         
-        left_icon = Gtk.Image().new_from_file(os.path.join(self.modulepath, "data/icons/com.github.hezral.quickword-left.svg"))
+        left_icon = Gtk.Image().new_from_file("data/icons/com.github.hezral.quickword-left.svg")
+        # left_icon = Gtk.Image().new_from_file(os.path.join(self.modulepath, "data/icons/com.github.hezral.quickword-left.svg"))
         left_icon.props.expand = False
         
-        right_icon = Gtk.Image().new_from_file(os.path.join(self.modulepath, "data/icons/com.github.hezral.quickword-right.svg"))
+        right_icon = Gtk.Image().new_from_file("data/icons/com.github.hezral.quickword-right.svg")
+        # right_icon = Gtk.Image().new_from_file(os.path.join(self.modulepath, "data/icons/com.github.hezral.quickword-right.svg"))
         right_icon.props.expand = False
 
         icon_overlay = Gtk.Overlay()
@@ -139,9 +141,12 @@ class UpdaterView(Gtk.Grid):
         stack = self.get_parent()
         window = stack.get_parent()
         app = window.props.application
+
         lookup = app.emit("on-new-word-lookup", app.lookup_word)
+
         if lookup is False:
             stack.set_visible_child_name("no-word-view")
+            self.current_view = "no-word-view"
 
     def on_proceed_update(self, button):
         stack = self.get_parent()
@@ -149,7 +154,6 @@ class UpdaterView(Gtk.Grid):
         app = window.props.application
         icon_overlay = [child for child in self.get_children() if isinstance(child, Gtk.Overlay)][0]
         download_icon = [child for child in icon_overlay.get_children() if child.props.name == "download-icon"][0]
-
 
         download_icon.get_style_context().remove_class("quickword-icon-right")
         download_icon.get_style_context().add_class("download-icon-start")
@@ -164,21 +168,16 @@ class UpdaterView(Gtk.Grid):
                 GLib.idle_add(self.on_update_progress, "One moment..", "Waiting for data manager")
             app._data_manager.run_func(runname="update", callback=self.on_update_progress)
 
-
-
-
     def on_update_progress(self, message_str, sub_message_str):
         message = [child for child in self.get_children() if child.props.name == "message"][0]
         sub_message = [child for child in self.get_children() if child.props.name == "sub-message"][0]
-        proceed_btn = [child for child in self.get_children() if child.props.name == "proceed-btn"][0]
-        start_btn = [child for child in self.get_children() if child.props.name == "start-btn"][0]
-
-
-
+        
         if message_str == "Completed" or message_str == "Downloaded" or message_str == "No Updates":
+            start_btn = [child for child in self.get_children() if child.props.name == "start-btn"][0]
             self.remove_row(4)
             self.attach(start_btn, 0, 4, 1, 1)
         else:
+            proceed_btn = [child for child in self.get_children() if child.props.name == "proceed-btn"][0]
             proceed_btn.props.label = "Please wait.."
 
         message.props.label = message_str

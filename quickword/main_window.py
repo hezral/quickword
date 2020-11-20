@@ -148,7 +148,8 @@ class QuickWordWindow(Gtk.ApplicationWindow):
 
         #------ view switch ----#
         icon_theme = Gtk.IconTheme.get_default()
-        icon_theme.prepend_search_path(os.path.join(self.modulepath, "data/icons"))
+        icon_theme.prepend_search_path("data/icons")
+        # icon_theme.prepend_search_path(os.path.join(self.modulepath, "data/icons"))
         view_switch = Granite.ModeSwitch.from_icon_name("com.github.hezral.quickword-symbolic", "preferences-system-symbolic")
         view_switch.props.primary_icon_tooltip_text = "Word Lookup"
         view_switch.props.secondary_icon_tooltip_text = "Settings"
@@ -246,7 +247,7 @@ class QuickWordWindow(Gtk.ApplicationWindow):
         current_stack_child = {}
         current_stack_child["current"] = stack.get_visible_child()
 
-        #print(current_stack_child["current"])
+        #print("current_stack_child", current_stack_child["current"])
 
         if view.is_visible():
             word_label.props.label = "Settings"
@@ -312,9 +313,8 @@ class QuickWordWindow(Gtk.ApplicationWindow):
             stack.get_style_context().remove_class("stack-settings")
             headerbar.get_style_context().remove_class("headerbar-settings")
 
-        # finally set visible stack
-        # print("active", self.active_view)
-        # print("triggered", view)
+        #print("active_view", self.active_view)
+        #print("triggered", view)
 
         stack.set_visible_child_name(self.current_view)
 
