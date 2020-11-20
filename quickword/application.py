@@ -65,6 +65,8 @@ class QuickWordApp(Gtk.Application):
         # initialize word lookup
         self._word_lookup = WordLookup(application_id=self.props.application_id)
         # print(datetime.now(), "word lookup background init ")
+        # hack to load wordnet faster
+        self._word_lookup.get_synsets("a")
         
         # initialize clipboard listener and clipboard paster
         self.clipboard_listener = ClipboardListener()
@@ -72,6 +74,7 @@ class QuickWordApp(Gtk.Application):
 
         # get current selected text if any
         self.lookup_word = self.clipboard_listener.copy_selected_text()
+        
         # print(datetime.now(), "self.lookup_word", self.lookup_word)
 
         # first run
