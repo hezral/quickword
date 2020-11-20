@@ -34,11 +34,12 @@ launch_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
 
 # Update sys.path to include modules
 if launch_dir == "/usr/bin":
-    modules_path = os.path.join(prefix_data, app_id, app_name)
+    modules_path = os.path.join(prefix_data, app_id)
 else:
     modules_path = os.path.join(launch_dir, app_name)
 
-sys.path.insert(0, modules_path)
+sys.path.insert(0, modules_path, )
+
 
 try:
     import application

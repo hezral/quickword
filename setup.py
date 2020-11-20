@@ -36,7 +36,6 @@ saythanks_url = 'https://saythanks.io/to/adihezral%40gmail.com'
 prefix = '/usr'
 prefix_data = path.join(prefix, 'share')
 install_path = path.join(prefix_data, app_id)
-module_path = path.join(install_path, app_name)
 data_path = path.join(install_path, 'data')
 icon_path = 'icons/hicolor'
 icon_sizes = ['16','24','32','48','64','128']
@@ -63,16 +62,16 @@ install_data = [(prefix_data + '/metainfo', ['data/' + app_id + '.appdata.xml'])
                 (data_path + '/icons',['data/icons/' + app_id + '-left.svg']),
                 (data_path + '/icons',['data/icons/' + app_id + '-right.svg']),
                 (data_path,['data/application.css']),
-                (module_path,[app_name + '/application.py']),
-                (module_path,[app_name + '/clipboard_manager.py']),
-                (module_path,[app_name + '/custom_shortcut_settings.py']),
-                (module_path,[app_name + '/data_manager.py']),
-                (module_path,[app_name + '/main_window.py']),
-                (module_path,[app_name + '/noword_view.py']),
-                (module_path,[app_name + '/settings_view.py']),
-                (module_path,[app_name + '/updater_view.py']),
-                (module_path,[app_name + '/word_lookup.py']),
-                (module_path,[app_name + '/word_view.py']),
+                (install_path,[app_name + '/application.py']),
+                (install_path,[app_name + '/clipboard_manager.py']),
+                (install_path,[app_name + '/custom_shortcut_settings.py']),
+                (install_path,[app_name + '/data_manager.py']),
+                (install_path,[app_name + '/main_window.py']),
+                (install_path,[app_name + '/noword_view.py']),
+                (install_path,[app_name + '/settings_view.py']),
+                (install_path,[app_name + '/updater_view.py']),
+                (install_path,[app_name + '/word_lookup.py']),
+                (install_path,[app_name + '/word_view.py']),
                 (icon_scalable,['data/icons/' + app_id + '.svg']),
                 (icon_16,['data/icons/16/' + app_id + '.svg']),
                 (icon_16_2x,['data/icons/16/' + app_id + '.svg']),

@@ -42,12 +42,12 @@ class UpdaterView(Gtk.Grid):
         download_icon.props.name = "download-icon"
         download_icon.get_style_context().add_class("quickword-icon-right")
         
-        left_icon = Gtk.Image().new_from_file("data/icons/com.github.hezral.quickword-left.svg")
-        # left_icon = Gtk.Image().new_from_file(os.path.join(self.modulepath, "data/icons/com.github.hezral.quickword-left.svg"))
+        # left_icon = Gtk.Image().new_from_file("data/icons/com.github.hezral.quickword-left.svg")
+        left_icon = Gtk.Image().new_from_file(os.path.join(self.modulepath, "data/icons/com.github.hezral.quickword-left.svg"))
         left_icon.props.expand = False
         
-        right_icon = Gtk.Image().new_from_file("data/icons/com.github.hezral.quickword-right.svg")
-        # right_icon = Gtk.Image().new_from_file(os.path.join(self.modulepath, "data/icons/com.github.hezral.quickword-right.svg"))
+        # right_icon = Gtk.Image().new_from_file("data/icons/com.github.hezral.quickword-right.svg")
+        right_icon = Gtk.Image().new_from_file(os.path.join(self.modulepath, "data/icons/com.github.hezral.quickword-right.svg"))
         right_icon.props.expand = False
 
         icon_overlay = Gtk.Overlay()
