@@ -247,7 +247,7 @@ class QuickWordWindow(Gtk.ApplicationWindow):
         current_stack_child = {}
         current_stack_child["current"] = stack.get_visible_child()
 
-        print("current_stack_child", current_stack_child["current"])
+        #print("current_stack_child", current_stack_child["current"])
 
         if view.is_visible():
             word_label.props.label = "Settings"
@@ -319,8 +319,8 @@ class QuickWordWindow(Gtk.ApplicationWindow):
             stack.get_style_context().remove_class("stack-settings")
             headerbar.get_style_context().remove_class("headerbar-settings")
 
-        print("active_view", self.active_view)
-        print("triggered", view)
+        #print("active_view", self.active_view)
+        #print("triggered", view)
 
         stack.set_visible_child_name(self.current_view)
 
