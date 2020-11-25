@@ -26,7 +26,6 @@ from gi.repository import GLib
 # nltk imports
 from nltk import data
 from nltk.corpus import wordnet as wn
-from nltk.corpus import cmudict as cm
 
 # for ipa output of words by espeak
 import subprocess
@@ -38,9 +37,6 @@ class WordLookup():
         # setup nltk data path
         nltk_data_path = os.path.join(GLib.get_user_data_dir(), application_id, 'nltk_data')
         data.path = [nltk_data_path]
-
-        # # setup cmudict
-        # self.dictionary = cm.dict()
 
         #check if exiftool is installed
         try:

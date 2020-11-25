@@ -52,11 +52,6 @@ class QuickWordApp(Gtk.Application):
 
         # set application properties
         self.props.application_id = "com.github.hezral.quickword"
-        # Gdk.set_program_class("com.github.hezral.quickword")
-
-        # setup path
-        self.modulepath = os.path.dirname(__file__)
-
 
         # initialize objects
         self.window = None
@@ -104,7 +99,6 @@ class QuickWordApp(Gtk.Application):
                 _custom_shortcut_settings.edit_shortcut(shortcut, SHORTCUT)
                 _custom_shortcut_settings.edit_command(shortcut, ID)
 
- 
         # print(datetime.now(), "app init")
 
     def do_startup(self):
@@ -118,9 +112,8 @@ class QuickWordApp(Gtk.Application):
 
         # set CSS provider
         provider = Gtk.CssProvider()
-        # provider.load_from_path("data/application.css")
-        provider.load_from_path(os.path.join(self.modulepath, "data/application.css"))
-        # # provider.load_from_resource ("com/github/hezral/quickword/application.css")
+        provider.load_from_path(os.path.join(os.path.dirname(__file__), "..", "data", "application.css"))
+
         Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 
         # print(datetime.now(), "startup")
@@ -137,8 +130,6 @@ class QuickWordApp(Gtk.Application):
         # create data manager if first run
         if self.first_run:
             self.generate_data_manager()
-
-
 
         # print(datetime.now(), "activate")
 
@@ -160,14 +151,7 @@ class QuickWordApp(Gtk.Application):
             # start background lookup if word selected
             if self.lookup_word is None:
                 self.lookup_word = "QuickWord"
-                #self._run_background_lookup = None
             else:
-                # self._run_background_lookup = RunInBackground(target=self._word_lookup.get_synsets, args=(self.lookup_word,))
-                # self._run_background_lookup.start()
-                # # print(datetime.now(), "lookup background init")
-
-                # self.word_data = app._run_background_lookup.join()
-                # # print(datetime.now(), "background lookup retrieved")
                 self.word_data = self._word_lookup.get_synsets(self.lookup_word)
 
             if self.word_data is not None:
@@ -175,9 +159,6 @@ class QuickWordApp(Gtk.Application):
                 # print(datetime.now(), "emit word lookup")
             else:
                 self.lookup_word = "QuickWord"
-
-        # setup background updater
-        # print(datetime.now(), "background updater initiated")
 
         # print(datetime.now(), "post-activate")
 
@@ -232,11 +213,3 @@ class RunInBackground(Thread):
     def join(self, *args):
         Thread.join(self, *args) 
         return self._return
-
-#------------------CLASS-SEPARATOR------------------#
-
-if __name__ == "__main__":
-    app = QuickWordApp()
-    app.run(sys.argv)
-
-
