@@ -5,6 +5,8 @@
 # ![logo_type](data/logo_type.png?raw=true)
 </div>
 
+[![Build Status](https://travis-ci.com/hezral/quickword.svg?branch=master)](https://travis-ci.com/hezral/quickword)
+
 ### Quickly lookup words on the fly and offline
 * On the fly word lookup
 * Works offline (first run will require internet to download dictionary data)
