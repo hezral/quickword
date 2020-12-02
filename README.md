@@ -50,9 +50,9 @@ Ensure you have these dependencies installed.
 * espeak
 
 ### Installation
-Download the updated source [here](https://gitlab.com/hezral/quickword/archive/master.zip), or use git:
+Download the updated source [here](https://github.com/hezral/quickword/archive/master.zip), or use git:
 ```bash
-git clone https://gitlab.com/hezral/quickword.git
+git clone https://github.com/hezral/quickword.git
 cd quickword
 ```
 
