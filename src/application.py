@@ -57,11 +57,17 @@ class QuickWordApp(Gtk.Application):
         self.window = None
         self.word_data = None
 
+        # first run
+        gio_settings = Gio.Settings(schema_id="com.github.hezral.quickword")
+        self.first_run = gio_settings.get_value("first-run")
+        # print(datetime.now(), "first_run", self.first_run)
+
         # initialize word lookup
         self._word_lookup = WordLookup(application_id=self.props.application_id)
         # print(datetime.now(), "word lookup background init ")
         # hack to load wordnet faster
-        self._word_lookup.get_synsets("a")
+        if not self.first_run:
+            self._word_lookup.get_synsets("a")
         
         # initialize clipboard listener and clipboard paster
         self.clipboard_listener = ClipboardListener()
@@ -72,10 +78,7 @@ class QuickWordApp(Gtk.Application):
         
         # print(datetime.now(), "self.lookup_word", self.lookup_word)
 
-        # first run
-        gio_settings = Gio.Settings(schema_id="com.github.hezral.quickword")
-        self.first_run = gio_settings.get_value("first-run")
-        # print(datetime.now(), "first_run", self.first_run)
+
         
         # setup signal for new word lookup
         self.connect("on-new-word-lookup", self.on_new_word_lookup)
