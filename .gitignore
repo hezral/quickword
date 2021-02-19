@@ -131,3 +131,4 @@ dmypy.json
 .pyre/
 
 reference.png
+data/application.css~

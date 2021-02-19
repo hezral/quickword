@@ -24,10 +24,12 @@
 @define-color shaded_base shade(@theme_base_color, 0.98);
 @define-color popup shade(@theme_base_color, 0.98);
 
-
+/*
 *:backdrop {
     color: gray;
 }
+*/
+
 /* ------------------------------ */
 
 
@@ -141,6 +143,10 @@ stack {
     border-radius: 4px;
 }
 
+.word-hover {
+    font-weight: bold;
+}
+
 .word-examples {
     font-style: italic;
     color: gray;
@@ -153,7 +159,7 @@ stack {
     border-width: 1px;
     padding-left: 4px;
     padding-right: 4px;
-    border-radius: 12px;
+    border-radius: 3px;
 }
 
 .word-lemmas:hover {
@@ -171,19 +177,22 @@ stack {
 
 button#speak-btn {
     border-style: none;
+    border-width: 1px;
     background-image: none;
-    border-radius: 16px;
+    border-radius: 3px;
     box-shadow: none;
 }
 
 button#speak-btn:active {
-    /* background-color: rgba(24, 24, 24, 0.25) */
     border: solid;
     border-width: 1px;
     border-color: shade(@theme_base_color, 0.7);
     background-color: shade(@theme_base_color, 0.89);
-    box-shadow: 0px 0px 2px 0px shade(@theme_base_color, 0.7) inset;
+    box-shadow: 0px 0px 1px 0px shade(@theme_base_color, 0.7) inset;
 }
+    /* background-color: rgba(24, 24, 24, 0.25) */
+
+    /* box-shadow: 0px 0px 2px 0px shade(@theme_base_color, 0.7) inset; */
 
 /* .action-button {
     color: @theme_text_color;

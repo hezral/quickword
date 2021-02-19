@@ -143,9 +143,6 @@ class QuickWordWindow(Gtk.ApplicationWindow):
         word_box.connect("leave-notify-event", self.on_leave_word_label)
 
         #------ view switch ----#
-        icon_theme = Gtk.IconTheme.get_default()
-        # icon_theme.prepend_search_path("data/icons")
-        icon_theme.prepend_search_path(os.path.join(os.path.dirname(__file__), "..", "data", "icons"))
         view_switch = Granite.ModeSwitch.from_icon_name("com.github.hezral.quickword-symbolic", "preferences-system-symbolic")
         view_switch.props.primary_icon_tooltip_text = "Word Lookup"
         view_switch.props.secondary_icon_tooltip_text = "Settings"

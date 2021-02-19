@@ -119,6 +119,10 @@ class QuickWordApp(Gtk.Application):
 
         Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 
+        # prepend custom path for icon theme
+        icon_theme = Gtk.IconTheme.get_default()
+        icon_theme.prepend_search_path(os.path.join(os.path.dirname(__file__), "..", "data", "icons"))        
+
         # print(datetime.now(), "startup")
 
     def do_activate(self):

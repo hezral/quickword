@@ -32,8 +32,12 @@ class NoWordView(Gtk.Grid):
         super().__init__(*args, **kwargs)
 
         #-- quickword logo --------#
-        left_icon = Gtk.Image().new_from_file(os.path.join(os.path.dirname(__file__), "..", "data", "icons", "com.github.hezral.quickword-left.svg"))
-        right_icon = Gtk.Image().new_from_file(os.path.join(os.path.dirname(__file__), "..", "data", "icons", "com.github.hezral.quickword-right.svg"))
+        left_icon = Gtk.Image().new_from_icon_name("com.github.hezral.quickword-left", Gtk.IconSize.DIALOG)
+        right_icon = Gtk.Image().new_from_icon_name("com.github.hezral.quickword-right", Gtk.IconSize.DIALOG)
+
+        left_icon.set_pixel_size(96)
+        right_icon.set_pixel_size(96)
+
         right_icon.get_style_context().add_class("quickword-icon-right")
         
         icon_overlay = Gtk.Overlay()

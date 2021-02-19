@@ -52,7 +52,7 @@ class WordView(Gtk.Grid):
         speak_btn.props.margin_right = 5
         speak_btn.props.name = "speak-btn"
         speak_btn.connect("clicked", self.on_speak_word)
-        speak_btn.set_size_request(30, 24)
+        speak_btn.set_size_request(26, 26)
 
         #-- stack construct --------#
         stack = Gtk.Stack()
@@ -72,7 +72,7 @@ class WordView(Gtk.Grid):
         self.props.visible = True
         self.props.expand = False
         self.props.margin = 20
-        self.props.margin_top = 0
+        self.props.margin_top = 3
         self.props.row_spacing = 6       
         self.attach(speak_btn, 0, 1, 1, 1)
         self.attach(pronounciation_label, 1, 1, 1, 1)
@@ -82,6 +82,7 @@ class WordView(Gtk.Grid):
     def on_speak_word(self, button):
         try:
             subprocess.call(["espeak", self.lookup_word])
+            print("speak")
         except:
             pass
 
@@ -339,7 +340,7 @@ class WordItems(Gtk.Grid):
         content_eventbox.add(content_grid)
         
         # list items to pass to eventbox events
-        eventbox_params = (copy_img, copied_label, copied_img, copied_grid, word, word_definition, word_examples)
+        eventbox_params = (copy_img, copied_label, copied_img, copied_grid, word, word_definition, word_examples, word_box)
 
         content_eventbox.connect("enter-notify-event", self.on_enter_content_box, eventbox_params)
         content_eventbox.connect("leave-notify-event", self.on_leave_content_box, eventbox_params)
@@ -387,6 +388,7 @@ class WordItems(Gtk.Grid):
     def on_enter_content_box(self, eventbox, event, widget_list):
         copy_img = widget_list[0]
         copied_grid = widget_list[3]
+        word_box = widget_list[7]
 
         # show widget and set flags to trigger transition effect, see application.css
         copy_img.show()
@@ -395,9 +397,13 @@ class WordItems(Gtk.Grid):
         # set flags to ready state for transition effect, see application.css
         copied_grid.set_state_flags(Gtk.StateFlags.DIR_LTR, True)
 
+        # add styling for hover effect
+        word_box.get_style_context().add_class("word-hover")
+
     def on_leave_content_box(self, eventbox, event, widget_list):
         copy_img = widget_list[0]
         copied_grid = widget_list[3]
+        word_box = widget_list[7]
 
         # reset state flagss to ready state for transition effect, see application.css
         copy_img.set_state_flags(Gtk.StateFlags.DIR_LTR, True)
@@ -406,14 +412,15 @@ class WordItems(Gtk.Grid):
         # grid can stay as show state since only toggle widget hide/shows
         copied_grid.set_state_flags(Gtk.StateFlags.DIR_LTR, True)
 
+        # remove styling for hover effect
+        word_box.get_style_context().remove_class("word-hover")
+
+
     def on_copy_content_clicked(self, eventbox, event, widget_list):
         copy_img = widget_list[0]
         copied_label = widget_list[1]
         copied_img = widget_list[2]
         copied_grid = widget_list[3]
-        word = widget_list[4]
-        word_definition = widget_list[5]
-        word_example = widget_list[6]
 
         # reset state flagss to ready state for transition effect, see application.css
         copy_img.set_state_flags(Gtk.StateFlags.DIR_LTR, True)
