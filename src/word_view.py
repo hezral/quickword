@@ -167,6 +167,7 @@ class WordSubView(Gtk.Grid):
         scrolled_view = Gtk.ScrolledWindow()
         scrolled_view.props.vexpand = True
         scrolled_view.set_size_request(-1, 500)
+        scrolled_view.connect("edge-reached", self.on_edge_reached)
         scrolled_view_grid = Gtk.Grid()
 
         i = 1
@@ -181,10 +182,17 @@ class WordSubView(Gtk.Grid):
             scrolled_view.add(scrolled_view_grid)
             self.attach(scrolled_view, 0, 1, 1, 1)
 
-            more_count = len(scrolled_view_grid.get_children()) - 10
-            label = Gtk.Label(str(more_count) + " more results below..")
-            label.get_style_context().add_class("more-results")
-            self.attach(label, 0, 2, 1, 1)
+            self.more_count = len(scrolled_view_grid.get_children()) - 10
+            self.count_label = Gtk.Label(str(self.more_count) + " more results below..")
+            self.count_label.get_style_context().add_class("more-results")
+            self.attach(self.count_label, 0, 2, 1, 1)
+
+    def on_edge_reached(self, scrolledwindow, position):
+        print(position.value_name)
+        if position.value_name == "GTK_POS_BOTTOM":
+            self.count_label.props.label = str(self.more_count) + " more results up.."
+        elif position.value_name == "GTK_POS_TOP":
+            self.count_label.props.label = str(self.more_count) + " more results below.."
 
 #------------------CLASS-SEPARATOR------------------#
 
