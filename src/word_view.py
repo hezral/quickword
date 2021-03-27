@@ -429,6 +429,9 @@ class WordItems(Gtk.Grid):
         copied_label = widget_list[1]
         copied_img = widget_list[2]
         copied_grid = widget_list[3]
+        word = widget_list[4]
+        word_definition = widget_list[5]
+        word_example = widget_list[6]
 
         # reset state flagss to ready state for transition effect, see application.css
         copy_img.set_state_flags(Gtk.StateFlags.DIR_LTR, True)
