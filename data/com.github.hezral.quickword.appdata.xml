@@ -72,10 +72,10 @@
   </content_rating>
 
 ​  <releases>
-​    <release version="1.0.0" date="2020-11-12">
+​    <release version="1.0.1" date="2021-03-27">
 ​      <description>
 ​        <ul>
-            <li>First release</li>
+            <li>Minor bug fix</li>
         </ul>
 ​      </description>
 ​    </release>
