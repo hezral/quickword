@@ -63,7 +63,7 @@
     <content_attribute id="language-humor">none</content_attribute>
     <content_attribute id="language-discrimination">none</content_attribute>
     <content_attribute id="social-chat">none</content_attribute>
-    <content_attribute id="social-info">none</content_attribute>
+    <content_attribute id="social-info">mild</content_attribute>
     <content_attribute id="social-audio">none</content_attribute>
     <content_attribute id="social-location">none</content_attribute>
     <content_attribute id="social-contacts">none</content_attribute>
@@ -72,7 +72,7 @@
   </content_rating>
 
 ​  <releases>
-​    <release version="1.0.1" date="2021-03-27">
+​    <release version="1.0.2" date="2021-04-08">
 ​      <description>
 ​        <ul>
             <li>Minor bug fix</li>
