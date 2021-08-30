@@ -4,6 +4,7 @@ runtime-version: '6'
 sdk: io.elementary.Sdk
 command: quickword
 finish-args:
+  # for espeak to work
   - --socket=pulseaudio
   - --share=ipc
   - --socket=wayland
