@@ -106,7 +106,6 @@ class QuickWordWindow(Gtk.ApplicationWindow):
             self.active_view = self.word
             self.current_view = "word-view"
         
-        
 
     def on_start_settings(self):
         # read user saved settings
