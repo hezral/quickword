@@ -27,10 +27,10 @@ gi.require_version('Granite', '1.0')
 from gi.repository import Gtk, Gio, Gdk, Granite, GObject, Pango
 
 # QuickWord imports
-from settings_view import SettingsView
-from noword_view import NoWordView
-from word_view import WordView
-from updater_view import UpdaterView
+from .settings_view import SettingsView
+from .noword_view import NoWordView
+from .word_view import WordView
+from .updater_view import UpdaterView
 
 
 #------------------CLASS-SEPARATOR------------------#
@@ -51,34 +51,32 @@ class QuickWordWindow(Gtk.ApplicationWindow):
         app = self.props.application
 
         #-- view --------#
-        updater = UpdaterView()
-        noword = NoWordView()
-        word = WordView()
-        settings = SettingsView()
-        settings.connect("notify::visible", self.on_view_visible)
+        self.updater = UpdaterView()
+        self.noword = NoWordView()
+        self.word = WordView()
+        self.settings = SettingsView()
+        self.settings.connect("notify::visible", self.on_view_visible)
         
         #-- stack --------#
-        stack = Gtk.Stack()
-        stack.props.transition_type = Gtk.StackTransitionType.CROSSFADE
-        stack.add_named(word, word.get_name())
-        stack.add_named(settings, settings.get_name())
-        stack.add_named(noword, noword.get_name())
-        stack.add_named(updater, updater.get_name())
+        self.stack = Gtk.Stack()
+        self.stack.props.transition_type = Gtk.StackTransitionType.CROSSFADE
+        self.stack.add_named(self.word, self.word.get_name())
+        self.stack.add_named(self.settings, self.settings.get_name())
+        self.stack.add_named(self.noword, self.noword.get_name())
+        self.stack.add_named(self.updater, self.updater.get_name())
         
         #-- header --------#
-        headerbar = self.generate_headerbar(settings_view=settings)
+        self.headerbar = self.generate_headerbar(settings_view=self.settings)
 
         #-- QuickWordWindow construct--------#
         self.props.resizable = False #set this and window will expand and retract based on child
-        # self.props.skip_taskbar_hint = True
-        # self.set_icon_name("com.github.hezral.quickword")
         self.title = "QuickWord"
         self.set_keep_above(True)
         self.get_style_context().add_class("rounded")
         self.set_size_request(600, -1) #set width to -1 to expand and retract based on content
         self.props.window_position = Gtk.WindowPosition.MOUSE
-        self.set_titlebar(headerbar)
-        self.add(stack)
+        self.set_titlebar(self.headerbar)
+        self.add(self.stack)
         
         #-- QuickWordWindow variables--------#
 
@@ -87,26 +85,25 @@ class QuickWordWindow(Gtk.ApplicationWindow):
         self.active_state_flags = ['GTK_STATE_FLAG_NORMAL', 'GTK_STATE_FLAG_DIR_LTR']
         
         self.on_start_settings()
-        
 
         # set active views based on app launch conditions
         # initial view is noword-view for manual lookup
         self.active_view = None
         self.current_view = None
         if app.first_run:
-            self.active_view = updater
+            self.active_view = self.updater
             self.current_view = "updater-view"
         
         elif app.lookup_word is None:
-            self.active_view = noword
+            self.active_view = self.noword
             self.current_view = "no-word-view"
 
         elif app.lookup_word is not None or app.lookup_word == "QuickWord":
-            self.active_view = noword
+            self.active_view = self.noword
             self.current_view = "no-word-view"
 
         elif app.lookup_word is not None and not app.lookup_word == "QuickWord":
-            self.active_view = word
+            self.active_view = self.word
             self.current_view = "word-view"
         
         

@@ -98,6 +98,7 @@ class WordView(Gtk.Grid):
 
         # set pronounciation label
         pronounciation = data[1]
+        print(pronounciation)
         pronounciation_label.props.label = "/ " + pronounciation + " /"
         
         # delete all stack children if any

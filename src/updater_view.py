@@ -84,20 +84,27 @@ class UpdaterView(Gtk.Grid):
         sub_message.props.justify = Gtk.Justification.CENTER
 
         #-- proceed button --------#
-        proceed_btn = Gtk.Button(label="Proceed")
-        proceed_btn.props.name = "proceed-btn"
-        proceed_btn.get_style_context().add_class("h3")
-        proceed_btn.get_style_context().add_class(Gtk.STYLE_CLASS_SUGGESTED_ACTION)
-        proceed_btn.set_size_request(-1, 32)
-        proceed_btn.connect("clicked", self.on_proceed_update)
+        self.proceed_btn = Gtk.Button(label="Proceed")
+        self.proceed_btn.props.name = "proceed-btn"
+        self.proceed_btn.get_style_context().add_class("h3")
+        # self.proceed_btn.get_style_context().add_class(Gtk.STYLE_CLASS_SUGGESTED_ACTION)
+        self.proceed_btn.set_size_request(-1, 32)
+        self.proceed_btn.connect("clicked", self.on_proceed_update)
+
+        self.proceed_btn_revealer = Gtk.Revealer()
+        self.proceed_btn_revealer.add(self.proceed_btn)
+        self.proceed_btn_revealer.set_reveal_child(True)
 
         #-- start button --------#
-        start_btn = Gtk.Button(label="Start Using Quickword")
-        start_btn.props.name = "start-btn"
-        start_btn.get_style_context().add_class("h3")
-        start_btn.get_style_context().add_class(Gtk.STYLE_CLASS_SUGGESTED_ACTION)
-        start_btn.set_size_request(-1, 32)
-        start_btn.connect("clicked", self.on_start)
+        self.start_btn = Gtk.Button(label="Start Using Quickword")
+        self.start_btn.props.name = "start-btn"
+        self.start_btn.get_style_context().add_class("h3")
+        # self.start_btn.get_style_context().add_class(Gtk.STYLE_CLASS_SUGGESTED_ACTION)
+        self.start_btn.set_size_request(-1, 32)
+        self.start_btn.connect("clicked", self.on_start)
+
+        self.start_btn_revealer = Gtk.Revealer()
+        self.start_btn_revealer.add(self.start_btn)
 
         #-- UpdaterView construct--------#
         self.props.name = 'updater-view'
@@ -112,8 +119,8 @@ class UpdaterView(Gtk.Grid):
         self.attach(icon_overlay, 0, 1, 1, 1)
         self.attach(message, 0, 2, 1, 1)
         self.attach(sub_message, 0, 3, 1, 1)
-        self.attach(proceed_btn, 0, 4, 1, 1)
-        self.attach(start_btn, 0, 4, 1, 1)
+        self.attach(self.proceed_btn_revealer, 0, 4, 1, 1)
+        self.attach(self.start_btn_revealer, 0, 5, 1, 1)
         self.connect_after("realize", self.generate_message_str)
 
     def generate_message_str(self, view):
@@ -172,12 +179,14 @@ class UpdaterView(Gtk.Grid):
         sub_message = [child for child in self.get_children() if child.props.name == "sub-message"][0]
         
         if message_str == "Completed" or message_str == "Downloaded" or message_str == "No Updates":
-            start_btn = [child for child in self.get_children() if child.props.name == "start-btn"][0]
-            self.remove_row(4)
-            self.attach(start_btn, 0, 4, 1, 1)
+            # start_btn = [child for child in self.get_children() if child.props.name == "start-btn"][0]
+            # self.remove_row(4)
+            # self.attach(start_btn, 0, 4, 1, 1)
+            self.proceed_btn_revealer.set_reveal_child(False)
+            self.start_btn_revealer.set_reveal_child(True)
         else:
-            proceed_btn = [child for child in self.get_children() if child.props.name == "proceed-btn"][0]
-            proceed_btn.props.label = "Please wait.."
+            # proceed_btn = [child for child in self.get_children() if child.props.name == "proceed-btn"][0]
+            self.proceed_btn.props.label = "Please wait.."
 
         message.props.label = message_str
         sub_message.props.label = sub_message_str
