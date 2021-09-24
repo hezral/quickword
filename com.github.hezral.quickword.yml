@@ -23,6 +23,14 @@ cleanup:
   - '*.la'
 modules:
 
+  - name: python-xlib
+    buildsystem: simple
+    build-options:
+      build-args:
+        - --share=network
+    build-commands:
+      - "pip3 install --prefix=${FLATPAK_DEST} python-xlib"
+
   - name: ntlk
     buildsystem: simple
     build-options:
@@ -36,7 +44,8 @@ modules:
     sources:
       - type: git
         url: https://github.com/espeak-ng/pcaudiolib.git
-
+        
+    # this is the version the builds with flatpak
   - name: espeak-ng
     buildsystem: simple
     build-commands:
