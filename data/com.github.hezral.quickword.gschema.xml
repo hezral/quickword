@@ -22,5 +22,15 @@
             <summary>Enable/Disable this behaviour</summary>
             <description>Display QuickWord app window on all workspaces</description>
         </key>
+        <key type="b" name="always-on-top">
+            <default>false</default>
+            <summary>Enable/Disable this behaviour</summary>
+            <description>Display QuickWord app window on top of all windows</description>
+        </key>
+        <key type="b" name="show-close-button">
+            <default>false</default>
+            <summary>Show window close button</summary>
+            <description>Show window close button</description>
+        </key>
     </schema>
 </schemalist>
