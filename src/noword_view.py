@@ -89,8 +89,6 @@ class NoWordView(Gtk.Grid):
         self.get_style_context().add_class(self.props.name)
         self.props.visible = True
         self.props.expand = True
-        self.props.margin = 20
-        self.props.margin_top = 12
         self.props.row_spacing = 12
         self.props.column_spacing = 6
         self.props.valign = Gtk.Align.CENTER
