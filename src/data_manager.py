@@ -35,7 +35,7 @@ DATA_IDS = ('wordnet',)
 #------------------CLASS-SEPARATOR------------------#
 
 
-class DataUpdater():
+class DataManager():
     def __init__(self, application_id="com.github.hezral.quickword", *args, **kwargs):
 
         self.nltk_data_path = os.path.join(GLib.get_user_data_dir(), application_id, 'nltk_data')
