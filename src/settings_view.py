@@ -26,30 +26,27 @@ from gi.repository import Gtk, Gio,  GObject
 
 
 class SettingsView(Gtk.Grid):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, app, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        
+        self.app = app
 
-        #-- object ----#
-        gio_settings = Gio.Settings(schema_id="com.github.hezral.quickword")
-        gtk_settings = Gtk.Settings().get_default()
-
-        #-- settings --------#
-        #------ theme switch ----#
         theme_switch = SubSettings(name="theme-switch", label="Switch between Dark/Light theme", sublabel=None, separator=True)
-        theme_switch.switch.bind_property("active", gtk_settings, "gtk_application_prefer_dark_theme", GObject.BindingFlags.SYNC_CREATE)
-        gio_settings.bind("prefer-dark-style", theme_switch.switch, "active", Gio.SettingsBindFlags.DEFAULT)
+        theme_switch.switch.bind_property("active", self.app.gtk_settings, "gtk_application_prefer_dark_theme", GObject.BindingFlags.SYNC_CREATE)
+        self.app.gio_settings.bind("prefer-dark-style", theme_switch.switch, "active", Gio.SettingsBindFlags.DEFAULT)
 
-        #------ persistent mode ----#
         persistent_mode = SubSettings(name="persistent-mode", label="Persistent mode", sublabel="QuickWord stays open and updates as text selection changes",separator=True)
         persistent_mode.switch.connect_after("notify::active", self.on_switch_activated)
-        gio_settings.bind("persistent-mode", persistent_mode.switch, "active", Gio.SettingsBindFlags.DEFAULT)
+        self.app.gio_settings.bind("persistent-mode", persistent_mode.switch, "active", Gio.SettingsBindFlags.DEFAULT)
         
-        #------ sticky mode ----#
         sticky_mode = SubSettings(name="sticky-mode", label="Sticky mode", sublabel="QuickWord is displayed on all workspaces",separator=False)
         sticky_mode.switch.connect_after("notify::active", self.on_switch_activated)
-        gio_settings.bind("sticky-mode", sticky_mode.switch, "active", Gio.SettingsBindFlags.DEFAULT)
+        self.app.gio_settings.bind("sticky-mode", sticky_mode.switch, "active", Gio.SettingsBindFlags.DEFAULT)
 
-        #-- settings items grid --------#
+        show_close_button = SubSettings(name="show-close-button", label="Show close button", sublabel=None,separator=True)
+        show_close_button.switch.connect_after("notify::active", self.on_switch_activated)
+        self.app.gio_settings.bind("show-close-button", show_close_button.switch, "active", Gio.SettingsBindFlags.DEFAULT)
+
         grid = Gtk.Grid()
         grid.props.margin = 8
         grid.props.hexpand = True
@@ -58,42 +55,31 @@ class SettingsView(Gtk.Grid):
         grid.attach(theme_switch, 0, 1, 1, 1)
         grid.attach(persistent_mode, 0, 2, 1, 1)
         grid.attach(sticky_mode, 0, 3, 1, 1)
-
-        #-- settings items frame --------#
+        grid.attach(show_close_button, 0, 4, 1, 1)
         frame = Gtk.Frame()
         frame.get_style_context().add_class("settings-frame")
         frame.add(grid)
 
-        #-- total words --------#
         totalwords_label = Gtk.Label("NA")
         totalwords_label.props.name = "total-words"
         totalwords_label.props.vexpand = True
         totalwords_label.props.valign = Gtk.Align.END
         totalwords_label.get_style_context().add_class(totalwords_label.props.name)
 
-        #-- start button --------#
         check_update_btn = Gtk.Button(label="Check Data Updates")
         check_update_btn.props.name = "check-update-btn"
         check_update_btn.props.expand = False
         check_update_btn.props.halign = check_update_btn.props.valign = Gtk.Align.CENTER
-        #check_update_btn.get_style_context().add_class("h3")
-        #.get_style_context().add_class(Gtk.STYLE_CLASS_SUGGESTED_ACTION)
-        #check_update_btn.set_size_request(-1, 32)
         check_update_btn.connect("clicked", self.on_check_update)
 
-        #-- SettingsView construct--------#
         self.props.name = "settings-view"
         self.get_style_context().add_class(self.props.name)
         self.props.expand = True
-        self.props.margin = 20
-        self.props.margin_top = 12
         self.props.row_spacing = 6
         self.props.column_spacing = 6
         self.attach(frame, 0, 1, 1, 1)
         self.attach(totalwords_label, 0, 2, 1, 1)
         self.attach(check_update_btn, 0, 3, 1, 1)
-
-        # self.attach(icon_overlay, 0, 2, 1, 1)
 
     def on_check_update(self, button):
         stack = self.get_parent()
@@ -106,7 +92,7 @@ class SettingsView(Gtk.Grid):
         word_label.props.label = "QuickWord"
         window.active_view = updater_view
         window.current_view = "updater-view"
-        self.hide()
+        # self.hide()
 
     def on_totalwords(self):
         stack = self.get_parent()
@@ -142,8 +128,51 @@ class SettingsView(Gtk.Grid):
                 else:
                     window.unstick()
 
+            if name == "show-close-button":
+                if window is not None:
+                    headerbar = [child for child in window.get_children() if isinstance(child, Gtk.HeaderBar)][0]
+
+                    if switch.get_active():
+                        headerbar.set_show_close_button(True)
+                    else:
+                        headerbar.set_show_close_button(False)
+                        headerbar.hide()
+                        headerbar.show_all()
+
 
 #------------------CLASS-SEPARATOR------------------#
+class SettingsGroup(Gtk.Grid):
+    def __init__(self, group_label, subsettings_list, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        grid = Gtk.Grid()
+        grid.props.margin = 8
+        grid.props.hexpand = True
+        grid.props.row_spacing = 8
+        grid.props.column_spacing = 10
+
+        i = 0
+        for subsetting in subsettings_list:
+            grid.attach(subsetting, 0, i, 1, 1)
+            i += 1
+
+        frame = Gtk.Frame()
+        frame.props.name = "settings-group-frame"
+        frame.props.hexpand = True
+        frame.add(grid)
+
+        label = Gtk.Label(group_label)
+        label.props.name = "settings-group-label"
+        label.props.halign = Gtk.Align.START
+        label.props.margin_left = 4
+
+        self.props.name = "settings-group"
+        self.props.halign = Gtk.Align.FILL
+        self.props.hexpand = True
+        self.props.row_spacing = 4
+        self.props.can_focus = False
+        self.attach(label, 0, 0, 1, 1)
+        self.attach(frame, 0, 1, 1, 1)
 
 
 class SubSettings(Gtk.Grid):
