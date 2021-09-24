@@ -24,27 +24,20 @@
 @define-color shaded_base shade(@theme_base_color, 0.98);
 @define-color popup shade(@theme_base_color, 0.98);
 
-/*
-*:backdrop {
-    color: gray;
-}
-*/
-
 /* ------------------------------ */
 
 
 /* -- headerbar -- */
 /* ------------------------------ */
 .lookup-word-header {
-
     font-size: larger;
     font-weight: bold;
 }
 
 headerbar {
     padding-left: 16px;
-    padding-right: 12px;
-    padding-top: 4px;
+    padding-right: 8px;
+    padding-top: 8px;
 }
 /* ------------------------------ */
 
@@ -60,14 +53,14 @@ stack {
 
 /* -- settings-view -- */
 /* ------------------------------ */
-.stack-settings, .headerbar-settings {
+/* .stack-settings, .headerbar-settings {
     background-color: @shaded_dark;
-}
+} */
 
-.settings-frame {
+/* .settings-frame {
     border-radius: 4px;
     background-color: @shaded_darker;
-}
+} */
 
 .settings-sub-label {
     font-style: italic;
