@@ -64,6 +64,11 @@ install_data(
     rename: meson.project_name() + '.svg'
 )
 
+install_data(
+    join_paths('icons', meson.project_name() + '-' + 'symbolic' + '.svg'),
+    install_dir: join_paths(get_option ('datadir'), 'icons', 'hicolor', 'symbolic', 'apps'),
+)
+
 other_icon_sources = [
   join_paths('icons', meson.project_name() + '-' + 'left' + '.svg'),
   join_paths('icons', meson.project_name() + '-' + 'right' + '.svg'),
