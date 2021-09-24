@@ -20,6 +20,7 @@ configure_file(
 
 quickword_sources = [
   '__init__.py',
+  'utils.py',
   'main.py',
   'main_window.py',
   'clipboard_manager.py',
