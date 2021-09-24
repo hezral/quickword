@@ -109,8 +109,6 @@ class UpdaterView(Gtk.Grid):
         self.get_style_context().add_class(self.props.name)
         self.props.visible = True
         self.props.expand = True
-        self.props.margin = 20
-        self.props.margin_top = 12
         self.props.row_spacing = 12
         self.props.column_spacing = 6
         self.props.valign = Gtk.Align.CENTER
@@ -166,6 +164,7 @@ class UpdaterView(Gtk.Grid):
             app._data_manager.run_func(runname="download", callback=self.on_update_progress)
             gio_settings = Gio.Settings(schema_id="com.github.hezral.quickword")
             gio_settings.set_boolean("first-run", False)
+            app.first_run = False
         else:
             run = app.generate_data_manager()
             while run is False:
@@ -182,6 +181,7 @@ class UpdaterView(Gtk.Grid):
             # self.attach(start_btn, 0, 4, 1, 1)
             self.proceed_btn_revealer.set_reveal_child(False)
             self.start_btn_revealer.set_reveal_child(True)
+            
         else:
             # proceed_btn = [child for child in self.get_children() if child.props.name == "proceed-btn"][0]
             self.proceed_btn.props.label = "Please wait.."
