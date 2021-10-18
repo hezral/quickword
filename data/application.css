@@ -53,20 +53,17 @@ stack {
 
 /* -- settings-view -- */
 /* ------------------------------ */
-/* .stack-settings, .headerbar-settings {
-    background-color: @shaded_dark;
-} */
-
-/* .settings-frame {
+frame#settings-group-frame {
     border-radius: 4px;
-    background-color: @shaded_darker;
-} */
+    border-color: rgba(0, 0, 0, 0.3);
+    background-color: alpha(@shaded_dark, 0.5);
+}
 
 .settings-sub-label {
-    font-style: italic;
     font-size: 0.9em;
     color: gray;
 }
+
 /* ------------------------------ */
 
 
