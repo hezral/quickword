@@ -1,5 +1,5 @@
 app-id: com.github.hezral.quickword
-runtime: io.elementary.Sdk
+runtime: io.elementary.Platform
 runtime-version: '6'
 sdk: io.elementary.Sdk
 command: quickword
@@ -12,6 +12,7 @@ finish-args:
   - --share=network
   # needed for perfers-color-scheme
   - --system-talk-name=org.freedesktop.Accounts
+  
 cleanup:
   - '/include'
   - '/lib/pkgconfig'
@@ -22,7 +23,6 @@ cleanup:
   - '*.a'
   - '*.la'
 modules:
-
   - name: python-xlib
     buildsystem: simple
     build-options:
