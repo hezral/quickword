@@ -26,26 +26,32 @@ from gi.repository import Gtk, Gio, Gdk
 from .main_window import QuickWordWindow
 from .clipboard_manager import ClipboardListener, ClipboardPaste
 from .word_lookup import WordLookup
+from .active_window_manager import ActiveWindowManager
 from .utils import HelperUtils
+
+from datetime import datetime
 
 #------------------CLASS-SEPARATOR------------------#
 
 class QuickWordApp(Gtk.Application):
 
+    app_id = "com.github.hezral.quickword"
+    gtk_settings = Gtk.Settings().get_default()
+    gio_settings = Gio.Settings(schema_id=app_id)
     clipboard_listener = ClipboardListener()
     clipboard_paste = ClipboardPaste()
     utils = HelperUtils()
+    window_manager = None
+    window = None
+    lookup_word = None
+    word_data = None
+    running = False
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.props.application_id = "com.github.hezral.quickword"
-
-        self.window = None
-        self.word_data = None
-
-        self.gio_settings = Gio.Settings(schema_id=self.props.application_id)
-        self.gtk_settings = Gtk.Settings().get_default()
+        self.props.application_id = self.app_id
+        self.window_manager = ActiveWindowManager(gtk_application=self)
         self.first_run = self.gio_settings.get_value("first-run")
 
         # initialize word lookup
@@ -55,9 +61,6 @@ class QuickWordApp(Gtk.Application):
         else:
             self._word_lookup.get_synsets("a") # hack to load wordnet faster
             self.total_words = self._word_lookup.get_totalwords() # get total words in Wordnet
-        
-        # get current selected text
-        self.lookup_word = self.clipboard_listener.copy_selected_text()
 
     def do_startup(self):
         Gtk.Application.do_startup(self)
@@ -78,20 +81,18 @@ class QuickWordApp(Gtk.Application):
         icon_theme.prepend_search_path(os.path.join(os.path.dirname(__file__), "data", "icons"))        
 
     def do_activate(self):
-        # Only allow a single window and raise any existing ones
+
         if self.window is None:
             self.window = QuickWordWindow(application=self)
             self.window.word_view.clipboard_paste = self.clipboard_paste
             self.add_window(self.window)
-            self.window.show_all()
+            self.window.show()
             self.window.present()
 
-        if self.lookup_word is None:
-            self.lookup_word = "QuickWord"
-        else:
-            self.word_data = self._word_lookup.get_synsets(self.lookup_word)
-            if self.word_data is not None:
-                self.on_new_word_lookup(self.word_data)
+        # get current selected text and lookup
+        self.on_new_word_selected()
+
+        self.running = True
 
         # setup listener for new text selection
         self.clipboard_listener.clipboard.connect("owner-change", self.on_new_word_selected)
@@ -99,25 +100,23 @@ class QuickWordApp(Gtk.Application):
     def generate_data_manager(self):
         from .data_manager import DataManager
         self._data_manager = DataManager(application_id=self.props.application_id)
-        return True
+        return True 
 
-    def on_new_word_selected(self, clipboard, event):
-        new_word = self.clipboard_listener.copy_selected_text()
-        self.on_new_word_lookup(new_word)
+    def on_new_word_selected(self, clipboard=None, event=None):
+        self.on_new_word_lookup(self.clipboard_listener.copy_selected_text())
 
-    def on_new_word_lookup(self, word_data):
-        # check if data is string from new word selected or data from background lookup
-        if isinstance(word_data, str):
-            new_word = word_data
-            word_data = self._word_lookup.get_synsets(new_word)
+    def on_new_word_lookup(self, word):
+        self.lookup_word = word
+        if word is not None:
+            word_data = self._word_lookup.get_synsets(word)
 
         if word_data is not None:
             # emit the signal to trigger content update callback
             self.window.emit("on-new-word-selected", word_data)
-            # print(datetime.now(), "emit on-new-word-selected")
             return True
         else:
             # go back to no-word-view
+            self.lookup_word = None
             self.window.on_manual_lookup(not_found=True)
             return False
 

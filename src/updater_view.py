@@ -85,7 +85,6 @@ class UpdaterView(Gtk.Grid):
         self.proceed_btn = Gtk.Button(label="Proceed")
         self.proceed_btn.props.name = "proceed-btn"
         self.proceed_btn.get_style_context().add_class("h3")
-        # self.proceed_btn.get_style_context().add_class(Gtk.STYLE_CLASS_SUGGESTED_ACTION)
         self.proceed_btn.set_size_request(-1, 32)
         self.proceed_btn.connect("clicked", self.on_proceed_update)
 
@@ -97,7 +96,6 @@ class UpdaterView(Gtk.Grid):
         self.start_btn = Gtk.Button(label="Start Using Quickword")
         self.start_btn.props.name = "start-btn"
         self.start_btn.get_style_context().add_class("h3")
-        # self.start_btn.get_style_context().add_class(Gtk.STYLE_CLASS_SUGGESTED_ACTION)
         self.start_btn.set_size_request(-1, 32)
         self.start_btn.connect("clicked", self.on_start)
 
@@ -142,13 +140,7 @@ class UpdaterView(Gtk.Grid):
     def on_start(self, button):
         stack = self.get_parent()
         window = stack.get_parent()
-        app = window.props.application
-
-        lookup = app.emit("on-new-word-lookup", app.lookup_word)
-
-        if lookup is False:
-            stack.set_visible_child_name("no-word-view")
-            self.current_view = "no-word-view"
+        window.on_view_visible()
 
     def on_proceed_update(self, button):
         stack = self.get_parent()

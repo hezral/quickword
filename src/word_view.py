@@ -378,11 +378,7 @@ class WordItems(Gtk.Grid):
         stack = wordview.get_parent()
         window = stack.get_parent()
         app = window.props.application
-        # callback to WordLookup
-        lookup = app.emit("on-new-word-lookup", button.props.name)
-        # check if word lookup succeeded or not
-        if lookup is False:
-            pass
+        app.on_new_word_lookup(button.props.name)
 
     def generate_separator(self):
         separator = Gtk.Separator()

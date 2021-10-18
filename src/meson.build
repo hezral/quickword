@@ -23,6 +23,7 @@ quickword_sources = [
   'utils.py',
   'main.py',
   'main_window.py',
+  'active_window_manager.py',
   'clipboard_manager.py',
   'data_manager.py',
   'noword_view.py',

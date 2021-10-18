@@ -120,7 +120,7 @@ class NoWordView(Gtk.Grid):
             icon_overlay.grab_focus()
         else:
             # callback to WordLookup
-            lookup = app.emit("on-new-word-lookup", entry.props.text)
+            lookup = app.on_new_word_lookup(entry.props.text)
             # check if word lookup succeeded or not
             if lookup is False:
                 message.props.label = "Word not found"

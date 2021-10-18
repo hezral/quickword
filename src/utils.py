@@ -47,7 +47,7 @@ class HelperUtils:
         return async_func
 
     @staticmethod
-    def get_active_window_xlib():
+    def get_active_window_wm_class():
         ''' Function to get active window '''
         import Xlib
         import Xlib.display
@@ -56,14 +56,14 @@ class HelperUtils:
         root = display.screen().root
 
         NET_ACTIVE_WINDOW = display.intern_atom('_NET_ACTIVE_WINDOW')
-        GTK_APPLICATION_ID = display.intern_atom('_GTK_APPLICATION_ID')
+        WM_CLASS = display.intern_atom('WM_CLASS')
 
         root.change_attributes(event_mask=Xlib.X.FocusChangeMask)
         try:
             window_id = root.get_full_property(NET_ACTIVE_WINDOW, Xlib.X.AnyPropertyType).value[0]
             window = display.create_resource_object('window', window_id)
             try:
-                return window.get_full_property(GTK_APPLICATION_ID, 0).value.replace(b'\x00',b' ').decode("utf-8").lower()
+                return window.get_full_property(WM_CLASS, 0).value.replace(b'\x00',b' ').decode("utf-8").lower()
             except:
                 return None
         except Xlib.error.XError: #simplify dealing with BadWindow
