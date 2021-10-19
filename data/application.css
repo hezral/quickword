@@ -150,7 +150,7 @@ frame#settings-group-frame {
 }
 
 .word-hover {
-    font-weight: bold;
+    color: @accent_color_500;
 }
 
 .word-examples {
