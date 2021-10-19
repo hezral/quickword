@@ -53,10 +53,15 @@ stack {
 
 /* -- settings-view -- */
 /* ------------------------------ */
+label#settings-group-label {
+    font-weight: bold;
+    opacity: 0.75;
+}
+
 frame#settings-group-frame {
     border-radius: 4px;
     border-color: rgba(0, 0, 0, 0.3);
-    background-color: alpha(@shaded_dark, 0.5);
+    background-color: @shaded_dark;
 }
 
 .settings-sub-label {
@@ -111,16 +116,27 @@ frame#settings-group-frame {
 /* -- word-view -- */
 /* ------------------------------ */
 .word-types-left {
-    border-top-left-radius: 4px;
-    border-bottom-left-radius: 4px;
-    }
-    
-.word-types-right {
-    border-top-right-radius: 4px;
-    border-bottom-right-radius: 4px;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 6px;
+    border-right-color: rgba(0,0,0,0.05);
 }
-    
-.subview-switcher > button:checked {
+
+.word-types-right {
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 6px;
+    border-left-color: rgba(0,0,0,0.05);
+}
+
+.word-types {
+    border-top-color: rgba(0,0,0,0.1);
+    border-bottom-color: rgba(0,0,0,0);
+    border-left-color: rgba(0,0,0,0);
+    border-right-color: rgba(0,0,0,0);
+    color: alpha(@theme_text_color, 0.6);
+}
+
+.word-types:checked {
+    color: alpha(@theme_text_color, 1);
     font-weight: bold;
 }
 
@@ -140,6 +156,11 @@ frame#settings-group-frame {
 .word-examples {
     font-style: italic;
     color: gray;
+}
+
+.word-examples-hover {
+    font-style: italic;
+    color: alpha(@accent_color_500, 0.75);
 }
 
 .word-lemmas {
@@ -165,43 +186,6 @@ frame#settings-group-frame {
     font-size: 0.9em;
 }
 
-button#speak-btn {
-    border-style: none;
-    border-width: 1px;
-    background-image: none;
-    border-radius: 3px;
-    box-shadow: none;
-}
-
-button#speak-btn:active {
-    border: solid;
-    border-width: 1px;
-    border-color: shade(@theme_base_color, 0.7);
-    background-color: shade(@theme_base_color, 0.89);
-    box-shadow: 0px 0px 1px 0px shade(@theme_base_color, 0.7) inset;
-}
-    /* background-color: rgba(24, 24, 24, 0.25) */
-
-    /* box-shadow: 0px 0px 2px 0px shade(@theme_base_color, 0.7) inset; */
-
-/* .action-button {
-    color: @theme_text_color;
-    border-radius: 50%;
-    box-shadow: none;
-    border: none;
-    border-width: 1px;
-    border-color: shade(@theme_base_color, 0.7);
-}
-
-
-.action-button:active {
-    border: solid;
-    border-width: 1px;
-    border-color: shade(@theme_base_color, 0.7);
-    background-color: shade(@theme_base_color, 0.89);
-    box-shadow: 0px 0px 2px 0px shade(@theme_base_color, 0.7) inset;
-} */
-
 /* -- transition effects -- */
 /* ------------------------------ */
 .transition-on:dir(ltr) {
@@ -226,16 +210,28 @@ button#speak-btn:active {
     font-size: large;
 }
 
-
-/* .scrolled-view-top-overlay {
-    opacity: 0.5;
-    background-image: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%,rgba(0,0,0,0) 25%,rgba(0,0,0,0) 100%);
+scrolledwindow > undershoot.top {
+    background-blend-mode: normal;
+    background-clip: border-box;
+    background-color: rgba(0,0,0,0);
+    background-image: linear-gradient(@theme_base_color 0, alpha(@theme_base_color, 0) 50%);
+    background-origin: padding-box;
+    background-position: left top;
+    background-repeat: repeat;
+    background-size: auto;
 }
 
-.scrolled-view-bottom-overlay {
-    opacity: 0.5;
-    background-image: linear-gradient(to top, rgba(0,0,0,0.3) 0%,rgba(0,0,0,0) 25%,rgba(0,0,0,0) 100%);
-} */
+scrolledwindow > undershoot.bottom {
+    background-blend-mode: normal;
+    background-clip: border-box;
+    background-color: rgba(0,0,0,0);
+    background-image: linear-gradient(alpha(@theme_base_color, 0) 50%, @theme_base_color 100%);
+    background-origin: padding-box;
+    background-position: left top;
+    background-repeat: repeat;
+    background-size: auto;
+}
 
-
-
+button#speak:hover {
+    color: @accent_color_500;
+}
