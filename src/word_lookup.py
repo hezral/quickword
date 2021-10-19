@@ -36,14 +36,13 @@ class WordLookup():
         nltk_data_path = os.path.join(GLib.get_user_data_dir(), application_id, 'nltk_data')
         data.path = [nltk_data_path]
 
-        #check if exiftool is installed
+        #check if espeak is installed
         try:
             self.espeak = which("espeak")
         except Error as error:
-            print("espeack not installed") 
-
+            print("espeak not installed") 
+        
     def get_synsets(self, word):
-
 
         # create list to store data to return
         # structure = word, pronounciation, synsets

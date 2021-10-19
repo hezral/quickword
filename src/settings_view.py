@@ -19,7 +19,8 @@
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gio, Gdk, GObject, Pango
+gi.require_version('Granite', '1.0')
+from gi.repository import Gtk, Gio, Gdk, GObject, Pango, Granite
 
 
 class SettingsView(Gtk.Grid):
@@ -28,75 +29,73 @@ class SettingsView(Gtk.Grid):
         
         self.app = app
 
-        theme_switch = SubSettings(type="switch", name="theme-switch", label="Switch between Dark/Light theme", sublabel=None, separator=True)
-        theme_switch.switch.bind_property("active", self.app.gtk_settings, "gtk_application_prefer_dark_theme", GObject.BindingFlags.SYNC_CREATE)
-        self.app.gio_settings.bind("prefer-dark-style", theme_switch.switch, "active", Gio.SettingsBindFlags.DEFAULT)
+        theme_switch = SubSettings(type="switch", name="theme-switch", label="Switch between Dark/Light theme", sublabel=None, separator=False)
+        theme_optin = SubSettings(type="checkbutton", name="theme-optin", label=None, sublabel=None, separator=True, params=("Follow system appearance style",))
 
-        persistent_mode = SubSettings(type="switch", name="persistent-mode", label="Persistent mode", sublabel="QuickWord stays open and updates as text selection changes",separator=True)
+        theme_switch.switch.bind_property("active", self.app.gtk_settings, "gtk-application-prefer-dark-theme", GObject.BindingFlags.SYNC_CREATE)
+
+        self.app.granite_settings.connect("notify::prefers-color-scheme", self.on_appearance_style_change, theme_switch)
+        theme_switch.switch.connect_after("notify::active", self.on_switch_activated)
+        theme_optin.checkbutton.connect_after("notify::active", self.on_checkbutton_activated, theme_switch)
+        
+        self.app.gio_settings.bind("prefer-dark-style", theme_switch.switch, "active", Gio.SettingsBindFlags.DEFAULT)
+        self.app.gio_settings.bind("theme-optin", theme_optin.checkbutton, "active", Gio.SettingsBindFlags.DEFAULT)
+
+        persistent_mode = SubSettings(type="switch", name="persistent-mode", label="Persistent mode", sublabel="Stays open and updates as text changes",separator=True)
         persistent_mode.switch.connect_after("notify::active", self.on_switch_activated)
         self.app.gio_settings.bind("persistent-mode", persistent_mode.switch, "active", Gio.SettingsBindFlags.DEFAULT)
         
-        sticky_mode = SubSettings(type="switch", name="sticky-mode", label="Sticky mode", sublabel="QuickWord is displayed on all workspaces",separator=True)
+        sticky_mode = SubSettings(type="switch", name="sticky-mode", label="Sticky mode", sublabel="Window is displayed on all workspaces",separator=False)
         sticky_mode.switch.connect_after("notify::active", self.on_switch_activated)
         self.app.gio_settings.bind("sticky-mode", sticky_mode.switch, "active", Gio.SettingsBindFlags.DEFAULT)
 
-        show_close_button = SubSettings(type="switch", name="show-close-button", label="Show close button", sublabel=None,separator=False)
-        show_close_button.switch.connect_after("notify::active", self.on_switch_activated)
-        self.app.gio_settings.bind("show-close-button", show_close_button.switch, "active", Gio.SettingsBindFlags.DEFAULT)
+        display_behaviour = SettingsGroup("Display & Behaviour", (theme_switch, theme_optin, persistent_mode, sticky_mode))
 
         buyme_coffee = SubSettings(type="button", name="buy-me-coffee", label="Show Support", sublabel="Thanks for supporting me!", separator=False, params=("Coffee Time", Gtk.Image().new_from_icon_name("com.github.hezral.quickword-coffee", Gtk.IconSize.LARGE_TOOLBAR), ))
         buyme_coffee.button.connect("clicked", self.on_button_clicked)
 
-        settings = SettingsGroup("Settings", (theme_switch, persistent_mode, sticky_mode, buyme_coffee))
+        check_updates = SubSettings(type="button", name="check-updates", label="NA", sublabel=None, separator=True, params=("Check Updates", Gtk.Image().new_from_icon_name("software-update-available", Gtk.IconSize.LARGE_TOOLBAR), ))
+        check_updates.button.connect("clicked", self.on_button_clicked)
 
-        totalwords_label = Gtk.Label("NA")
-        totalwords_label.props.name = "total-words"
-        totalwords_label.props.vexpand = True
-        totalwords_label.props.valign = Gtk.Align.END
-        totalwords_label.get_style_context().add_class(totalwords_label.props.name)
-
-        check_update_btn = Gtk.Button(label="Check Data Updates")
-        check_update_btn.props.name = "check-update-btn"
-        check_update_btn.props.expand = False
-        check_update_btn.props.halign = check_update_btn.props.valign = Gtk.Align.CENTER
-        check_update_btn.connect("clicked", self.on_check_update)
+        others = SettingsGroup("Others", (check_updates, buyme_coffee, ))
 
         self.props.name = "settings-view"
         self.get_style_context().add_class(self.props.name)
         self.props.expand = True
-        self.props.row_spacing = 6
+        self.props.margin = 20
+        self.props.margin_top = 10
+        self.props.row_spacing = 10
         self.props.column_spacing = 6
-        self.attach(settings, 0, 1, 1, 1)
-        self.attach(totalwords_label, 0, 2, 1, 1)
-        self.attach(check_update_btn, 0, 3, 1, 1)
+        self.attach(display_behaviour, 0, 0, 1, 1)
+        self.attach(others, 0, 1, 1, 1)
 
     def on_button_clicked(self, button, params=None):
         name = button.get_name()
+        if name == "check-updates":
+            self.on_check_update()
         if name == "buy-me-coffee":
             Gtk.show_uri_on_window(None, "https://www.buymeacoffee.com/hezral", Gdk.CURRENT_TIME)
 
-    def on_check_update(self, button):
+    def on_check_update(self):
         stack = self.get_parent()
         window = stack.get_parent()
-        headerbar = window.headerbar
-        stack = window.stack
-        word_label = window.word_label
-        updater_view = stack.get_child_by_name("updater-view")
 
-        stack.set_visible_child_name("updater-view")
-        word_label.props.label = "QuickWord"
-        window.active_view = updater_view
-        window.current_view = "updater-view"
-        # self.hide()
+        window.updater_view.show_all()
+        window.stack.set_visible_child_name("updater-view")
+        window.word_label.props.label = "Updater"
+        window.settings_view.hide()
 
     def on_totalwords(self):
         stack = self.get_parent()
         window = stack.get_parent()
         app = window.props.application
-        totalwords_label = [child for child in self.get_children() if isinstance(child, Gtk.Label)][0]
+        others_settinggroup = [child for child in self.get_children() if child.get_name() == "Others"][0]
+        others_settinggroup_frame = [child for child in others_settinggroup.get_children() if isinstance(child, Gtk.Frame)][0]
+        check_updates_subsetting = [child for child in others_settinggroup_frame.get_children()[0].get_children() if child.get_name() == "check-updates"][0]
+        # print(check_updates_subsetting.get_children())
 
-        if totalwords_label.props.label == "NA":
-            totalwords_label.props.label = "Total words available: " + str(app._word_lookup.get_totalwords())
+        if check_updates_subsetting.label_text.props.label == "NA":
+            check_updates_subsetting.label_text.props.label = "Total words available: " + str(app._word_lookup.get_totalwords())
 
     def generate_separator(self):
         separator = Gtk.Separator()
@@ -135,9 +134,37 @@ class SettingsView(Gtk.Grid):
                         headerbar.hide()
                         headerbar.show_all()
 
+    def on_checkbutton_activated(self, checkbutton, gparam, widget):
+        name = checkbutton.get_name()
+        theme_switch = widget
+        if name == "theme-optin":
+            if self.app.gio_settings.get_value("theme-optin"):
+                prefers_color_scheme = self.app.granite_settings.get_prefers_color_scheme()
+                sensitive = False
+            else:
+                prefers_color_scheme = Granite.SettingsColorScheme.NO_PREFERENCE
+                theme_switch.switch.props.active = self.app.gio_settings.get_value("prefer-dark-style")
+                sensitive = True
+
+            self.app.gtk_settings.set_property("gtk-application-prefer-dark-theme", prefers_color_scheme)
+            self.app.granite_settings.connect("notify::prefers-color-scheme", self.app.on_prefers_color_scheme)
+
+            if "DARK" in prefers_color_scheme.value_name:
+                active = True
+            else:
+                active = False
+
+            theme_switch.switch.props.active = active
+            theme_switch.props.sensitive = sensitive
+
+    def on_appearance_style_change(self, granite_settings, gparam, widget):
+        theme_switch = widget
+        if theme_switch.switch.props.active:
+            theme_switch.switch.props.active = False
+        else:
+            theme_switch.switch.props.active = True
 
 class SettingsGroup(Gtk.Grid):
-
     def __init__(self, group_label, subsettings_list, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -157,11 +184,17 @@ class SettingsGroup(Gtk.Grid):
         frame.props.hexpand = True
         frame.add(grid)
 
-        self.props.name = "settings-group"
+        label = Gtk.Label(group_label)
+        label.props.name = "settings-group-label"
+        label.props.halign = Gtk.Align.START
+        label.props.margin_left = 4
+
+        self.props.name = group_label
         self.props.halign = Gtk.Align.FILL
         self.props.hexpand = True
         self.props.row_spacing = 4
         self.props.can_focus = False
+        self.attach(label, 0, 0, 1, 1)
         self.attach(frame, 0, 1, 1, 1)
 
 

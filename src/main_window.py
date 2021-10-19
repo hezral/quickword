@@ -17,12 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this Application.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys, os
-
 import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('Granite', '1.0')
-from gi.repository import Gtk, Gio, Granite, GObject, GLib
+from gi.repository import GLib, Gtk, Granite, GObject, Gdk
 
 from .settings_view import SettingsView
 from .noword_view import NoWordView
@@ -51,8 +49,11 @@ class QuickWordWindow(Gtk.ApplicationWindow):
         self.settings_view = SettingsView(app=self.app)
         
         self.stack = Gtk.Stack()
-        self.stack.props.margin = 20
-        self.stack.props.margin_top = 0
+        # self.stack.props.margin_left = 0
+        # self.stack.props.margin_right = 0
+        # self.stack.props.margin_top = 0
+        # self.stack.props.margin_bottom = 20
+        # self.stack.props.margin = 20
         self.stack.props.transition_type = Gtk.StackTransitionType.CROSSFADE
         self.stack.add_named(self.word_view, self.word_view.get_name())
         self.stack.add_named(self.settings_view, self.settings_view.get_name())
@@ -61,20 +62,51 @@ class QuickWordWindow(Gtk.ApplicationWindow):
         
         self.headerbar = self.generate_headerbar()
 
-        self.props.resizable = False #set this and window will expand and retract based on child
+        # self.props.resizable = False #set this and window will expand and retract based on child
         self.title = "QuickWord"
         self.set_keep_above(True)
         self.get_style_context().add_class("rounded")
-        self.set_size_request(600, -1) #set width to -1 to expand and retract based on content
+        self.set_size_request(-1, -1) #set width to -1 to expand and retract based on content
         self.props.window_position = Gtk.WindowPosition.MOUSE
         # self.props.border_width = 20
         self.set_titlebar(self.headerbar)
         self.add(self.stack)
+
+        self.connect("key-press-event", self.on_key_press)
+
         self.show_all()
-
         self.on_start_settings()
+        self.noword_view.hide()
+        self.settings_view.hide()
+        self.updater_view.hide()
 
-        self.on_view_visible()
+    def on_key_press(self, widget, eventkey):
+        print(eventkey.type, Gdk.keyval_name(eventkey.keyval).lower(), self.stack.get_visible_child_name())
+
+        if self.stack.get_visible_child_name() != "no-word-view":
+
+            if Gdk.keyval_name(eventkey.keyval).lower() == "right":
+                self.stack.set_visible_child_name("settings-view")
+                self.on_view_visible(view="settings-view")
+
+            if Gdk.keyval_name(eventkey.keyval).lower() == "left":
+                self.on_view_visible(view="word-view")
+
+        if Gdk.keyval_name(eventkey.keyval).lower() == "m":
+                self.on_manual_lookup()
+
+        # if self.stack.get_visible_child_name() == "no-word-view":
+        #     ...
+
+        if self.stack.get_visible_child_name() == "word-view":
+            if Gdk.keyval_name(eventkey.keyval).lower() == "n":
+                self.word_view.stack.set_visible_child_name("noun")
+            if Gdk.keyval_name(eventkey.keyval).lower() == "a":
+                self.word_view.stack.set_visible_child_name("adjective")
+            if Gdk.keyval_name(eventkey.keyval).lower() == "d":
+                self.word_view.stack.set_visible_child_name("adverb")
+            if Gdk.keyval_name(eventkey.keyval).lower() == "v":
+                self.word_view.stack.set_visible_child_name("verb")
 
     def on_start_settings(self):
         if self.app.gio_settings.get_value("sticky-mode"):
@@ -87,50 +119,50 @@ class QuickWordWindow(Gtk.ApplicationWindow):
         if wm_class is not None:
             if self.app.props.application_id.split(".")[-1] not in wm_class:
                 if self.app.running:
-                    print("destroy")
                     self.destroy()
 
     def on_enter_word_label(self, *args):
-        word_grid = self.word_box.get_child()
-        edit_img = [child for child in word_grid.get_children() if isinstance(child, Gtk.Image)][0]
-        # show widget and set flags to trigger transition effect, see application.css
+        self.word_action_revealer.set_reveal_child(False)
         if self.stack.get_visible_child_name() == "word-view":
-            edit_img.show()
-            edit_img.set_state_flags(Gtk.StateFlags.PRELIGHT, True)
+            self.edit_img_revealer.set_reveal_child(True)
 
     def on_leave_word_label(self, *args):
-        word_grid = self.word_box.get_child()
-        edit_img = [child for child in word_grid.get_children() if isinstance(child, Gtk.Image)][0]
-        # hide and reset state flagss to ready state for transition effect, see application.css
         if self.stack.get_visible_child_name() == "settings-view":
             pass
-        else:
-            edit_img.set_state_flags(Gtk.StateFlags.DIR_LTR, True)
+        if self.stack.get_visible_child_name() != "no-word-view" or self.stack.get_visible_child_name() != "updater-view":
+            self.word_action_revealer.set_reveal_child(False)
+            self.edit_img_revealer.set_reveal_child(False)
+        if self.stack.get_visible_child_name() == "word-view":
+            self.word_action_revealer.set_reveal_child(True)
+            self.edit_img_revealer.set_reveal_child(False)
 
     def on_new_word_selected(self, window, word_data):
         self.lookup_word = word_data[0]
         self.word_label.props.label = word_data[0]
-        self.stack.set_visible_child(self.word_view)
         self.word_view.on_wordlookup(data=word_data)
+        self.word_view.show_all()
+        self.stack.set_visible_child(self.word_view)
 
     def on_manual_lookup(self, eventbutton=None, eventbox=None, not_found=False, *args):
-        message = [child for child in self.noword_view.get_children() if child.get_name() == "message"][0]
+        self.word_action_revealer.set_reveal_child(False)
 
         if self.stack.get_visible_child_name() == "word-view":
             if not_found:
-                message.props.label = "Word not found"
+                self.noword_view.message.props.label = "Word not found"
             else:
-                message.props.label = "Lookup a new word"
+                self.noword_view.message.props.label = "Lookup a new word"
             
             # need to clear entry text since clipboard_listener will pickup the text as it will be selected on focus and cause a loop back to the word-view
-            entry = [child for child in self.noword_view.get_children() if isinstance(child, Gtk.Entry)][0]
-            entry.props.text = ""
-            #need to show since it was hiddden in on_view_visible
-            self.noword_view.show()
+            self.noword_view.entry.props.text = ""
+
+            self.noword_view.show_all()
+            self.noword_view.icon_overlay.grab_focus()
             self.stack.set_visible_child_name(name="no-word-view")
             self.word_label.props.label = "QuickWord"
-            self.active_view = self.noword_view
-            self.current_view = "no-word-view"
+            self.word_view.hide()
+            self.settings_view.hide()
+            # delayed grab focus to avoid hotkey character getting inserted in entry field
+            GLib.timeout_add(250, self.noword_view.entry.grab_focus)
 
     def generate_viewswitch(self):
         self.view_switch = Granite.ModeSwitch.from_icon_name("com.github.hezral.quickword-symbolic", "preferences-system-symbolic")
@@ -139,6 +171,7 @@ class QuickWordWindow(Gtk.ApplicationWindow):
         self.view_switch.props.hexpand = True
         self.view_switch.props.margin = 4
         self.view_switch.props.name = "view-switch"
+        self.view_switch.get_children()[1].props.can_focus = False
         self.view_switch.connect_after("notify::active", self.on_view_visible)
         return self.view_switch
 
@@ -148,67 +181,125 @@ class QuickWordWindow(Gtk.ApplicationWindow):
         self.word_label.get_style_context().add_class("lookup-word-header")
 
         edit_img = Gtk.Image().new_from_icon_name("insert-text-symbolic", Gtk.IconSize.SMALL_TOOLBAR)
-        edit_img.props.no_show_all = True
-        edit_img.get_style_context().add_class("transition-on")
+        edit_img.props.halign = Gtk.Align.START
+        # edit_img.get_style_context().add_class("transition-on")
+        self.edit_img_revealer = Gtk.Revealer()
+        self.edit_img_revealer.props.transition_type = Gtk.RevealerTransitionType.CROSSFADE
+        self.edit_img_revealer.add(edit_img)
 
-        word_grid = Gtk.Grid()
-        word_grid.props.column_spacing = 4
-        word_grid.props.halign = Gtk.Align.START
-        word_grid.props.valign = Gtk.Align.CENTER
-        word_grid.attach(self.word_label, 0, 0, 1, 1)
-        word_grid.attach(edit_img, 1, 0, 1, 1)
+        self.pronounciation_label = Gtk.Label("")
+        self.pronounciation_label.props.name = "pronounciation"
+        self.pronounciation_label.props.expand = True
+        self.pronounciation_label.props.can_focus = False
+        self.pronounciation_label.get_style_context().add_class("pronounciation")
+
+        self.speak_btn = Gtk.Button(image=Gtk.Image().new_from_icon_name("audio-volume-high-symbolic", Gtk.IconSize.SMALL_TOOLBAR))
+        self.speak_btn.props.name = "speak"
+        self.speak_btn.props.expand = True
+        self.speak_btn.props.can_focus = False
+        self.speak_btn.get_style_context().add_class("speak")
+        self.speak_btn.connect("clicked", self.on_speak_word)
+
+        self.word_actions = Gtk.Grid()
+        self.word_actions.props.name = "word-actions"
+        self.word_actions.props.column_spacing = 6
+        self.word_actions.props.expand = False
+        self.word_actions.attach(self.pronounciation_label, 0, 0, 1, 1)
+        self.word_actions.attach(self.speak_btn, 1, 0, 1, 1)
+
+        self.word_action_revealer = Gtk.Revealer()
+        self.word_action_revealer.props.transition_type = Gtk.RevealerTransitionType.CROSSFADE
+        self.word_action_revealer.add(self.word_actions)
 
         self.word_box = Gtk.EventBox()
-        self.word_box.add(word_grid)
+        self.word_box.add(self.word_label)
         self.word_box.connect("button-press-event", self.on_manual_lookup)
         self.word_box.connect("enter-notify-event", self.on_enter_word_label)
         self.word_box.connect("leave-notify-event", self.on_leave_word_label)
 
+        self.word_grid = Gtk.Grid()
+        self.word_grid.props.column_spacing = 6
+        self.word_grid.props.halign = Gtk.Align.START
+        self.word_grid.props.valign = Gtk.Align.CENTER
+        self.word_grid.attach(self.word_box, 0, 0, 1, 1)
+        self.word_grid.attach(self.word_action_revealer, 1, 0, 1, 1)
+        self.word_grid.attach(self.edit_img_revealer, 1, 0, 1, 1)
+
         titlebar_grid = Gtk.Grid()
         titlebar_grid.props.hexpand = True
-        titlebar_grid.attach(self.word_box, 0, 0, 1, 1)
+        titlebar_grid.attach(self.word_grid, 0, 0, 1, 1)
         titlebar_grid.attach(self.generate_viewswitch(), 1, 0, 1, 1)
 
         headerbar = Gtk.HeaderBar()
         headerbar.props.custom_title = titlebar_grid
         headerbar.props.show_close_button = False
         headerbar.props.decoration_layout = "close:"
-        headerbar.get_style_context().add_class(Gtk.STYLE_CLASS_FLAT)
         return headerbar
 
-    def on_view_visible(self, viewswitch=None, gparam=None):
+    def on_speak_word(self, button):
+        import subprocess
+        from shutil import which, Error
+        try:
+            word = self.word_label.props.label
+            subprocess.call(["espeak", word])
+            print(word)
+        except:
+            pass
+
+    def on_view_visible(self, viewswitch=None, gparam=None, view=None):
 
         def set_word_view():
             if self.app.lookup_word is None:
-                print("noword_view")
-                # self.noword_view.set_visible(True)
+                self.noword_view.show_all()
                 self.word_label.props.label = "Quickword"
                 self.stack.set_visible_child(self.noword_view)
-                # GLib.timeout_add(1000, self.stack.set_visible_child, self.noword_view)
+                self.word_view.hide()
             else:
-                print("word_view")
+                self.word_view.show_all()
                 self.word_label.props.label = self.lookup_word
                 self.stack.set_visible_child(self.word_view)
-                # GLib.timeout_add(1000, self.stack.set_visible_child, self.word_view)
+                self.noword_view.hide()
+                self.word_action_revealer.set_reveal_child(True)
 
-        # app first-run
+        def set_settings_view():
+            self.word_action_revealer.set_reveal_child(False)
+            self.settings_view.show_all()
+            self.settings_view.on_totalwords()
+            self.stack.set_visible_child(self.settings_view)
+            self.word_label.props.label = "Settings"
+            self.word_view.hide()
+            self.noword_view.hide()
+                
+
+
+        # print(self.app.lookup_word)
+
+        # app first-run right
         # first-run >> download data view >> no word view or selected word view
 
         if self.app.first_run:
             print("first-run")
             self.stack.set_visible_child(self.updater_view)
+            self.updater_view.show()
 
-        if not self.app.first_run:
+        if not self.app.first_run and view is None:
             print("normal-run")
             if viewswitch is not None:
                 if viewswitch.props.active:
-                    self.settings_view.on_totalwords()
-                    self.stack.set_visible_child(self.settings_view)
-                    self.word_label.props.label = "Settings"
+                    set_settings_view()
                 else:
                     set_word_view()
+                    self.settings_view.hide()
             else:
                 set_word_view()
+
+        if view is not None:
+            self.stack.set_visible_child_name(view)
+            if view == "settings-view":
+                self.view_switch.props.active = True
+            else:
+                self.view_switch.props.active = False
+
 
         # app normal-run >> no word view or selected word view
 
@@ -219,3 +310,4 @@ class QuickWordWindow(Gtk.ApplicationWindow):
         # settings view >> updater view
         # updater view >> no word view
         # updater view >> selected word view
+        # right

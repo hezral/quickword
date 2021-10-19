@@ -61,6 +61,10 @@ class QuickWordApp(Gtk.Application):
         if self.first_run:
             self.generate_data_manager()
         else:
+            # self._word_lookup.get_synsets("a") # hack to load wordnet faster
+            # self.total_words = self._word_lookup.get_totalwords() # get total words in Wordnet
+            ...
+
         if self.gio_settings.get_value("theme-optin"):
             prefers_color_scheme = self.granite_settings.get_prefers_color_scheme()
             self.gtk_settings.set_property("gtk-application-prefer-dark-theme", prefers_color_scheme)
@@ -90,8 +94,7 @@ class QuickWordApp(Gtk.Application):
             self.window = QuickWordWindow(application=self)
             self.window.word_view.clipboard_paste = self.clipboard_paste
             self.add_window(self.window)
-            self.window.show()
-            self.window.present()
+            self.window.present_with_time(Gdk.CURRENT_TIME)
 
         # get current selected text and lookup
         self.on_new_word_selected()
@@ -111,6 +114,7 @@ class QuickWordApp(Gtk.Application):
 
     def on_new_word_lookup(self, word):
         self.lookup_word = word
+        word_data = None
         if word is not None:
             word_data = self._word_lookup.get_synsets(word)
 

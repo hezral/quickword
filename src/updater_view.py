@@ -103,13 +103,14 @@ class UpdaterView(Gtk.Grid):
         self.start_btn_revealer.add(self.start_btn)
 
         #-- UpdaterView construct--------#
-        self.props.name = 'updater-view'
+        self.props.name = "updater-view"
         self.get_style_context().add_class(self.props.name)
-        self.props.visible = True
+        self.set_size_request(350, -1)
         self.props.expand = True
         self.props.row_spacing = 12
         self.props.column_spacing = 6
-        self.props.valign = Gtk.Align.CENTER
+        self.props.margin = 20
+        self.props.valign = Gtk.Align.END
         self.attach(icon_overlay, 0, 1, 1, 1)
         self.attach(message, 0, 2, 1, 1)
         self.attach(sub_message, 0, 3, 1, 1)
