@@ -21,7 +21,8 @@ import sys, os
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gio, Gdk
+gi.require_version('Granite', '1.0')
+from gi.repository import Gtk, Gio, Gdk, Granite
 
 from .main_window import QuickWordWindow
 from .clipboard_manager import ClipboardListener, ClipboardPaste
@@ -38,6 +39,7 @@ class QuickWordApp(Gtk.Application):
     app_id = "com.github.hezral.quickword"
     gtk_settings = Gtk.Settings().get_default()
     gio_settings = Gio.Settings(schema_id=app_id)
+    granite_settings = Granite.Settings.get_default()
     clipboard_listener = ClipboardListener()
     clipboard_paste = ClipboardPaste()
     utils = HelperUtils()
@@ -59,8 +61,10 @@ class QuickWordApp(Gtk.Application):
         if self.first_run:
             self.generate_data_manager()
         else:
-            self._word_lookup.get_synsets("a") # hack to load wordnet faster
-            self.total_words = self._word_lookup.get_totalwords() # get total words in Wordnet
+        if self.gio_settings.get_value("theme-optin"):
+            prefers_color_scheme = self.granite_settings.get_prefers_color_scheme()
+            self.gtk_settings.set_property("gtk-application-prefer-dark-theme", prefers_color_scheme)
+            self.granite_settings.connect("notify::prefers-color-scheme", self.on_prefers_color_scheme)
 
     def do_startup(self):
         Gtk.Application.do_startup(self)
@@ -124,6 +128,9 @@ class QuickWordApp(Gtk.Application):
         if self.window is not None:
             self.window.destroy()
 
+    def on_prefers_color_scheme(self, *args):
+        prefers_color_scheme = self.granite_settings.get_prefers_color_scheme()
+        self.gtk_settings.set_property("gtk-application-prefer-dark-theme", prefers_color_scheme)
 
 def main(version):
     app = QuickWordApp()
