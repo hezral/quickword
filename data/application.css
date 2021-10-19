@@ -19,7 +19,7 @@
 
 /* -- colors -- */
 /* ------------------------------ */
-@define-color shaded_dark shade(@theme_base_color, 0.87);
+@define-color shaded_dark shade(@theme_base_color, 0.95);
 @define-color shaded_darker shade(@theme_base_color, 0.85);
 @define-color shaded_base shade(@theme_base_color, 0.98);
 @define-color popup shade(@theme_base_color, 0.98);
