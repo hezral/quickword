@@ -3,7 +3,7 @@
 <schemalist>
     <schema path="/com/github/hezral/quickword/" id="com.github.hezral.quickword">
         <key name="prefer-dark-style" type="b">
-            <default>true</default>
+            <default>false</default>
             <summary>If the dark Gtk stylesheet should be used</summary>
             <description>If the dark Gtk stylesheet should be used</description>
         </key>
