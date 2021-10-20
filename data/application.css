@@ -34,21 +34,12 @@
     font-weight: bold;
 }
 
-headerbar {
-    padding-left: 16px;
-    padding-right: 8px;
-    padding-top: 8px;
-}
-/* ------------------------------ */
-
-
 /* -- stack -- */
 /* ------------------------------ */
 stack {
     border-bottom-right-radius: 4px;
     border-bottom-left-radius: 4px;
 }
-/* ------------------------------ */
 
 
 /* -- settings-view -- */
@@ -68,9 +59,6 @@ frame#settings-group-frame {
     font-size: 0.9em;
     color: gray;
 }
-
-/* ------------------------------ */
-
 
 /* -- quickword icon animation -- */
 /* ------------------------------ */
@@ -109,9 +97,6 @@ frame#settings-group-frame {
     animation: floating-two 1.25s ease-in-out infinite;
 
 }
-/* ------------------------------ */
-
-
 
 /* -- word-view -- */
 /* ------------------------------ */
@@ -197,7 +182,6 @@ frame#settings-group-frame {
     opacity: 1;
     transition: all 250ms ease-in-out; 
 }
-/* ------------------------------ */
 
 
 /* -- no-word-view -- */
