@@ -32,6 +32,7 @@ gettext.install('quickword', localedir)
 
 if __name__ == '__main__':
     import gi
-
+    
     from quickword import main
+    print("Quickword", VERSION)
     sys.exit(main.main(VERSION))
