@@ -1,23 +1,21 @@
 #!/usr/bin/env python3
 
-'''
-   Copyright 2020 Adi Hezral (hezral@gmail.com) (https://github.com/hezral)
-
-   This file is part of QuickWord ("Application").
-
-    The Application is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    The Application is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this Application.  If not, see <http://www.gnu.org/licenses/>.
-'''
+# Copyright 2020 Adi Hezral (hezral@gmail.com) (https://github.com/hezral)
+#
+# This file is part of QuickWord ("Application").
+#
+# The Application is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# The Application is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this Application.  If not, see <http://www.gnu.org/licenses/>.
 import os
 import gi
 from gi.repository import GLib
@@ -84,36 +82,40 @@ class UpdaterView(Gtk.Grid):
         sub_message.props.justify = Gtk.Justification.CENTER
 
         #-- proceed button --------#
-        proceed_btn = Gtk.Button(label="Proceed")
-        proceed_btn.props.name = "proceed-btn"
-        proceed_btn.get_style_context().add_class("h3")
-        proceed_btn.get_style_context().add_class(Gtk.STYLE_CLASS_SUGGESTED_ACTION)
-        proceed_btn.set_size_request(-1, 32)
-        proceed_btn.connect("clicked", self.on_proceed_update)
+        self.proceed_btn = Gtk.Button(label="Proceed")
+        self.proceed_btn.props.name = "proceed-btn"
+        self.proceed_btn.get_style_context().add_class("h3")
+        self.proceed_btn.set_size_request(-1, 32)
+        self.proceed_btn.connect("clicked", self.on_proceed_update)
+
+        self.proceed_btn_revealer = Gtk.Revealer()
+        self.proceed_btn_revealer.add(self.proceed_btn)
+        self.proceed_btn_revealer.set_reveal_child(True)
 
         #-- start button --------#
-        start_btn = Gtk.Button(label="Start Using Quickword")
-        start_btn.props.name = "start-btn"
-        start_btn.get_style_context().add_class("h3")
-        start_btn.get_style_context().add_class(Gtk.STYLE_CLASS_SUGGESTED_ACTION)
-        start_btn.set_size_request(-1, 32)
-        start_btn.connect("clicked", self.on_start)
+        self.start_btn = Gtk.Button(label="Start Using Quickword")
+        self.start_btn.props.name = "start-btn"
+        self.start_btn.get_style_context().add_class("h3")
+        self.start_btn.set_size_request(-1, 32)
+        self.start_btn.connect("clicked", self.on_start)
+
+        self.start_btn_revealer = Gtk.Revealer()
+        self.start_btn_revealer.add(self.start_btn)
 
         #-- UpdaterView construct--------#
-        self.props.name = 'updater-view'
+        self.props.name = "updater-view"
         self.get_style_context().add_class(self.props.name)
-        self.props.visible = True
+        self.set_size_request(350, -1)
         self.props.expand = True
-        self.props.margin = 20
-        self.props.margin_top = 12
         self.props.row_spacing = 12
         self.props.column_spacing = 6
-        self.props.valign = Gtk.Align.CENTER
+        self.props.margin = 20
+        self.props.valign = Gtk.Align.END
         self.attach(icon_overlay, 0, 1, 1, 1)
         self.attach(message, 0, 2, 1, 1)
         self.attach(sub_message, 0, 3, 1, 1)
-        self.attach(proceed_btn, 0, 4, 1, 1)
-        self.attach(start_btn, 0, 4, 1, 1)
+        self.attach(self.proceed_btn_revealer, 0, 4, 1, 1)
+        self.attach(self.start_btn_revealer, 0, 5, 1, 1)
         self.connect_after("realize", self.generate_message_str)
 
     def generate_message_str(self, view):
@@ -124,9 +126,8 @@ class UpdaterView(Gtk.Grid):
 
         if app.first_run:
             message_str ="Hello!"
-            sub_message_str = "Before QuickWord can work, it needs to download dictionary data."
-            sub_message_str = sub_message_str + "\n" + "Please ensure internet connectivity, before proceeding."
-            sub_message_str = sub_message_str + "\n" + "This usually takes less than a minute."
+            sub_message_str = "On first run, dictionary download is required"
+            sub_message_str = sub_message_str + "\n" + "Ensure internet connectivity before proceeding"
         else:
             message_str = "Check for Updates"
             sub_message_str = "Check for any updates to dictionary data"
@@ -140,12 +141,7 @@ class UpdaterView(Gtk.Grid):
         stack = self.get_parent()
         window = stack.get_parent()
         app = window.props.application
-
-        lookup = app.emit("on-new-word-lookup", app.lookup_word)
-
-        if lookup is False:
-            stack.set_visible_child_name("no-word-view")
-            self.current_view = "no-word-view"
+        app.on_new_word_selected()
 
     def on_proceed_update(self, button):
         stack = self.get_parent()
@@ -161,6 +157,7 @@ class UpdaterView(Gtk.Grid):
             app._data_manager.run_func(runname="download", callback=self.on_update_progress)
             gio_settings = Gio.Settings(schema_id="com.github.hezral.quickword")
             gio_settings.set_boolean("first-run", False)
+            app.first_run = False
         else:
             run = app.generate_data_manager()
             while run is False:
@@ -172,12 +169,15 @@ class UpdaterView(Gtk.Grid):
         sub_message = [child for child in self.get_children() if child.props.name == "sub-message"][0]
         
         if message_str == "Completed" or message_str == "Downloaded" or message_str == "No Updates":
-            start_btn = [child for child in self.get_children() if child.props.name == "start-btn"][0]
-            self.remove_row(4)
-            self.attach(start_btn, 0, 4, 1, 1)
+            # start_btn = [child for child in self.get_children() if child.props.name == "start-btn"][0]
+            # self.remove_row(4)
+            # self.attach(start_btn, 0, 4, 1, 1)
+            self.proceed_btn_revealer.set_reveal_child(False)
+            self.start_btn_revealer.set_reveal_child(True)
+            
         else:
-            proceed_btn = [child for child in self.get_children() if child.props.name == "proceed-btn"][0]
-            proceed_btn.props.label = "Please wait.."
+            # proceed_btn = [child for child in self.get_children() if child.props.name == "proceed-btn"][0]
+            self.proceed_btn.props.label = "Please wait.."
 
         message.props.label = message_str
         sub_message.props.label = sub_message_str

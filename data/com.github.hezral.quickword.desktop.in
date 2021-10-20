@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Quickword
+Exec=com.github.hezral.quickword
+Icon=com.github.hezral.quickword
+Terminal=false
+Type=Application
+Categories=Utilities;
+StartupNotify=true

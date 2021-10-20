@@ -1,30 +1,25 @@
 #!/usr/bin/env python3
 
-'''
-   Copyright 2020 Adi Hezral (hezral@gmail.com) (https://github.com/hezral)
-
-   This file is part of QuickWord ("Application").
-
-    The Application is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    The Application is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this Application.  If not, see <http://www.gnu.org/licenses/>.
-'''
+# Copyright 2020 Adi Hezral (hezral@gmail.com) (https://github.com/hezral)
+#
+# This file is part of QuickWord ("Application").
+#
+# The Application is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# The Application is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this Application.  If not, see <http://www.gnu.org/licenses/>.
 import os
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Pango
-
-
-#------------------CLASS-SEPARATOR------------------#
 
 
 class NoWordView(Gtk.Grid):
@@ -40,66 +35,65 @@ class NoWordView(Gtk.Grid):
 
         right_icon.get_style_context().add_class("quickword-icon-right")
         
-        icon_overlay = Gtk.Overlay()
-        icon_overlay.add(left_icon)
-        icon_overlay.add_overlay(right_icon)
-        icon_overlay.props.can_focus = True
-        icon_overlay.props.focus_on_click = True
-        icon_overlay.grab_focus()
+        self.icon_overlay = Gtk.Overlay()
+        self.icon_overlay.add(left_icon)
+        self.icon_overlay.add_overlay(right_icon)
+        self.icon_overlay.props.can_focus = True
+        self.icon_overlay.props.focus_on_click = True
+        # self.icon_overlay.grab_focus()
         
         #-- message header --------#
-        message = Gtk.Label("No word detected")
-        message.props.name = "message"
-        message.props.margin_bottom = 5
-        message.props.hexpand = True
-        message.props.halign = Gtk.Align.CENTER
-        message.props.valign = Gtk.Align.CENTER
-        message.props.max_width_chars = 30
-        message.props.wrap = True
-        message.props.wrap_mode = Pango.WrapMode.WORD
-        message.props.justify = Gtk.Justification.CENTER
-        message.get_style_context().add_class("h3")
+        self.message = Gtk.Label("No word detected")
+        self.message.props.name = "message"
+        self.message.props.margin_bottom = 5
+        self.message.props.hexpand = True
+        self.message.props.halign = Gtk.Align.CENTER
+        self.message.props.valign = Gtk.Align.CENTER
+        self.message.props.max_width_chars = 30
+        self.message.props.wrap = True
+        self.message.props.wrap_mode = Pango.WrapMode.WORD
+        self.message.props.justify = Gtk.Justification.CENTER
+        self.message.get_style_context().add_class("h3")
 
         #-- message header --------#
-        sub_message = Gtk.Label("Select a word in any application or document\nor type a word below to get a quick word lookup")
-        sub_message.props.margin_bottom = 10
-        sub_message.props.hexpand = True
-        sub_message.props.halign = Gtk.Align.CENTER
-        sub_message.props.valign = Gtk.Align.CENTER
-        sub_message.props.max_width_chars = 40
-        sub_message.props.wrap = True
-        sub_message.props.wrap_mode = Pango.WrapMode.WORD
-        sub_message.props.justify = Gtk.Justification.CENTER
+        self.sub_message = Gtk.Label("Select a word in any application or document\nor type a word below to get a quick word lookup")
+        self.sub_message.props.margin_bottom = 10
+        self.sub_message.props.hexpand = True
+        self.sub_message.props.halign = Gtk.Align.CENTER
+        self.sub_message.props.valign = Gtk.Align.CENTER
+        self.sub_message.props.max_width_chars = 40
+        self.sub_message.props.wrap = True
+        self.sub_message.props.wrap_mode = Pango.WrapMode.WORD
+        self.sub_message.props.justify = Gtk.Justification.CENTER
 
         #-- word entry --------#
-        entry = Gtk.Entry()
-        entry.set_size_request(-1, 40)
-        entry.props.expand = False
-        entry.props.margin = 10
-        entry.props.margin_bottom = 0
-        entry.props.focus_on_click = True
-        entry.props.placeholder_text = "type a word like 'quick' and press enter"
-        entry.props.xalign = 0.5
-        entry.get_style_context().add_class("entry-word")
-        entry.connect("key-press-event", self.on_entry_start)
-        entry.connect("button-press-event", self.on_entry_start)
-        entry.connect("activate", self.on_entry_activate)
-        entry.connect("icon_press", self.on_backspace)
+        self.entry = Gtk.Entry()
+        self.entry.set_size_request(-1, 40)
+        self.entry.props.expand = False
+        self.entry.props.focus_on_click = True
+        self.entry.props.placeholder_text = "type a word like 'quick' and press enter"
+        self.entry.props.xalign = 0.5
+        self.entry.get_style_context().add_class("entry-word")
+        self.entry.connect("key-press-event", self.on_entry_start)
+        self.entry.connect("button-press-event", self.on_entry_start)
+        self.entry.connect("activate", self.on_entry_activate)
+        self.entry.connect("icon_press", self.on_backspace)
 
-        #-- NoWordView construct--------#
+
         self.props.name = 'no-word-view'
         self.get_style_context().add_class(self.props.name)
-        self.props.visible = True
-        self.props.expand = True
+        self.set_size_request(350, -1)
         self.props.margin = 20
-        self.props.margin_top = 12
+        self.props.margin_left = 20
+        self.props.margin_right = 20
+        self.props.expand = True
         self.props.row_spacing = 12
         self.props.column_spacing = 6
         self.props.valign = Gtk.Align.CENTER
-        self.attach(icon_overlay, 0, 1, 1, 1)
-        self.attach(message, 0, 2, 1, 1)
-        self.attach(sub_message, 0, 3, 1, 1)
-        self.attach(entry, 0, 4, 1, 1)
+        self.attach(self.icon_overlay, 0, 1, 1, 1)
+        self.attach(self.message, 0, 2, 1, 1)
+        self.attach(self.sub_message, 0, 3, 1, 1)
+        self.attach(self.entry, 0, 4, 1, 1)
 
 
     def on_entry_start(self, entry, eventkey):
@@ -109,25 +103,22 @@ class NoWordView(Gtk.Grid):
         entry.props.text = ""
 
     def on_entry_activate(self, entry):
-        view = self
-        stack = self.get_parent()
-        window = stack.get_parent()
-        app = window.props.application
-        icon_overlay = [child for child in self.get_children() if isinstance(child, Gtk.Overlay)][0]
-        message = [child for child in self.get_children() if child.props.name == "message"][0]
-        entry.props.secondary_icon_name = None
+        self.entry.props.secondary_icon_name = None
+        window = self.get_toplevel()
 
-        if entry.props.text == "":
+        if self.entry.props.text == "":
             # need to reset text, bug maybe?
-            entry.props.text = ""
-            entry.props.placeholder_text = "need a word here 😀️"
-            icon_overlay.grab_focus()
+            self.entry.props.text = ""
+            self.entry.props.placeholder_text = "need a word here 😀️"
+            self.icon_overlay.grab_focus()
         else:
             # callback to WordLookup
-            lookup = app.emit("on-new-word-lookup", entry.props.text)
+            lookup = window.props.application.on_new_word_lookup(entry.props.text)
             # check if word lookup succeeded or not
             if lookup is False:
-                message.props.label = "Word not found"
-                entry.props.text = ""
-                entry.props.placeholder_text = "please type a valid word 🧐️"
-                icon_overlay.grab_focus()
+                self.message.props.label = "Word not found"
+                self.entry.props.text = ""
+                self.entry.props.placeholder_text = "please type a valid word 🧐️"
+                self.icon_overlay.grab_focus()
+            else:
+                self.hide()

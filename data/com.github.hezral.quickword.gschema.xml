@@ -3,7 +3,7 @@
 <schemalist>
     <schema path="/com/github/hezral/quickword/" id="com.github.hezral.quickword">
         <key name="prefer-dark-style" type="b">
-            <default>true</default>
+            <default>false</default>
             <summary>If the dark Gtk stylesheet should be used</summary>
             <description>If the dark Gtk stylesheet should be used</description>
         </key>
@@ -21,6 +21,26 @@
             <default>false</default>
             <summary>Enable/Disable this behaviour</summary>
             <description>Display QuickWord app window on all workspaces</description>
+        </key>
+        <key type="b" name="always-on-top">
+            <default>false</default>
+            <summary>Enable/Disable this behaviour</summary>
+            <description>Display QuickWord app window on top of all windows</description>
+        </key>
+        <key type="b" name="show-close-button">
+            <default>false</default>
+            <summary>Show window close button</summary>
+            <description>Show window close button</description>
+        </key>
+        <key type="b" name="theme-optin">
+            <default>false</default>
+            <summary>Follow OS Appearance Style</summary>
+            <description>Follow OS Appearance Style</description>
+        </key>
+                <key type="b" name="close-mode">
+            <default>false</default>
+            <summary>Close to exit or run in background</summary>
+            <description>lose to exit or run in background</description>
         </key>
     </schema>
 </schemalist>

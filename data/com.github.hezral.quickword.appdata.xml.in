@@ -71,21 +71,26 @@
     <content_attribute id="money-gambling">none</content_attribute>
   </content_rating>
 
-​  <releases>
-​    <release version="1.0.2" date="2021-04-08">
-​      <description>
-​        <ul>
-            <li>Minor bug fix</li>
+  <releases>
+    <release version="2.0.0" date="2021-10-19">
+      <description>
+        <p>First release as Flatpak</p>
+        <ul>
+            <li>Redesigned and improved user interface</li>
+            <li>Window is now resizable and adapts to the content</li>
+            <li>Option to follow system theme preferences</li>
+            <li>Option to close and run in background</li>
+            <li>Improved Persistent Mode, Quickword now exits to allow quick lookup</li>
         </ul>
-​      </description>
-​    </release>
-​  </releases>
+      </description>
+    </release>
+  </releases>
 
   <custom>
     <value key="x-appcenter-color-primary">#D9262C</value>
     <value key="x-appcenter-color-primary-text">#FFFFFF</value>
-    <value key="x-appcenter-suggested-price">1.99</value>
+    <value key="x-appcenter-suggested-price">2.00</value>
+	<value key="x-appcenter-stripe">pk_live_51J03F1AXT8Az6AYFEiPc5mgpv7vUSWDnw135TmPT4tUbB2CJLwG19e3NxEuC7Zbz3VkXg7BygUQOTf7x6UDhSAn8005gq9ywZy</value>
   </custom>
 
 </component>
-

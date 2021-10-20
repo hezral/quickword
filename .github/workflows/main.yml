@@ -1,10 +1,14 @@
 name: CI
 
 # This workflow will run for any pull request or pushed commit
-on:
-  push:
-    branches: [flatpak]
-  pull_request:
+#<<<<<<< flatpak
+on: [push, pull_request]
+#=======
+#on:
+#  push:
+#    branches: [flatpak]
+#  pull_request:
+#>>>>>>> master
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:

@@ -1,109 +1,63 @@
 #!/usr/bin/env python3
 
-'''
-   Copyright 2020 Adi Hezral (hezral@gmail.com) (https://github.com/hezral)
-
-   This file is part of QuickWord ("Application").
-
-    The Application is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    The Application is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this Application.  If not, see <http://www.gnu.org/licenses/>.
-'''
+# Copyright 2020 Adi Hezral (hezral@gmail.com) (https://github.com/hezral)
+#
+# This file is part of QuickWord ("Application").
+#
+# The Application is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# The Application is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this Application.  If not, see <http://www.gnu.org/licenses/>.
 
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Pango
 
-# for espeak
-import subprocess
-from shutil import which, Error
-
-#------------------CLASS-SEPARATOR------------------#
-
-
 class WordView(Gtk.Grid):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # copy to clipboard
         self.clipboard_paste = None
         self.lookup_word = None
 
-        #-- pronounciation --------#
-        pronounciation_label = Gtk.Label()
-        pronounciation_label.props.name = "pronounciation-label"
-        pronounciation_label.props.halign = Gtk.Align.START
-        pronounciation_label.props.hexpand = True
-        pronounciation_label.get_style_context().add_class(pronounciation_label.props.name)
-
-        #-- speak button --------#
-        speak_btn = Gtk.Button(image=Gtk.Image().new_from_icon_name("audio-volume-high-symbolic", Gtk.IconSize.SMALL_TOOLBAR))
-        speak_btn.props.halign = Gtk.Align.START
-        speak_btn.props.hexpand = False
-        speak_btn.props.margin_right = 5
-        speak_btn.props.name = "speak-btn"
-        speak_btn.connect("clicked", self.on_speak_word)
-        speak_btn.set_size_request(26, 26)
-
-        #-- stack construct --------#
-        stack = Gtk.Stack()
-        stack.props.expand = True
-        stack.props.transition_type = Gtk.StackTransitionType.CROSSFADE
+        self.stack = Gtk.Stack()
+        self.stack.props.expand = True
+        self.stack.props.transition_type = Gtk.StackTransitionType.CROSSFADE
         
-        # info stack switcher contruct
-        stack_switcher = Gtk.StackSwitcher()
-        stack_switcher.props.homogeneous = True
-        stack_switcher.props.stack = stack
-        stack_switcher.props.margin_top = 4
-        stack_switcher.get_style_context().add_class("subview-switcher")
+        self.stack_switcher = Gtk.StackSwitcher()
+        self.stack_switcher.props.homogeneous = True
+        self.stack_switcher.props.stack = self.stack
+        self.stack_switcher.get_style_context().add_class("subview-switcher")
 
-         #-- WordView construct--------#
         self.props.name = 'word-view'
         self.get_style_context().add_class(self.props.name)
-        self.props.visible = True
+        self.set_size_request(350, -1)
         self.props.expand = False
-        self.props.margin = 20
-        self.props.margin_top = 3
-        self.props.row_spacing = 6       
-        self.attach(speak_btn, 0, 1, 1, 1)
-        self.attach(pronounciation_label, 1, 1, 1, 1)
-        self.attach(stack, 0, 2, 2, 1)
-        self.attach(stack_switcher, 0, 3, 2, 1,)
-
-    def on_speak_word(self, button):
-        try:
-            subprocess.call(["espeak", self.lookup_word])
-            print("speak")
-        except:
-            pass
+        self.attach(self.stack, 0, 0, 2, 1)
+        self.attach(self.stack_switcher, 0, 1, 2, 1,)
 
     def on_wordlookup(self, button=None, data=None):
-        view = self
-        pronounciation_label = [child for child in view.get_children() if child.get_name() == "pronounciation-label"][0]
-        speak_btn = [child for child in view.get_children() if child.get_name() == "speak-btn"][0]
-        stack = [child for child in view.get_children() if isinstance(child, Gtk.Stack)][0]
-        stack_switcher = [child for child in view.get_children() if isinstance(child, Gtk.StackSwitcher)][0]
 
         self.lookup_word = data[0]
         synsets = data[2]
 
-        # set pronounciation label
-        pronounciation = data[1]
-        pronounciation_label.props.label = "/ " + pronounciation + " /"
-        
+        stack = self.get_parent()
+        window = stack.get_toplevel()
+        window.pronounciation_label.props.label = "/ " + data[1] + " /"
+        window.word_action_revealer.set_reveal_child(True)
+
         # delete all stack children if any
-        if stack.get_children():
-            for child in stack.get_children():
-                stack.remove(child)
+        if self.stack.get_children():
+            for child in self.stack.get_children():
+                self.stack.remove(child)
 
         # create list for each type of word
         noun_data = []
@@ -136,16 +90,22 @@ class WordView(Gtk.Grid):
                 
         # add views to stack
         for view in subviews:
-            stack.add_titled(subviews[view], view, view)
+            # subviews[view].show_all()
+            self.stack.add_titled(subviews[view], view, view)
         
-        # # style left and right tabs for stack switcher
-        stack_count = len(stack_switcher.get_children())
-        left_tab = stack_switcher.get_children()[0]
+        # style left and right tabs for stack switcher
+        stack_count = len(self.stack_switcher.get_children())
+
+        left_tab = self.stack_switcher.get_children()[0]
         left_tab.get_style_context().add_class("word-types-left")
-        right_tab = stack_switcher.get_children()[stack_count-1]
+        right_tab = self.stack_switcher.get_children()[stack_count-1]
         right_tab.get_style_context().add_class("word-types-right")
+
+        for child in self.stack_switcher.get_children():
+            child.get_style_context().add_class("word-types")
+            child.props.can_focus = False
         
-        stack.show_all()
+        self.stack.show_all()
 
 
 #------------------CLASS-SEPARATOR------------------#
@@ -155,44 +115,49 @@ class WordSubView(Gtk.Grid):
     def __init__(self, name, word, contents, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        #-- WordSubView construct -----#
         self.props.name = name
         self.props.hexpand = True
-        self.props.row_spacing = 6
+        self.props.row_spacing = 15
         self.props.column_spacing = 0
 
-        if len(self.get_children()) > 0:
-            print("children:", self.get_children())
-
         scrolled_view = Gtk.ScrolledWindow()
-        scrolled_view.props.vexpand = True
-        scrolled_view.set_size_request(-1, 500)
-        scrolled_view.connect("edge-reached", self.on_edge_reached)
+        scrolled_view.props.expand = True
+        # scrolled_view.connect("edge-reached", self.on_edge_reached)
+        # scrolled_view.connect("edge-overshot", self.on_edge_overshot)
+
         scrolled_view_grid = Gtk.Grid()
+        scrolled_view_grid.props.row_spacing = 10
+        scrolled_view_grid.props.expand = True
+        scrolled_view_grid.props.margin = 10
+        scrolled_view_grid.props.margin_left = 20
+        scrolled_view_grid.props.margin_right = 20
 
         i = 1
         for content in contents:
-            if len(contents) > 10:
-                scrolled_view_grid.attach(WordItems(word, content), 0, i, 1, 1)
-            else:
-                self.attach(WordItems(word, content), 0, i, 1, 1)
+            scrolled_view_grid.attach(WordItems(word, content), 0, i, 1, 1)
             i += 1
         
-        if len(scrolled_view_grid.get_children()) > 10:
-            scrolled_view.add(scrolled_view_grid)
-            self.attach(scrolled_view, 0, 1, 1, 1)
+        scrolled_view.add(scrolled_view_grid)
+        self.attach(scrolled_view, 0, 1, 1, 1)
 
-            self.more_count = len(scrolled_view_grid.get_children()) - 10
-            self.count_label = Gtk.Label(str(self.more_count) + " more results below..")
-            self.count_label.get_style_context().add_class("more-results")
-            self.attach(self.count_label, 0, 2, 1, 1)
+    def on_edge_overshot(self, scrolledwindow, position):
+        # print(position.value_name)
+        # stack = self.get_parent()
+        # word_view = stack.get_parent()
+        # print(word_view)
+        ...
 
     def on_edge_reached(self, scrolledwindow, position):
-        print(position.value_name)
-        if position.value_name == "GTK_POS_BOTTOM":
-            self.count_label.props.label = str(self.more_count) + " more results up.."
-        elif position.value_name == "GTK_POS_TOP":
-            self.count_label.props.label = str(self.more_count) + " more results below.."
+        # print(position.value_name)
+        # stack = self.get_parent()
+        # word_view = stack.get_parent()
+        # print(word_view)
+        ...
+        # if position.value_name == "GTK_POS_BOTTOM":
+        #     self.count_label.props.label = str(self.more_count) + " more results up.."
+        # elif position.value_name == "GTK_POS_TOP":
+        #     self.count_label.props.label = str(self.more_count) + " more results below.."
+
 
 #------------------CLASS-SEPARATOR------------------#
 
@@ -208,7 +173,6 @@ class WordItems(Gtk.Grid):
         definition_str = synset.definition()
 
         word_definition = Gtk.Label(definition_str)
-        word_definition.props.max_width_chars = 50
         word_definition.props.wrap = True
         word_definition.props.hexpand = True
         word_definition.props.wrap_mode = Pango.WrapMode.WORD
@@ -226,7 +190,6 @@ class WordItems(Gtk.Grid):
             examples_str = ""
 
         word_examples = Gtk.Label(examples_str)
-        word_examples.props.max_width_chars = 50
         word_examples.props.wrap = True
         word_examples.props.hexpand = True
         word_examples.props.wrap_mode = Pango.WrapMode.WORD
@@ -246,11 +209,7 @@ class WordItems(Gtk.Grid):
 
         #-- lemmas (similar words) -------#
         lemmas = synset.lemma_names()
-        # print(lemmas)
-
         lemmas.sort(key=len)
-
-        # print(lemmas)
 
         # remove lemma that is same with lookup word
         for lemma in lemmas:
@@ -348,7 +307,7 @@ class WordItems(Gtk.Grid):
         content_eventbox.add(content_grid)
         
         # list items to pass to eventbox events
-        eventbox_params = (copy_img, copied_label, copied_img, copied_grid, word, word_definition, word_examples, word_box)
+        eventbox_params = (copy_img, copied_label, copied_img, copied_grid, word, word_definition, word_examples, word_box, lemma_box)
 
         content_eventbox.connect("enter-notify-event", self.on_enter_content_box, eventbox_params)
         content_eventbox.connect("leave-notify-event", self.on_leave_content_box, eventbox_params)
@@ -367,7 +326,6 @@ class WordItems(Gtk.Grid):
         else:
             self.attach(lemma_box, 0, 2, 1, 1)
 
-
     def generate_lemma_buttons(self, lemma_label, lemma_name):
         button = Gtk.Button(label=lemma_label)
         button.props.name = lemma_name
@@ -381,11 +339,7 @@ class WordItems(Gtk.Grid):
         stack = wordview.get_parent()
         window = stack.get_parent()
         app = window.props.application
-        # callback to WordLookup
-        lookup = app.emit("on-new-word-lookup", button.props.name)
-        # check if word lookup succeeded or not
-        if lookup is False:
-            pass
+        app.on_new_word_lookup(button.props.name)
 
     def generate_separator(self):
         separator = Gtk.Separator()
@@ -406,7 +360,12 @@ class WordItems(Gtk.Grid):
         copied_grid.set_state_flags(Gtk.StateFlags.DIR_LTR, True)
 
         # add styling for hover effect
-        word_box.get_style_context().add_class("word-hover")
+        word_box.get_children()[0].get_style_context().add_class("word-hover")
+        try:
+            word_box.get_children()[1].get_style_context().remove_class("word-examples")
+            word_box.get_children()[1].get_style_context().add_class("word-examples-hover")
+        except:
+            pass
 
     def on_leave_content_box(self, eventbox, event, widget_list):
         copy_img = widget_list[0]
@@ -421,9 +380,13 @@ class WordItems(Gtk.Grid):
         copied_grid.set_state_flags(Gtk.StateFlags.DIR_LTR, True)
 
         # remove styling for hover effect
-        word_box.get_style_context().remove_class("word-hover")
-
-
+        word_box.get_children()[0].get_style_context().remove_class("word-hover")
+        try:
+            word_box.get_children()[1].get_style_context().remove_class("word-examples-hover")
+            word_box.get_children()[1].get_style_context().add_class("word-examples")
+        except:
+            pass
+            
     def on_copy_content_clicked(self, eventbox, event, widget_list):
         copy_img = widget_list[0]
         copied_label = widget_list[1]
@@ -432,6 +395,11 @@ class WordItems(Gtk.Grid):
         word = widget_list[4]
         word_definition = widget_list[5]
         word_example = widget_list[6]
+        word_lemmas = widget_list[8]
+        word_lemmas_list = []
+        if len(word_lemmas.get_children()) > 0:
+            for child in word_lemmas.get_children():
+                word_lemmas_list.append(child.props.label)
 
         # reset state flagss to ready state for transition effect, see application.css
         copy_img.set_state_flags(Gtk.StateFlags.DIR_LTR, True)
@@ -446,8 +414,10 @@ class WordItems(Gtk.Grid):
         # callback to copy content to clipboard
         clipboard_paste = self.get_wordview().clipboard_paste
         to_copy = "Word: " + word + "\n"
+        to_copy = to_copy + "Pronounciation: " + self.get_wordview().get_toplevel().pronounciation_label.props.label + "\n"
         to_copy = to_copy + "Definition: " + word_definition.props.label + "\n"
-        to_copy = to_copy + "Example: " + word_example.props.label
+        to_copy = to_copy + "Example: " + word_example.props.label + "\n"
+        to_copy = to_copy + "Synonyms/Related: " + ", ".join(word_lemmas_list)
         clipboard_paste.copy_to_clipboard(to_copy)
 
     def get_wordview(self):        
