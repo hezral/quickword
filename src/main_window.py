@@ -97,17 +97,25 @@ class QuickWordWindow(Gtk.ApplicationWindow):
                 self.word_view.stack.set_visible_child_name("verb")
 
     def on_start_settings(self):
+        self.connect("delete-event", self.on_close_window)
+
         if self.app.gio_settings.get_value("sticky-mode"):
             self.stick()
+
         if not self.app.gio_settings.get_value("persistent-mode"):
+            self.headerbar.set_show_close_button(False)
+            self.word_label.props.margin_left = 10
             if self.app.window_manager is not None:
                 self.app.window_manager._run(callback=self.on_persistent_mode)
+        else:
+            self.headerbar.set_show_close_button(True)
+            self.word_label.props.margin_left = 0
 
     def on_persistent_mode(self, wm_class):
         if wm_class is not None:
             if self.app.props.application_id.split(".")[-1] not in wm_class:
                 if self.app.running:
-                    self.destroy()
+                    self.on_close_window()
 
     def on_enter_word_label(self, *args):
         self.word_action_revealer.set_reveal_child(False)
@@ -130,6 +138,7 @@ class QuickWordWindow(Gtk.ApplicationWindow):
         self.word_view.on_wordlookup(data=word_data)
         self.word_view.show_all()
         self.stack.set_visible_child(self.word_view)
+        self.props.resizable = True
 
     def on_manual_lookup(self, eventbutton=None, eventbox=None, not_found=False, *args):
         self.word_action_revealer.set_reveal_child(False)
@@ -149,6 +158,7 @@ class QuickWordWindow(Gtk.ApplicationWindow):
             self.word_label.props.label = "QuickWord"
             self.word_view.hide()
             self.settings_view.hide()
+            self.props.resizable = False
             # delayed grab focus to avoid hotkey character getting inserted in entry field
             GLib.timeout_add(250, self.noword_view.entry.grab_focus)
 
@@ -170,7 +180,6 @@ class QuickWordWindow(Gtk.ApplicationWindow):
 
         edit_img = Gtk.Image().new_from_icon_name("insert-text-symbolic", Gtk.IconSize.SMALL_TOOLBAR)
         edit_img.props.halign = Gtk.Align.START
-        # edit_img.get_style_context().add_class("transition-on")
         self.edit_img_revealer = Gtk.Revealer()
         self.edit_img_revealer.props.transition_type = Gtk.RevealerTransitionType.CROSSFADE
         self.edit_img_revealer.add(edit_img)
@@ -241,12 +250,14 @@ class QuickWordWindow(Gtk.ApplicationWindow):
                 self.word_label.props.label = "Quickword"
                 self.stack.set_visible_child(self.noword_view)
                 self.word_view.hide()
+                self.props.resizable = False
             else:
                 self.word_view.show_all()
                 self.word_label.props.label = self.lookup_word
                 self.stack.set_visible_child(self.word_view)
                 self.noword_view.hide()
                 self.word_action_revealer.set_reveal_child(True)
+                self.props.resizable = True
 
         def set_settings_view():
             self.word_action_revealer.set_reveal_child(False)
@@ -256,6 +267,7 @@ class QuickWordWindow(Gtk.ApplicationWindow):
             self.word_label.props.label = "Settings"
             self.word_view.hide()
             self.noword_view.hide()
+            self.props.resizable = False
                 
         # app first-run right
         # first-run >> download data view >> no word view or selected word view
@@ -283,14 +295,12 @@ class QuickWordWindow(Gtk.ApplicationWindow):
             else:
                 self.view_switch.props.active = False
 
-
-        # app normal-run >> no word view or selected word view
-
-        # app running
-        # no word view >> settings view
-        # settings view >> no word view
-        # settings view >>> selected word view
-        # settings view >> updater view
-        # updater view >> no word view
-        # updater view >> selected word view
-        # right
+    def on_close_window(self, window=None, event=None):
+        if self.app.gio_settings.get_value("close-mode"):
+            if window is None:
+                self.hide()
+            else:
+                window.hide()
+            return True
+        else:
+            self.destroy()
