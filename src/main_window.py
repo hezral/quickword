@@ -75,8 +75,7 @@ class QuickWordWindow(Gtk.ApplicationWindow):
 
     def on_key_press(self, widget, eventkey):
 
-        if self.stack.get_visible_child_name() != "no-word-view":
-
+        if not self.noword_view.entry.props.has_focus:
             if Gdk.keyval_name(eventkey.keyval).lower() == "right":
                 self.stack.set_visible_child_name("settings-view")
                 self.on_view_visible(view="settings-view")
