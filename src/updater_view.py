@@ -140,7 +140,8 @@ class UpdaterView(Gtk.Grid):
     def on_start(self, button):
         stack = self.get_parent()
         window = stack.get_parent()
-        window.on_view_visible()
+        app = window.props.application
+        app.on_new_word_selected()
 
     def on_proceed_update(self, button):
         stack = self.get_parent()
