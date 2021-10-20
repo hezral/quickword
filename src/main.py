@@ -62,8 +62,6 @@ class QuickWordApp(Gtk.Application):
             self.generate_data_manager()
         else:
             self._word_lookup.get_synsets("a") # hack to load wordnet faster maybe
-            # self.total_words = self._word_lookup.get_totalwords() # get total words in Wordnet
-            ...
 
         if self.gio_settings.get_value("theme-optin"):
             prefers_color_scheme = self.granite_settings.get_prefers_color_scheme()
@@ -117,18 +115,21 @@ class QuickWordApp(Gtk.Application):
     def on_new_word_lookup(self, word):
         self.lookup_word = word
         word_data = None
-        if word is not None:
-            word_data = self._word_lookup.get_synsets(word)
-
-        if word_data is not None:
-            # emit the signal to trigger content update callback
-            self.window.emit("on-new-word-selected", word_data)
-            return True
+        if self.first_run:
+            self.window.on_view_visible()
         else:
-            # go back to no-word-view
-            self.lookup_word = None
-            self.window.on_manual_lookup(not_found=True)
-            return False
+            if word is not None:
+                word_data = self._word_lookup.get_synsets(word)
+
+            if word_data is not None:
+                # emit the signal to trigger content update callback
+                self.window.emit("on-new-word-selected", word_data)
+                return True
+            else:
+                # go back to no-word-view
+                self.lookup_word = None
+                self.window.on_manual_lookup(not_found=True)
+                return False
 
     def on_quit_action(self, action, param):
         if self.window is not None:
