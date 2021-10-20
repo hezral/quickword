@@ -118,8 +118,16 @@ class SettingsView(Gtk.Grid):
                 if switch.get_active():
                     self.app.window_manager._stop()
                     main_window.set_keep_above(True) # manually trigger a window manager event to stop the thread
+                    main_window.headerbar.set_show_close_button(True)
+                    main_window.word_label.props.margin_left = 0
+                    main_window.headerbar.hide()
+                    main_window.headerbar.show_all()
                 else:
                     self.app.window_manager._run(callback=main_window.on_persistent_mode)
+                    main_window.headerbar.set_show_close_button(False)
+                    main_window.word_label.props.margin_left = 10
+                    main_window.headerbar.hide()
+                    main_window.headerbar.show_all()
 
             if name == "sticky-mode":
                 if switch.get_active():
