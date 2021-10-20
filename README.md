@@ -5,9 +5,7 @@
 # ![logo_type](data/logo_type.png?raw=true)
 </div>
 
-[![Build Status](https://travis-ci.com/hezral/quickword.svg?branch=master)](https://travis-ci.com/hezral/quickword)
-
-If you like what i make, it would really be nice to have someone
+If you like what i make, it would really be nice to have someone buy me a coffee
 
 <a href="https://www.buymeacoffee.com/hezral" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
 
@@ -20,61 +18,52 @@ If you like what i make, it would really be nice to have someone
 * Synonyms
 * Explore synonyms from each word
 
-| ![Screenshot](data/screenshot-01.png?raw=true) | ![Screenshot](data/screenshot-02.png?raw=true) |
-|------------------------------------------|-----------------------------------------|
+| ![Screenshot](data/screenshot-01.png?raw=true) | ![Screenshot](data/screenshot-02.png?raw=true) | ![Screenshot](data/screenshot-03.png?raw=true) |
+|------------------------------------------|-----------------------------------------|-----------------------------------------|
 
 ## Demo and How to use
 QuickWord can be used by manual lookup and via a keyboard shortcut to open it on the fly. 
 
-Select a word and hit the ⌘ + Ctrl + D shortcut to get the lookup.  
+Select a word and hit the a keyboard shortcut to get the lookup. Recommended shortcut: ⌘ + D
 * Manual entry of words
 * Selecting a text
 
 ![](data/demo.gif)
 
-## Installation
+# Installation
 
-### Install from deb file
-Download the deb file from the Releases page and install using a deb installer or command line. 
-```bash
-sudo apt install /path/to/deb/filename.deb
+## Build using flatpak
+* requires that you have flatpak-builder installed
+* flatpak enabled
+* flathub remote enabled
+
+```
+flatpak-builder --user --force-clean --install build-dir com.github.hezral.quickword.yml
 ```
 
-### Install it from source
-You can of course download and install this app from source.
-
-### Dependencies
-Ensure you have these dependencies installed. 
+### Build using meson 
+Ensure you have these dependencies installed
 
 * python3
 * python3-gi
-* python3-nltk
 * libgranite-dev
-* libgtk-3-dev
-* espeak
+* python-xlib
+* xclip
+* pynput
 
-### Installation
 Download the updated source [here](https://github.com/hezral/quickword/archive/master.zip), or use git:
 ```bash
 git clone https://github.com/hezral/quickword.git
-cd quickword
+cd clips
+meson build --prefix=/usr
+cd build
+ninja build
+sudo ninja install
 ```
-
-### From .setup.py
-In the quickword file directory:
-```bash
-sudo python3 setup.py install --prefix=/usr --install-data prefix/share --install-purelib prefix/share
-sudo python3 post_install.py
+The desktop launcher should show up on the application launcher for your desktop environment
+if it doesn't, try running
 ```
-
-## Uninstallation
-This will output all the installed files.
-```bash
-sudo python3 setup.py install --prefix=/usr --install-data prefix/share --record files.txt
-```
-Then when you want to uninstall it simply run; be careful with the 'sudo'
-```bash
-cat files.txt | xargs sudo rm -rf
+com.github.hezral.quickword
 ```
 
 ## Thanks/Credits
