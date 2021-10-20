@@ -37,5 +37,10 @@
             <summary>Follow OS Appearance Style</summary>
             <description>Follow OS Appearance Style</description>
         </key>
+                <key type="b" name="close-mode">
+            <default>false</default>
+            <summary>Close to exit or run in background</summary>
+            <description>lose to exit or run in background</description>
+        </key>
     </schema>
 </schemalist>
