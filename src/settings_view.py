@@ -165,6 +165,7 @@ class SettingsView(Gtk.Grid):
         else:
             theme_switch.switch.props.active = True
 
+
 class SettingsGroup(Gtk.Grid):
     def __init__(self, group_label, subsettings_list, *args, **kwargs):
         super().__init__(*args, **kwargs)

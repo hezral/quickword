@@ -27,8 +27,6 @@ from .noword_view import NoWordView
 from .word_view import WordView
 from .updater_view import UpdaterView
 
-#------------------CLASS-SEPARATOR------------------#
-
 
 class QuickWordWindow(Gtk.ApplicationWindow):
     def __init__(self, *args, **kwargs):
@@ -49,11 +47,6 @@ class QuickWordWindow(Gtk.ApplicationWindow):
         self.settings_view = SettingsView(app=self.app)
         
         self.stack = Gtk.Stack()
-        # self.stack.props.margin_left = 0
-        # self.stack.props.margin_right = 0
-        # self.stack.props.margin_top = 0
-        # self.stack.props.margin_bottom = 20
-        # self.stack.props.margin = 20
         self.stack.props.transition_type = Gtk.StackTransitionType.CROSSFADE
         self.stack.add_named(self.word_view, self.word_view.get_name())
         self.stack.add_named(self.settings_view, self.settings_view.get_name())
@@ -68,7 +61,6 @@ class QuickWordWindow(Gtk.ApplicationWindow):
         self.get_style_context().add_class("rounded")
         self.set_size_request(-1, -1) #set width to -1 to expand and retract based on content
         self.props.window_position = Gtk.WindowPosition.MOUSE
-        # self.props.border_width = 20
         self.set_titlebar(self.headerbar)
         self.add(self.stack)
 
@@ -81,7 +73,6 @@ class QuickWordWindow(Gtk.ApplicationWindow):
         self.updater_view.hide()
 
     def on_key_press(self, widget, eventkey):
-        print(eventkey.type, Gdk.keyval_name(eventkey.keyval).lower(), self.stack.get_visible_child_name())
 
         if self.stack.get_visible_child_name() != "no-word-view":
 
@@ -94,9 +85,6 @@ class QuickWordWindow(Gtk.ApplicationWindow):
 
         if Gdk.keyval_name(eventkey.keyval).lower() == "m":
                 self.on_manual_lookup()
-
-        # if self.stack.get_visible_child_name() == "no-word-view":
-        #     ...
 
         if self.stack.get_visible_child_name() == "word-view":
             if Gdk.keyval_name(eventkey.keyval).lower() == "n":
