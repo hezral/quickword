@@ -139,6 +139,7 @@ class QuickWordWindow(Gtk.ApplicationWindow):
         self.word_view.show_all()
         self.stack.set_visible_child(self.word_view)
         self.props.resizable = True
+        self.view_switch.props.active = False
 
     def on_manual_lookup(self, eventbutton=None, eventbox=None, not_found=False, *args):
         self.word_action_revealer.set_reveal_child(False)
