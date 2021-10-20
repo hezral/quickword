@@ -45,7 +45,7 @@ class SettingsView(Gtk.Grid):
         persistent_mode.switch.connect_after("notify::active", self.on_switch_activated)
         self.app.gio_settings.bind("persistent-mode", persistent_mode.switch, "active", Gio.SettingsBindFlags.DEFAULT)
 
-        close_mode = SubSettings(type="switch", name="close-mode", label="Close mode", sublabel="Close window and run-in-background",separator=True)
+        close_mode = SubSettings(type="switch", name="close-mode", label="Background mode", sublabel="Close window and run-in-background",separator=True)
         close_mode.switch.connect_after("notify::active", self.on_switch_activated)
         self.app.gio_settings.bind("close-mode", close_mode.switch, "active", Gio.SettingsBindFlags.DEFAULT)
         
