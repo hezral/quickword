@@ -122,7 +122,6 @@ class WordSubView(Gtk.Grid):
 
         scrolled_view = Gtk.ScrolledWindow()
         scrolled_view.props.expand = True
-        # scrolled_view.set_size_request(-1, 500)
         # scrolled_view.connect("edge-reached", self.on_edge_reached)
         # scrolled_view.connect("edge-overshot", self.on_edge_overshot)
 
@@ -136,23 +135,10 @@ class WordSubView(Gtk.Grid):
         i = 1
         for content in contents:
             scrolled_view_grid.attach(WordItems(word, content), 0, i, 1, 1)
-            # if len(contents) > 10:
-                # scrolled_view_grid.attach(WordItems(word, content), 0, i, 1, 1)
-            # else:
-                # self.attach(WordItems(word, content), 0, i, 1, 1)
-                # self.props.margin = 10
-                # self.props.margin_left = 20
-                # self.props.margin_right = 20
             i += 1
         
-        # if len(scrolled_view_grid.get_children()) > 10:
         scrolled_view.add(scrolled_view_grid)
         self.attach(scrolled_view, 0, 1, 1, 1)
-
-        #     self.more_count = len(scrolled_view_grid.get_children()) - 10
-        #     self.count_label = Gtk.Label(str(self.more_count) + " more results below..")
-        #     self.count_label.get_style_context().add_class("more-results")
-        #     self.attach(self.count_label, 0, 2, 1, 1)
 
     def on_edge_overshot(self, scrolledwindow, position):
         # print(position.value_name)
@@ -187,7 +173,6 @@ class WordItems(Gtk.Grid):
         definition_str = synset.definition()
 
         word_definition = Gtk.Label(definition_str)
-        # word_definition.props.max_width_chars = 150
         word_definition.props.wrap = True
         word_definition.props.hexpand = True
         word_definition.props.wrap_mode = Pango.WrapMode.WORD
@@ -205,7 +190,6 @@ class WordItems(Gtk.Grid):
             examples_str = ""
 
         word_examples = Gtk.Label(examples_str)
-        # word_examples.props.max_width_chars = 150
         word_examples.props.wrap = True
         word_examples.props.hexpand = True
         word_examples.props.wrap_mode = Pango.WrapMode.WORD
@@ -225,11 +209,7 @@ class WordItems(Gtk.Grid):
 
         #-- lemmas (similar words) -------#
         lemmas = synset.lemma_names()
-        # print(lemmas)
-
         lemmas.sort(key=len)
-
-        # print(lemmas)
 
         # remove lemma that is same with lookup word
         for lemma in lemmas:
@@ -406,7 +386,7 @@ class WordItems(Gtk.Grid):
             word_box.get_children()[1].get_style_context().add_class("word-examples")
         except:
             pass
-
+            
     def on_copy_content_clicked(self, eventbox, event, widget_list):
         copy_img = widget_list[0]
         copied_label = widget_list[1]
