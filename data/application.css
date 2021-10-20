@@ -121,8 +121,8 @@ frame#settings-group-frame {
 }
 
 .word-types:checked {
-    color: alpha(@theme_text_color, 1);
     font-weight: bold;
+    color: alpha(@theme_text_color, 1);
 }
 
 .copied-content, .copy-img {
