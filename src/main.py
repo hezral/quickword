@@ -94,7 +94,9 @@ class QuickWordApp(Gtk.Application):
             self.window = QuickWordWindow(application=self)
             self.window.word_view.clipboard_paste = self.clipboard_paste
             self.add_window(self.window)
-            self.window.present_with_time(Gdk.CURRENT_TIME)
+
+        self.window.show()
+        self.window.present_with_time(Gdk.CURRENT_TIME)
 
         # get current selected text and lookup
         self.on_new_word_selected()
