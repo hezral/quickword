@@ -44,12 +44,16 @@ class SettingsView(Gtk.Grid):
         persistent_mode = SubSettings(type="switch", name="persistent-mode", label="Persistent mode", sublabel="Stays open and updates as text changes",separator=True)
         persistent_mode.switch.connect_after("notify::active", self.on_switch_activated)
         self.app.gio_settings.bind("persistent-mode", persistent_mode.switch, "active", Gio.SettingsBindFlags.DEFAULT)
+
+        close_mode = SubSettings(type="switch", name="close-mode", label="Close mode", sublabel="Close window and run-in-background",separator=True)
+        close_mode.switch.connect_after("notify::active", self.on_switch_activated)
+        self.app.gio_settings.bind("close-mode", close_mode.switch, "active", Gio.SettingsBindFlags.DEFAULT)
         
         sticky_mode = SubSettings(type="switch", name="sticky-mode", label="Sticky mode", sublabel="Window is displayed on all workspaces",separator=False)
         sticky_mode.switch.connect_after("notify::active", self.on_switch_activated)
         self.app.gio_settings.bind("sticky-mode", sticky_mode.switch, "active", Gio.SettingsBindFlags.DEFAULT)
 
-        display_behaviour = SettingsGroup("Display & Behaviour", (theme_switch, theme_optin, persistent_mode, sticky_mode))
+        display_behaviour = SettingsGroup("Display & Behaviour", (theme_switch, theme_optin, persistent_mode, close_mode, sticky_mode))
 
         buyme_coffee = SubSettings(type="button", name="buy-me-coffee", label="Show Support", sublabel="Thanks for supporting me!", separator=False, params=("Coffee Time", Gtk.Image().new_from_icon_name("com.github.hezral.quickword-coffee", Gtk.IconSize.LARGE_TOOLBAR), ))
         buyme_coffee.button.connect("clicked", self.on_button_clicked)
@@ -122,17 +126,6 @@ class SettingsView(Gtk.Grid):
                     window.stick()
                 else:
                     window.unstick()
-
-            if name == "show-close-button":
-                if window is not None:
-                    headerbar = [child for child in window.get_children() if isinstance(child, Gtk.HeaderBar)][0]
-
-                    if switch.get_active():
-                        headerbar.set_show_close_button(True)
-                    else:
-                        headerbar.set_show_close_button(False)
-                        headerbar.hide()
-                        headerbar.show_all()
 
     def on_checkbutton_activated(self, checkbutton, gparam, widget):
         name = checkbutton.get_name()
