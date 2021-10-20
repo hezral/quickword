@@ -61,7 +61,7 @@ class QuickWordApp(Gtk.Application):
         if self.first_run:
             self.generate_data_manager()
         else:
-            # self._word_lookup.get_synsets("a") # hack to load wordnet faster
+            self._word_lookup.get_synsets("a") # hack to load wordnet faster maybe
             # self.total_words = self._word_lookup.get_totalwords() # get total words in Wordnet
             ...
 
