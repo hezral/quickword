@@ -12,7 +12,7 @@ conf.set('pkgdatadir', pkgdatadir)
 
 configure_file(
   input: 'quickword.in',
-  output: 'quickword',
+  output: 'com.github.hezral.quickword',
   configuration: conf,
   install: true,
   install_dir: get_option('bindir')

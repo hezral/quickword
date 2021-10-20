@@ -2,7 +2,7 @@ app-id: com.github.hezral.quickword
 runtime: io.elementary.Platform
 runtime-version: '6'
 sdk: io.elementary.Sdk
-command: quickword
+command: com.github.hezral.quickword
 finish-args:
   # for espeak to work
   - --socket=pulseaudio
