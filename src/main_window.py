@@ -269,17 +269,21 @@ class QuickWordWindow(Gtk.ApplicationWindow):
             self.word_view.hide()
             self.noword_view.hide()
             self.props.resizable = False
-                
-        # app first-run right
-        # first-run >> download data view >> no word view or selected word view
-
-        if self.app.first_run:
-            print("first-run")
+            
+        def set_updater_view():
+            self.word_action_revealer.set_reveal_child(False)
+            self.updater_view.show_all()
             self.stack.set_visible_child(self.updater_view)
-            self.updater_view.show()
+            self.word_label.props.label = "Settings"
+            self.word_view.hide()
+            self.noword_view.hide()
+            self.settings_view.hide()
+            self.props.resizable = False
+            
+        if self.app.first_run:
+            set_updater_view()
 
         if not self.app.first_run and view is None:
-            print("normal-run")
             if viewswitch is not None:
                 if viewswitch.props.active:
                     set_settings_view()
