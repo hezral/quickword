@@ -68,6 +68,7 @@ class QuickWordWindow(Gtk.ApplicationWindow):
 
         self.show_all()
         self.on_start_settings()
+        # hide all other views to enable window to expand and retract based on content
         self.noword_view.hide()
         self.settings_view.hide()
         self.updater_view.hide()
@@ -220,7 +221,6 @@ class QuickWordWindow(Gtk.ApplicationWindow):
 
         headerbar = Gtk.HeaderBar()
         headerbar.props.custom_title = titlebar_grid
-        headerbar.props.show_close_button = False
         headerbar.props.decoration_layout = "close:"
         return headerbar
 
@@ -258,10 +258,6 @@ class QuickWordWindow(Gtk.ApplicationWindow):
             self.word_view.hide()
             self.noword_view.hide()
                 
-
-
-        # print(self.app.lookup_word)
-
         # app first-run right
         # first-run >> download data view >> no word view or selected word view
 
