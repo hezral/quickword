@@ -38,8 +38,8 @@ class QuickWordWindow(Gtk.ApplicationWindow):
         GObject.signal_new("on-new-word-selected", Gtk.ApplicationWindow, GObject.SIGNAL_RUN_LAST, GObject.TYPE_BOOLEAN, [GObject.TYPE_PYOBJECT])
         self.connect("on-new-word-selected", self.on_new_word_selected)
 
-        self.lookup_word = "QuickWord"
         self.app = self.props.application
+        self.lookup_word = self.app.lookup_word
 
         self.updater_view = UpdaterView()
         self.noword_view = NoWordView()
