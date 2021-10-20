@@ -126,9 +126,8 @@ class UpdaterView(Gtk.Grid):
 
         if app.first_run:
             message_str ="Hello!"
-            sub_message_str = "Before QuickWord can work, it needs to download dictionary data."
-            sub_message_str = sub_message_str + "\n" + "Please ensure internet connectivity, before proceeding."
-            sub_message_str = sub_message_str + "\n" + "This usually takes less than a minute."
+            sub_message_str = "On first run, dictionary download is required"
+            sub_message_str = sub_message_str + "\n" + "Ensure internet connectivity before proceeding"
         else:
             message_str = "Check for Updates"
             sub_message_str = "Check for any updates to dictionary data"
