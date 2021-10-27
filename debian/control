@@ -4,7 +4,9 @@ Priority: optional
 Maintainer: Adi Hezral <hezral@gmail.com>
 Build-Depends: debhelper (>= 10),
                dh-python,
-               python3
+               python3,
+               meson,
+               libgranite-dev
 X-Python3-Version: >= 3.6.9
 Standards-Version: 3.9.3
 
@@ -16,6 +18,11 @@ Depends: ${python3:Depends},
          python3-gi,
          libgranite-dev,
          python3-nltk,
-         espeak
-Description: QuickWord
- Quick and easy word lookup on the fly and offline
+         espeak,
+         gir1.2-granite-1.0,
+         libgranite5 | libgranite6
+Description: Quick and easy word lookup on the fly and offline
+ QuickWord can be used by manual lookup and via a keyboard shortcut to open it 
+ on the fly.
+ .
+ Select a word and hit the a keyboard shortcut to get the lookup.
