@@ -25,4 +25,10 @@ Description: Quick and easy word lookup on the fly and offline
  QuickWord can be used by manual lookup and via a keyboard shortcut to open it 
  on the fly.
  .
- Select a word and hit the a keyboard shortcut to get the lookup.
+ Features:
+• On the fly word lookup
+• Works offline (first run will require internet to download dictionary data)
+• Copy definitions and examples to clipboard with just a click
+• Word definitions
+• Examples of word sentences
+• Explore synonyms from each word
