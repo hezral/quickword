@@ -1,5 +1,6 @@
 [Desktop Entry]
 Name=Quickword
+Comment=Quick and easy word lookup
 Exec=com.github.hezral.quickword
 Icon=com.github.hezral.quickword
 Terminal=false
