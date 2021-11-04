@@ -31,7 +31,7 @@ Select a word and hit the a keyboard shortcut to get the lookup. Recommended sho
 ![](data/demo.gif)
 
 # Installation
-QuickWord is availble for installation in the following Linux Distribution repositories
+QuickWord is availble for installation in the following Linux Distributions
 <a href="https://repology.org/project/quickword/versions">
     <img src="https://repology.org/badge/vertical-allrepos/quickword.svg" alt="Packaging status" align="right">
 </a>
