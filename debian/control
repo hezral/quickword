@@ -16,7 +16,7 @@ Depends: ${python3:Depends},
          ${misc:Depends},
          python3,
          python3-gi,
-         libgranite-dev,
+         python3-xlib
          python3-nltk,
          espeak,
          gir1.2-granite-1.0,
@@ -26,9 +26,9 @@ Description: Quick and easy word lookup on the fly and offline
  on the fly.
  .
  Features:
-• On the fly word lookup
-• Works offline (first run will require internet to download dictionary data)
-• Copy definitions and examples to clipboard with just a click
-• Word definitions
-• Examples of word sentences
-• Explore synonyms from each word
+ • On the fly word lookup
+ • Works offline (first run will require internet to download dictionary data)
+ • Copy definitions and examples to clipboard with just a click
+ • Word definitions
+ • Examples of word sentences
+ • Explore synonyms from each word
