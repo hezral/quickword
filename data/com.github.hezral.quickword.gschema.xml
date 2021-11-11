@@ -37,10 +37,15 @@
             <summary>Follow OS Appearance Style</summary>
             <description>Follow OS Appearance Style</description>
         </key>
-                <key type="b" name="close-mode">
+        <key type="b" name="close-button">
+            <default>false</default>
+            <summary>Always show close button</summary>
+            <description>Always show close button</description>
+        </key>
+            <key type="b" name="close-mode">
             <default>false</default>
             <summary>Close to exit or run in background</summary>
-            <description>lose to exit or run in background</description>
+            <description>Close to exit or run in background</description>
         </key>
     </schema>
 </schemalist>

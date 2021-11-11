@@ -41,8 +41,12 @@ class SettingsView(Gtk.Grid):
         self.app.gio_settings.bind("prefer-dark-style", theme_switch.switch, "active", Gio.SettingsBindFlags.DEFAULT)
         self.app.gio_settings.bind("theme-optin", theme_optin.checkbutton, "active", Gio.SettingsBindFlags.DEFAULT)
 
+        close_button = SubSettings(type="switch", name="close-button", label="Show close button", sublabel="Always show close button",separator=True)
+        close_button.switch.connect_after("notify::active", self.on_switch_activated)
+        self.app.gio_settings.bind("close-button", close_button.switch, "active", Gio.SettingsBindFlags.DEFAULT)
+
         persistent_mode = SubSettings(type="switch", name="persistent-mode", label="Persistent mode", sublabel="Stays open and updates as text changes",separator=True)
-        persistent_mode.switch.connect_after("notify::active", self.on_switch_activated)
+        persistent_mode.switch.connect_after("notify::active", self.on_switch_activated, close_button)
         self.app.gio_settings.bind("persistent-mode", persistent_mode.switch, "active", Gio.SettingsBindFlags.DEFAULT)
 
         close_mode = SubSettings(type="switch", name="close-mode", label="Background mode", sublabel="Close window and run-in-background",separator=True)
@@ -53,7 +57,7 @@ class SettingsView(Gtk.Grid):
         sticky_mode.switch.connect_after("notify::active", self.on_switch_activated)
         self.app.gio_settings.bind("sticky-mode", sticky_mode.switch, "active", Gio.SettingsBindFlags.DEFAULT)
 
-        display_behaviour = SettingsGroup("Display & Behaviour", (theme_switch, theme_optin, persistent_mode, close_mode, sticky_mode))
+        display_behaviour = SettingsGroup("Display & Behaviour", (theme_switch, theme_optin, persistent_mode, close_button, close_mode, sticky_mode))
 
         buyme_coffee = SubSettings(type="button", name="buy-me-coffee", label="Show Support", sublabel="Thanks for supporting me!", separator=False, params=("Coffee Time", Gtk.Image().new_from_icon_name("com.github.hezral.quickword-coffee", Gtk.IconSize.LARGE_TOOLBAR), ))
         buyme_coffee.button.connect("clicked", self.on_button_clicked)
@@ -107,33 +111,49 @@ class SettingsView(Gtk.Grid):
         separator.props.valign = Gtk.Align.CENTER
         return separator
 
-    def on_switch_activated(self, switch, gparam):
+    def on_switch_activated(self, switch, gparam, widget=None):
         name = switch.get_name()
         main_window = self.get_toplevel()
 
         if self.is_visible():
-            stack = self.get_parent()
-            window = stack.get_parent()
+            # stack = self.get_parent()
+            # window = stack.get_parent()
             if name == "persistent-mode":
+                close_button = widget
                 if switch.get_active():
                     self.app.window_manager._stop()
                     main_window.set_keep_above(True) # manually trigger a window manager event to stop the thread
                     main_window.headerbar.set_show_close_button(True)
                     main_window.word_label.props.margin_left = 0
-                    main_window.headerbar.hide()
-                    main_window.headerbar.show_all()
+                    # if self.app.gio_settings.get_value("close-button"):
+                        # close_button.props.sensitive = True
                 else:
                     self.app.window_manager._run(callback=main_window.on_persistent_mode)
-                    main_window.headerbar.set_show_close_button(False)
-                    main_window.word_label.props.margin_left = 10
-                    main_window.headerbar.hide()
-                    main_window.headerbar.show_all()
+                    if not self.app.gio_settings.get_value("close-button"):
+                        main_window.headerbar.set_show_close_button(False)
+                        main_window.word_label.props.margin_left = 10
+
+                main_window.headerbar.hide()
+                main_window.headerbar.show_all()
 
             if name == "sticky-mode":
                 if switch.get_active():
-                    window.stick()
+                    main_window.stick()
                 else:
-                    window.unstick()
+                    main_window.unstick()
+
+            if name == "close-button":
+                if switch.get_active():
+                    main_window.word_label.props.margin_left = 0
+                    main_window.headerbar.set_show_close_button(True)
+                else:
+                    main_window.word_label.props.margin_left = 10
+                    main_window.headerbar.set_show_close_button(False)
+                main_window.headerbar.hide()
+                main_window.headerbar.show_all()
+                        
+
+            
 
     def on_checkbutton_activated(self, checkbutton, gparam, widget):
         name = checkbutton.get_name()

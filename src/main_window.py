@@ -103,11 +103,15 @@ class QuickWordWindow(Gtk.ApplicationWindow):
             self.stick()
 
         if not self.app.gio_settings.get_value("persistent-mode"):
-            self.headerbar.set_show_close_button(False)
             self.word_label.props.margin_left = 10
+            self.headerbar.set_show_close_button(False)
             if self.app.window_manager is not None:
                 self.app.window_manager._run(callback=self.on_persistent_mode)
         else:
+            self.headerbar.set_show_close_button(True)
+            self.word_label.props.margin_left = 0
+
+        if self.app.gio_settings.get_value("close-button"):
             self.headerbar.set_show_close_button(True)
             self.word_label.props.margin_left = 0
 
