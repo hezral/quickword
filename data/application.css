@@ -198,7 +198,7 @@ scrolledwindow > undershoot.top {
     background-blend-mode: normal;
     background-clip: border-box;
     background-color: rgba(0,0,0,0);
-    background-image: linear-gradient(@theme_base_color 0, alpha(@theme_base_color, 0) 50%);
+    background-image: linear-gradient(@theme_bg_color 0, alpha(@theme_bg_color, 0) 50%);
     background-origin: padding-box;
     background-position: left top;
     background-repeat: repeat;
@@ -209,7 +209,7 @@ scrolledwindow > undershoot.bottom {
     background-blend-mode: normal;
     background-clip: border-box;
     background-color: rgba(0,0,0,0);
-    background-image: linear-gradient(alpha(@theme_base_color, 0) 50%, @theme_base_color 100%);
+    background-image: linear-gradient(alpha(@theme_bg_color, 0) 50%, @theme_bg_color 100%);
     background-origin: padding-box;
     background-position: left top;
     background-repeat: repeat;
