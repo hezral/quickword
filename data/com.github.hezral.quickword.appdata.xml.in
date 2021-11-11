@@ -5,7 +5,7 @@
   <metadata_license>CC0</metadata_license>
   <project_license>GPL-3.0+</project_license>
   <name>QuickWord</name>
-  <summary>Quickly lookup words on the fly and offline</summary>
+  <summary>Quick and easy word lookups</summary>
   <developer_name>Adi Hezral</developer_name>
   <description>
     <p>QuickWord can be used by manual lookup and via a keyboard shortcut to open it on the fly. </p>
@@ -94,7 +94,7 @@
     <value key="x-appcenter-color-primary">#D9262C</value>
     <value key="x-appcenter-color-primary-text">#FFFFFF</value>
     <value key="x-appcenter-suggested-price">2.00</value>
-	<value key="x-appcenter-stripe">pk_live_51J03F1AXT8Az6AYFEiPc5mgpv7vUSWDnw135TmPT4tUbB2CJLwG19e3NxEuC7Zbz3VkXg7BygUQOTf7x6UDhSAn8005gq9ywZy</value>
+    <value key="x-appcenter-stripe">pk_live_51HUnWtAIOwvlC6vLMv119RvqqsN3PWrr9CpRuQ8Jzn2pX5MPXL9oDHfdRdIzWIKr9TS39PCqQkf4QrtEFxN5Dquf00Ubl3tXzb</value>
   </custom>
 
 </component>
