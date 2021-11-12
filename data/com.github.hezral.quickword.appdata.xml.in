@@ -76,16 +76,10 @@
   </content_rating>
 
   <releases>
-    <release version="2.0.0" date="2021-10-19">
+    <release version="2.0.1" date="2021-11-12">
       <description>
-        <p>First release as Flatpak</p>
-        <ul>
-            <li>Redesigned and improved user interface</li>
-            <li>Window is now resizable and adapts to the content</li>
-            <li>Option to follow system theme preferences</li>
-            <li>Option to close and run in background</li>
-            <li>Improved Persistent Mode, Quickword now exits to allow quick lookup</li>
-        </ul>
+        <p>Add option to always show close button, fix #13 issue</p>
+        <p>Fixed and improved appdata info</p>
       </description>
     </release>
   </releases>
