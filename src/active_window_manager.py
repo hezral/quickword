@@ -14,6 +14,9 @@ from Xlib.protocol.rq import Event
 
 import threading
 
+import gi
+from gi.repository import GLib
+
 from datetime import datetime
 
 class ActiveWindowManager():
@@ -215,4 +218,4 @@ class ActiveWindowManager():
 
     def handle_change(self, new_state: dict):
         """Replace this with whatever you want to actually do"""
-        self.callback(new_state['title'])
+        GLib.idle_add(self.callback, new_state['title'])

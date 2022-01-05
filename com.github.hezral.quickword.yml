@@ -10,8 +10,6 @@ finish-args:
   - --socket=wayland
   - --socket=fallback-x11
   - --share=network
-  # needed for perfers-color-scheme
-  - --system-talk-name=org.freedesktop.Accounts
   
 cleanup:
   - '/include'
